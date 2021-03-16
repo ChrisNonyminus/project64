@@ -46,6 +46,9 @@
     <Filter Include="Header Files\User Interface Headers\Debugger Headers">
       <UniqueIdentifier>{c4249d55-df70-4453-b017-b548514ad094}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Vanguard">
+      <UniqueIdentifier>{aae2d76e-571b-4206-9769-e4c9aa441fbf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -254,6 +257,21 @@
     </ClCompile>
     <ClCompile Include="UserInterface\Settings\SettingsPage-Game-DiskDrive.cpp">
       <Filter>Source Files\User Interface Source\Settings Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Vanguard\UnmanagedWrapper.cpp">
+      <Filter>Vanguard</Filter>
+    </ClCompile>
+    <ClCompile Include="Vanguard\VanguardClient.cpp">
+      <Filter>Vanguard</Filter>
+    </ClCompile>
+    <ClCompile Include="Vanguard\VanguardConfigLoader.cpp">
+      <Filter>Vanguard</Filter>
+    </ClCompile>
+    <ClCompile Include="Vanguard\VanguardSettings.cpp">
+      <Filter>Vanguard</Filter>
+    </ClCompile>
+    <ClCompile Include="Vanguard\ManagedWrapper.cpp">
+      <Filter>Vanguard</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -493,6 +511,30 @@
     </ClInclude>
     <ClInclude Include="UserInterface\Settings\SettingsPage-Game-DiskDrive.h">
       <Filter>Header Files\User Interface Headers\Settings Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Vanguard\ManagedWrapper.h">
+      <Filter>Vanguard</Filter>
+    </ClInclude>
+    <ClInclude Include="Vanguard\ThreadLocalHelper.h">
+      <Filter>Vanguard</Filter>
+    </ClInclude>
+    <ClInclude Include="Vanguard\UnmanagedWrapper.h">
+      <Filter>Vanguard</Filter>
+    </ClInclude>
+    <ClInclude Include="Vanguard\VanguardClient.h">
+      <Filter>Vanguard</Filter>
+    </ClInclude>
+    <ClInclude Include="Vanguard\VanguardClientInitializer.h">
+      <Filter>Vanguard</Filter>
+    </ClInclude>
+    <ClInclude Include="Vanguard\VanguardConfigLoader.h">
+      <Filter>Vanguard</Filter>
+    </ClInclude>
+    <ClInclude Include="Vanguard\VanguardSettingsWrapper.h">
+      <Filter>Vanguard</Filter>
+    </ClInclude>
+    <ClInclude Include="Vanguard\Helpers.hpp">
+      <Filter>Vanguard</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

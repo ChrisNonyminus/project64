@@ -15,6 +15,8 @@
 #include <Project64-core/Logging.h>
 #include <Project64-core/Debugger.h>
 #include <Common/Util.h>
+#include "../Project64/Vanguard/VanguardClientInitializer.h"
+#include "Project64/Vanguard/VanguardClient.h"
 #include <float.h>
 #include <time.h>
 #if defined(ANDROID)
@@ -64,7 +66,7 @@ CN64System::CN64System(CPlugins * Plugins, uint32_t randomizer_seed, bool SavesR
     g_Settings->SaveDword(GameRunning_ScreenHertz, gameHertz);
     WriteTrace(TraceN64System, TraceDebug, "Setting up system");
     CInterpreterCPU::BuildCPU();
-
+    VanguardClientInitializer::Initialize();
     if (!m_MMU_VM.Initialize(SyncSystem))
     {
         WriteTrace(TraceN64System, TraceWarning, "MMU failed to Initialize");
@@ -2344,7 +2346,7 @@ void CN64System::RefreshScreen()
 {
     PROFILE_TIMERS CPU_UsageAddr = Timer_None/*, ProfilingAddr = Timer_None*/;
     uint32_t VI_INTR_TIME = 500000;
-
+    VanguardClientUnmanaged::CORE_STEP();
     if (bShowCPUPer()) { CPU_UsageAddr = m_CPU_Usage.StartTimer(Timer_RefreshScreen); }
 
     //Calculate how many cycles to next refresh

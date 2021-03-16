@@ -33,6 +33,7 @@
 #include "DepthBufferRender.h"
 #include "trace.h"
 #include "ScreenResolution.h"
+#include "../Project64/Vanguard/VanguardClient.h"
 #include <stdarg.h>
 
 #ifdef ANDROID
@@ -945,7 +946,7 @@ uint32_t update_screen_count = 0;
 void CALL UpdateScreen(void)
 {
     WriteTrace(TraceGlide64, TraceDebug, "Origin: %08x, Old origin: %08x, width: %d", *gfx.VI_ORIGIN_REG, rdp.vi_org_reg, *gfx.VI_WIDTH_REG);
-
+    //VanguardClientUnmanaged::CORE_STEP();
     uint32_t width = (*gfx.VI_WIDTH_REG) << 1;
     if (*gfx.VI_ORIGIN_REG > width)
     {
