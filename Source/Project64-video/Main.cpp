@@ -33,7 +33,7 @@
 #include "DepthBufferRender.h"
 #include "trace.h"
 #include "ScreenResolution.h"
-#include "../Project64/Vanguard/VanguardClient.h"
+//#include "../Project64/Vanguard/VanguardClient.h"
 #include <stdarg.h>
 
 #ifdef ANDROID

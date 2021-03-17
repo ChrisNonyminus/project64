@@ -2299,7 +2299,7 @@ void CN64System::RunRSP()
             __except_catch()
             {
                 WriteTrace(TraceRSP, TraceError, "exception generated");
-                g_Notify->FatalError("CN64System::RunRSP()\nUnknown memory action\n\nEmulation stop");
+                //g_Notify->FatalError("CN64System::RunRSP()\nUnknown memory action\n\nEmulation stop");
             }
 
             if (Task == 1 && bDelayDP() && ((m_Reg.m_GfxIntrReg & MI_INTR_DP) != 0))

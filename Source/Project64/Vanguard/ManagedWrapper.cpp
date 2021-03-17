@@ -6,13 +6,13 @@ unsigned char ManagedWrapper_peekbyte(long long addr)
 {
 	uint8_t val = 0;
 	
-	g_MMU->LB_PAddr(static_cast<uint32_t>(addr), val);
+	g_MMU->LB_VAddr(static_cast<uint32_t>(addr), val);
 	return val;
 }
 extern "C" __declspec(dllexport)
 void ManagedWrapper_pokebyte(long long addr, unsigned char val)
 {
-	g_MMU->SB_PAddr(static_cast<uint32_t>(addr), val);
+	g_MMU->SB_VAddr(static_cast<uint32_t>(addr), val);
 	
 }
 extern "C" __declspec(dllexport)
