@@ -258,18 +258,6 @@
     <ClCompile Include="UserInterface\Settings\SettingsPage-Game-DiskDrive.cpp">
       <Filter>Source Files\User Interface Source\Settings Source</Filter>
     </ClCompile>
-    <ClCompile Include="Vanguard\UnmanagedWrapper.cpp">
-      <Filter>Vanguard</Filter>
-    </ClCompile>
-    <ClCompile Include="Vanguard\VanguardClient.cpp">
-      <Filter>Vanguard</Filter>
-    </ClCompile>
-    <ClCompile Include="Vanguard\VanguardConfigLoader.cpp">
-      <Filter>Vanguard</Filter>
-    </ClCompile>
-    <ClCompile Include="Vanguard\VanguardSettings.cpp">
-      <Filter>Vanguard</Filter>
-    </ClCompile>
     <ClCompile Include="Vanguard\ManagedWrapper.cpp">
       <Filter>Vanguard</Filter>
     </ClCompile>
@@ -513,27 +501,6 @@
       <Filter>Header Files\User Interface Headers\Settings Header</Filter>
     </ClInclude>
     <ClInclude Include="Vanguard\ManagedWrapper.h">
-      <Filter>Vanguard</Filter>
-    </ClInclude>
-    <ClInclude Include="Vanguard\ThreadLocalHelper.h">
-      <Filter>Vanguard</Filter>
-    </ClInclude>
-    <ClInclude Include="Vanguard\UnmanagedWrapper.h">
-      <Filter>Vanguard</Filter>
-    </ClInclude>
-    <ClInclude Include="Vanguard\VanguardClient.h">
-      <Filter>Vanguard</Filter>
-    </ClInclude>
-    <ClInclude Include="Vanguard\VanguardClientInitializer.h">
-      <Filter>Vanguard</Filter>
-    </ClInclude>
-    <ClInclude Include="Vanguard\VanguardConfigLoader.h">
-      <Filter>Vanguard</Filter>
-    </ClInclude>
-    <ClInclude Include="Vanguard\VanguardSettingsWrapper.h">
-      <Filter>Vanguard</Filter>
-    </ClInclude>
-    <ClInclude Include="Vanguard\Helpers.hpp">
       <Filter>Vanguard</Filter>
     </ClInclude>
   </ItemGroup>

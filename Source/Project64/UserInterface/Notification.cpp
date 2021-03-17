@@ -273,7 +273,7 @@ void CNotificationImp::BreakPoint(const char * FileName, int LineNumber)
         DisplayError("Fatal Error: Stopping emulation");
         if (g_BaseSystem)
         {
-            g_BaseSystem->CloseCpu();
+            //g_BaseSystem->CloseCpu(); //RTC_Hijack: don't stop emulation
         }
     }
 }

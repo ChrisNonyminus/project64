@@ -43,15 +43,15 @@
       <StackReserveSize>1</StackReserveSize>
       <DataExecutionPrevention>false</DataExecutionPrevention>
       <LargeAddressAware>true</LargeAddressAware>
-      <ForceFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </ForceFileOutput>
+      <ForceFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MultiplyDefinedSymbolOnly</ForceFileOutput>
       <IgnoreAllDefaultLibraries Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</IgnoreAllDefaultLibraries>
+      <ForceFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MultiplyDefinedSymbolOnly</ForceFileOutput>
     </Link>
     <Manifest Condition="'$(PlatformToolset)'!='v90'">
       <EnableDPIAwareness>true</EnableDPIAwareness>
     </Manifest>
     <ClCompile>
-      <RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <ProjectReference>
       <LinkLibraryDependencies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</LinkLibraryDependencies>
@@ -133,30 +133,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">stdafx.h</PrecompiledHeaderFile>
     </ClCompile>
-    <ClCompile Include="Vanguard\UnmanagedWrapper.cpp">
-      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release|x64'">None</DebugInformationFormat>
-      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</CompileAsManaged>
-      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExceptionHandling>
-      <RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MultiThreadedDLL</RuntimeLibrary>
-      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</RuntimeTypeInfo>
-      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</MinimalRebuild>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="Vanguard\VanguardClient.cpp">
-      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release|x64'">None</DebugInformationFormat>
-      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</CompileAsManaged>
-      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExceptionHandling>
-      <RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MultiThreadedDLL</RuntimeLibrary>
-      <RuntimeTypeInfo Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</RuntimeTypeInfo>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </PrecompiledHeaderFile>
-      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</MinimalRebuild>
-    </ClCompile>
-    <ClCompile Include="Vanguard\VanguardConfigLoader.cpp" />
-    <ClCompile Include="Vanguard\VanguardSettings.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="UserInterface\About.h" />
@@ -237,14 +213,7 @@
     <ClInclude Include="UserInterface\WTLControls\PartialGroupBox.h" />
     <ClInclude Include="UserInterface\WTLControls\TooltipDialog.h" />
     <ClInclude Include="UserInterface\WTLControls\wtl-BitmapPicture.h" />
-    <ClInclude Include="Vanguard\Helpers.hpp" />
     <ClInclude Include="Vanguard\ManagedWrapper.h" />
-    <ClInclude Include="Vanguard\ThreadLocalHelper.h" />
-    <ClInclude Include="Vanguard\UnmanagedWrapper.h" />
-    <ClInclude Include="Vanguard\VanguardClient.h" />
-    <ClInclude Include="Vanguard\VanguardClientInitializer.h" />
-    <ClInclude Include="Vanguard\VanguardConfigLoader.h" />
-    <ClInclude Include="Vanguard\VanguardSettingsWrapper.h" />
     <ClInclude Include="WTLApp.h" />
   </ItemGroup>
   <ItemGroup>

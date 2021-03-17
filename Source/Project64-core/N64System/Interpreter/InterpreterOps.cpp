@@ -3030,11 +3030,11 @@ void R4300iOp::COP1_L_CVT_D()
 /************************** Other functions **************************/
 void R4300iOp::UnknownOpcode()
 {
-    g_Notify->DisplayError(stdstr_f("%s: %08X\n%s\n\nStopping Emulation !", GS(MSG_UNHANDLED_OP), (*_PROGRAM_COUNTER),
-        R4300iOpcodeName(m_Opcode.Hex, (*_PROGRAM_COUNTER))).c_str());
-    g_System->m_EndEmulation = true;
+    //g_Notify->DisplayError(stdstr_f("%s: %08X\n%s\n\nStopping Emulation !", GS(MSG_UNHANDLED_OP), (*_PROGRAM_COUNTER),
+        //R4300iOpcodeName(m_Opcode.Hex, (*_PROGRAM_COUNTER))).c_str());
+    //g_System->m_EndEmulation = true;
 
-    g_Notify->BreakPoint(__FILE__, __LINE__);
+    //g_Notify->BreakPoint(__FILE__, __LINE__); //RTC_Hijack: unknown opcode handler gets in the way of corruptions
 #ifdef legacycode
     if (HaveDebugger && !inFullScreen)
     {

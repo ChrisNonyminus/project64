@@ -1672,8 +1672,8 @@ void rsp_UnknownOpcode (void) {
 	int response;
 
 	if (InRSPCommandsWindow) {
-		SetRSPCommandViewto( *PrgCount );
-		DisplayError("Unhandled Opcode\n%s\n\nStoping Emulation!", RSPOpcodeName(RSPOpC.Hex,*PrgCount));
+		//SetRSPCommandViewto( *PrgCount );
+		//DisplayError("Unhandled Opcode\n%s\n\nStoping Emulation!", RSPOpcodeName(RSPOpC.Hex,*PrgCount));
 	} else {
 		sprintf(Message,"Unhandled Opcode\n%s\n\nStoping Emulation!\n\nDo you wish to enter the debugger ?", 
 			RSPOpcodeName(RSPOpC.Hex,*PrgCount));
@@ -1682,5 +1682,5 @@ void rsp_UnknownOpcode (void) {
 			Enter_RSP_Commands_Window ();
 		}
 	}
-	ExitThread(0);
+	//ExitThread(0); //RTC_Hijack: don't exit the thread when pokebyte causes an opcode pj64 didn't expect
 }
