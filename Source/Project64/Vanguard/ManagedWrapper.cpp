@@ -5,20 +5,22 @@ extern "C" __declspec(dllexport)
 unsigned char ManagedWrapper_peekbyte(long long addr)
 {
 	uint8_t val = 0;
-	
-	g_MMU->LB_VAddr(static_cast<uint32_t>(addr), val);
+	g_MMU->LB_PAddr(static_cast<uint32_t>(addr), val);
+	printf("Value at 0x%X is %X", static_cast<uint32_t>(addr), val);
 	return val;
 }
 extern "C" __declspec(dllexport)
 void ManagedWrapper_pokebyte(long long addr, unsigned char val)
 {
-	g_MMU->SB_VAddr(static_cast<uint32_t>(addr), val);
-	
+	g_MMU->SB_PAddr(static_cast<uint32_t>(addr), val);
 }
 extern "C" __declspec(dllexport)
-void ManagedWrapper_savesavestate()
+void ManagedWrapper_savesavestate(const char* SaveFile)
 {
+	g_Settings->SaveString(GameRunning_InstantSaveFile, std::string(SaveFile));
+	g_BaseSystem->ExternalEvent(SysEvent_PauseCPU_SaveGame);
 	g_BaseSystem->ExternalEvent(SysEvent_SaveMachineState);
+	g_BaseSystem->ExternalEvent(SysEvent_ResumeCPU_SaveGame);
 	
 }
 extern "C" __declspec(dllexport)
@@ -32,9 +34,9 @@ int ManagedWrapper_GetVRAMSize()
 	return /*VRAM_SIZE*/0x01000000;
 }
 extern "C" __declspec(dllexport)
-void ManagedWrapper_loadsavestate()
+void ManagedWrapper_loadsavestate(const char* SaveFile)
 {
-	g_BaseSystem->ExternalEvent(SysEvent_LoadMachineState);
+	g_System->LoadState(SaveFile);
 }
 extern "C" __declspec(dllexport)
 void ManagedWrapper_RelayToFlycastLog(std::string string)
@@ -44,38 +46,7 @@ void ManagedWrapper_RelayToFlycastLog(std::string string)
 extern "C" __declspec(dllexport)
 const char* ManagedWrapper_getstatepath()
 {
-	//code taken from MainMenu.cpp
-	std::string SlotName = std::string(GS(MENU_SLOT_DEFAULT));
-	if (!g_Settings->LoadBool(GameRunning_CPU_Running)) { return SlotName.c_str(); }
-	std::string LastSaveTime;
-	CPath FileName(g_Settings->LoadStringVal(Directory_InstantSave).c_str(), "");
-	if (g_Settings->LoadBool(Setting_UniqueSaveDir))
-	{
-		FileName.AppendDirectory(g_Settings->LoadStringVal(Game_UniqueSaveDir).c_str());
-	}
-	FileName.NormalizePath(CPath(CPath::MODULE_DIRECTORY));
-	FileName.SetNameExtension(stdstr_f("%s.pj", g_Settings->LoadStringVal(Rdb_GoodName).c_str()).c_str());
-	if (g_Settings->LoadDword(Setting_AutoZipInstantSave))
-	{
-		CPath ZipFileName(FileName.GetDriveDirectory(), stdstr_f("%s.zip", FileName.GetNameExtension().c_str()).c_str());
-		LastSaveTime = ManagedWrapperHelper::GetFileLastMod(ZipFileName);
-	}
-	if (LastSaveTime.empty())
-	{
-		LastSaveTime = ManagedWrapperHelper::GetFileLastMod(FileName);
-		FileName.SetNameExtension(stdstr_f("%s.pj%d", g_Settings->LoadStringVal(Game_GameName).c_str(), 0).c_str());
-		if (g_Settings->LoadBool(Setting_AutoZipInstantSave))
-		{
-			CPath ZipFileName(FileName.GetDriveDirectory(), stdstr_f("%s.zip", FileName.GetNameExtension().c_str()).c_str());
-			LastSaveTime = ManagedWrapperHelper::GetFileLastMod(ZipFileName);
-		}
-		if (LastSaveTime.empty())
-		{
-			LastSaveTime = ManagedWrapperHelper::GetFileLastMod(FileName);
-		}
-	}
-	SlotName += LastSaveTime;
-	return SlotName.c_str();
+	return "";
 }
 //also from MainMenu.cpp
 stdstr ManagedWrapperHelper::GetFileLastMod(const CPath& FileName)
