@@ -26,7 +26,7 @@ LRESULT CDebugTlb::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lPara
     col.iSubItem = 0;
     ListView_InsertColumn(GetDlgItem(IDC_LIST), 0, &col);
 
-    col.pszText = L"Page Mask";
+    col.pszText = L"Page mask";
     col.cx = (int)(90 * DPIScale);
     col.iSubItem = 1;
     ListView_InsertColumn(GetDlgItem(IDC_LIST), 1, &col);
@@ -100,7 +100,7 @@ LRESULT CDebugTlb::OnClicked(WORD /*wNotifyCode*/, WORD wID, HWND, BOOL& /*bHand
 
 void CDebugTlb::RefreshTLBWindow(void)
 {
-    if (m_hWnd == NULL)
+    if (m_hWnd == nullptr)
     {
         return;
     }

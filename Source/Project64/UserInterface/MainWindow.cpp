@@ -1,11 +1,10 @@
 #include "stdafx.h"
-#include "RomInformationClass.h"
+#include "RomInformation.h"
 #include <Project64\UserInterface\About.h>
-
 #include <commctrl.h>
 #include <Project64-core/Settings/SettingType/SettingsType-Application.h>
 #include <Project64-core/N64System/Enhancement/Enhancements.h>
-#include <Project64-core/N64System/N64DiskClass.h>
+#include <Project64-core/N64System/N64Disk.h>
 #include "DiscordRPC.h"
 
 void EnterLogOptions(HWND hwndOwner);
@@ -22,9 +21,9 @@ CMainGui::CMainGui(bool bMainWindow, const char * WindowTitle) :
     m_AttachingMenu(false),
     m_MakingVisible(false),
     m_ResetPlugins(false),
-    m_ResetInfo(NULL)
+    m_ResetInfo(nullptr)
 {
-    m_Menu = NULL;
+    m_Menu = nullptr;
 
     m_hMainWindow = 0;
     m_hStatusWnd = 0;
@@ -38,15 +37,16 @@ CMainGui::CMainGui(bool bMainWindow, const char * WindowTitle) :
 
     if (m_bMainWindow)
     {
-        g_Settings->RegisterChangeCB((SettingID)(FirstUISettings + RomBrowser_Enabled), this, (CSettings::SettingChangedFunc)RomBowserEnabledChanged);
-        g_Settings->RegisterChangeCB((SettingID)(FirstUISettings + RomBrowser_ColoumnsChanged), this, (CSettings::SettingChangedFunc)RomBowserColoumnsChanged);
-		g_Settings->RegisterChangeCB((SettingID)(FirstUISettings + Setting_EnableDiscordRPC), this, (CSettings::SettingChangedFunc)DiscordRPCChanged);
+        g_Settings->RegisterChangeCB((SettingID)RomBrowser_Enabled, this, (CSettings::SettingChangedFunc)RomBowserEnabledChanged);
+        g_Settings->RegisterChangeCB((SettingID)RomBrowser_ColoumnsChanged, this, (CSettings::SettingChangedFunc)RomBowserColoumnsChanged);
+		g_Settings->RegisterChangeCB((SettingID)Setting_EnableDiscordRPC, this, (CSettings::SettingChangedFunc)DiscordRPCChanged);
         g_Settings->RegisterChangeCB(RomList_GameDirRecursive, this, (CSettings::SettingChangedFunc)RomBrowserListChanged);
         g_Settings->RegisterChangeCB(RomList_ShowFileExtensions, this, (CSettings::SettingChangedFunc)RomBrowserListChanged);
         g_Settings->RegisterChangeCB(GameRunning_LoadingInProgress, this, (CSettings::SettingChangedFunc)LoadingInProgressChanged);
         g_Settings->RegisterChangeCB(GameRunning_CPU_Running, this, (CSettings::SettingChangedFunc)GameCpuRunning);
         g_Settings->RegisterChangeCB(GameRunning_CPU_Paused, this, (CSettings::SettingChangedFunc)GamePaused);
         g_Settings->RegisterChangeCB(Game_File, this, (CSettings::SettingChangedFunc)GameLoaded);
+        g_Settings->RegisterChangeCB((SettingID)UserInterface_ShowStatusBar, this, (CSettings::SettingChangedFunc)ShowStatusBarChanged);
 
 		if (UISettingsLoadBool(Setting_EnableDiscordRPC))
 		{
@@ -55,7 +55,7 @@ CMainGui::CMainGui(bool bMainWindow, const char * WindowTitle) :
 		}
     }
 
-    //if this fails then it has already been created
+    // If this fails then it has already been created
     RegisterWinClass();
     Create(WindowTitle);
 }
@@ -65,16 +65,17 @@ CMainGui::~CMainGui(void)
     WriteTrace(TraceUserInterface, TraceDebug, "Start");
     if (m_bMainWindow)
     {
-        g_Settings->UnregisterChangeCB((SettingID)(FirstUISettings + RomBrowser_Enabled), this, (CSettings::SettingChangedFunc)RomBowserEnabledChanged);
-        g_Settings->UnregisterChangeCB((SettingID)(FirstUISettings + RomBrowser_ColoumnsChanged), this, (CSettings::SettingChangedFunc)RomBowserColoumnsChanged);
-		g_Settings->UnregisterChangeCB((SettingID)(FirstUISettings + Setting_EnableDiscordRPC), this, (CSettings::SettingChangedFunc)DiscordRPCChanged);
+        g_Settings->UnregisterChangeCB((SettingID)RomBrowser_Enabled, this, (CSettings::SettingChangedFunc)RomBowserEnabledChanged);
+        g_Settings->UnregisterChangeCB((SettingID)RomBrowser_ColoumnsChanged, this, (CSettings::SettingChangedFunc)RomBowserColoumnsChanged);
+		g_Settings->UnregisterChangeCB((SettingID)Setting_EnableDiscordRPC, this, (CSettings::SettingChangedFunc)DiscordRPCChanged);
 		g_Settings->UnregisterChangeCB(RomList_GameDirRecursive, this, (CSettings::SettingChangedFunc)RomBrowserListChanged);
         g_Settings->UnregisterChangeCB(RomList_ShowFileExtensions, this, (CSettings::SettingChangedFunc)RomBrowserListChanged);
         g_Settings->UnregisterChangeCB(GameRunning_LoadingInProgress, this, (CSettings::SettingChangedFunc)LoadingInProgressChanged);
         g_Settings->UnregisterChangeCB(GameRunning_CPU_Running, this, (CSettings::SettingChangedFunc)GameCpuRunning);
         g_Settings->UnregisterChangeCB(GameRunning_CPU_Paused, this, (CSettings::SettingChangedFunc)GamePaused);
         g_Settings->UnregisterChangeCB(Game_File, this, (CSettings::SettingChangedFunc)GameLoaded);
-		
+        g_Settings->UnregisterChangeCB((SettingID)UserInterface_ShowStatusBar, this, (CSettings::SettingChangedFunc)ShowStatusBarChanged);
+
 		if (UISettingsLoadBool(Setting_EnableDiscordRPC))
 		{
 			CDiscord::Shutdown();
@@ -96,13 +97,13 @@ bool CMainGui::RegisterWinClass(void)
     wcl.style = CS_OWNDC | CS_HREDRAW | CS_VREDRAW;
     wcl.cbClsExtra = 0;
     wcl.cbWndExtra = 0;
-    wcl.hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_PJ64_Icon));
-    wcl.hCursor = LoadCursor(NULL, IDC_ARROW);
-    wcl.hInstance = GetModuleHandle(NULL);
+    wcl.hIcon = LoadIcon(GetModuleHandle(nullptr), MAKEINTRESOURCE(IDI_PJ64_Icon));
+    wcl.hCursor = LoadCursor(nullptr, IDC_ARROW);
+    wcl.hInstance = GetModuleHandle(nullptr);
 
     wcl.lpfnWndProc = (WNDPROC)MainGui_Proc;
     wcl.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
-    wcl.lpszMenuName = NULL;
+    wcl.lpszMenuName = nullptr;
     wcl.lpszClassName = VersionDisplay.c_str();
     if (RegisterClass(&wcl) == 0) return false;
     return true;
@@ -112,7 +113,7 @@ void CMainGui::AddRecentRom(const char * ImagePath)
 {
     if (HIWORD(ImagePath) == NULL) { return; }
 
-    //Get Information about the stored rom list
+    // Get information about the stored ROM list
     size_t MaxRememberedFiles = UISettingsLoadDword(File_RecentGameFileCount);
     strlist RecentGames;
     size_t i;
@@ -126,7 +127,7 @@ void CMainGui::AddRecentRom(const char * ImagePath)
         RecentGames.push_back(RecentGame);
     }
 
-    //See if the dir is already in the list if so then move it to the top of the list
+    // See if the directory is already in the list, if so then move it to the top of the list
     strlist::iterator iter;
     for (iter = RecentGames.begin(); iter != RecentGames.end(); iter++)
     {
@@ -205,7 +206,7 @@ void CMainGui::GameLoaded(CMainGui * Gui)
     stdstr FileLoc = g_Settings->LoadStringVal(Game_File);
     if (FileLoc.length() > 0)
     {
-        WriteTrace(TraceUserInterface, TraceDebug, "Add Recent Rom");
+        WriteTrace(TraceUserInterface, TraceDebug, "Add recent ROM");
         Gui->AddRecentRom(FileLoc.c_str());
         Gui->SetWindowCaption(stdstr(g_Settings->LoadStringVal(Rdb_GoodName)).ToUTF16().c_str());
 		
@@ -234,7 +235,7 @@ void CMainGui::GameCpuRunning(CMainGui * Gui)
             std::string Status = UISettingsLoadStringVal(Rdb_Status);
 
             char String[100];
-            RomIniFile.GetString("Rom Status", stdstr_f("%s.AutoFullScreen", Status.c_str()).c_str(), "true", String, sizeof(String));
+            RomIniFile.GetString("ROM Status", stdstr_f("%s.AutoFullScreen", Status.c_str()).c_str(), "true", String, sizeof(String));
             if (_stricmp(String, "true") == 0)
             {
                 g_Notify->ChangeFullScreen();
@@ -245,11 +246,23 @@ void CMainGui::GameCpuRunning(CMainGui * Gui)
     }
     else
     {
-        if (Gui->m_CheatsUI.m_hWnd != NULL)
+        if (Gui->m_CheatsUI.m_hWnd != nullptr)
         {
             Gui->m_CheatsUI.SendMessage(WM_COMMAND, MAKELONG(IDCANCEL, 0));
         }
         PostMessage(Gui->m_hMainWindow, WM_GAME_CLOSED, 0, 0);
+    }
+}
+
+void CMainGui::ShowStatusBarChanged(CMainGui * Gui)
+{
+    if (!Gui->bCPURunning())
+    {
+        ShowWindow(Gui->m_hStatusWnd, g_Settings->LoadBool((SettingID)UserInterface_ShowStatusBar) ? SW_SHOW : SW_HIDE);
+        
+        RECT rc;
+        GetClientRect(Gui->m_hMainWindow, &rc);
+        Gui->ResizeRomList((WORD)(rc.right - rc.left), (WORD)(rc.bottom - rc.top));
     }
 }
 
@@ -286,9 +299,9 @@ void CMainGui::ChangeWinSize(long width, long height)
     wndpl.length = sizeof(wndpl);
     GetWindowPlacement(m_hMainWindow, &wndpl);
 
-    if ((HWND)m_hStatusWnd != NULL)
+    if (m_hStatusWnd != nullptr && IsWindowVisible(m_hStatusWnd))
     {
-        GetClientRect((HWND)m_hStatusWnd, &swrect);
+        GetClientRect(m_hStatusWnd, &swrect);
         SetRect(&rc1, 0, 0, width, height + swrect.bottom);
     }
     else
@@ -296,14 +309,19 @@ void CMainGui::ChangeWinSize(long width, long height)
         SetRect(&rc1, 0, 0, width, height);
     }
 
-    AdjustWindowRectEx(&rc1, GetWindowLong(m_hMainWindow, GWL_STYLE), GetMenu(m_hMainWindow) != NULL, GetWindowLong(m_hMainWindow, GWL_EXSTYLE));
+    AdjustWindowRectEx(&rc1, GetWindowLong(m_hMainWindow, GWL_STYLE), GetMenu(m_hMainWindow) != nullptr, GetWindowLong(m_hMainWindow, GWL_EXSTYLE));
 
     MoveWindow(m_hMainWindow, wndpl.rcNormalPosition.left, wndpl.rcNormalPosition.top, rc1.right - rc1.left, rc1.bottom - rc1.top, TRUE);
 }
 
+void * CMainGui::GetStatusBar(void) const
+{
+    return g_Settings->LoadBool((SettingID)UserInterface_ShowStatusBar) ? m_hStatusWnd : nullptr;
+}
+
 void * CMainGui::GetModuleInstance(void) const
 {
-    return GetModuleHandle(NULL);
+    return GetModuleHandle(nullptr);
 }
 
 bool CMainGui::ResetPluginsInUiThread(CPlugins * plugins, CN64System * System)
@@ -311,7 +329,7 @@ bool CMainGui::ResetPluginsInUiThread(CPlugins * plugins, CN64System * System)
     RESET_PLUGIN info;
     info.system = System;
     info.plugins = plugins;
-    info.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+    info.hEvent = CreateEvent(nullptr, TRUE, FALSE, nullptr);
     bool bRes = true;
     if (info.hEvent)
     {
@@ -370,31 +388,32 @@ void CMainGui::Create(const char * WindowTitle)
     stdstr_f VersionDisplay("Project64 %s", VER_FILE_VERSION_STR);
     m_hMainWindow = CreateWindowEx(WS_EX_ACCEPTFILES, VersionDisplay.ToUTF16().c_str(), stdstr(WindowTitle).ToUTF16().c_str(), WS_OVERLAPPED | WS_CLIPCHILDREN |
         WS_CLIPSIBLINGS | WS_SYSMENU | WS_MINIMIZEBOX, 5, 5, 640, 480,
-        NULL, NULL, GetModuleHandle(NULL), this);
-    m_Created = m_hMainWindow != NULL;
+        nullptr, nullptr, GetModuleHandle(nullptr), this);
+    m_Created = m_hMainWindow != nullptr;
 }
 
 void CMainGui::CreateStatusBar(void)
 {
     m_hStatusWnd = (HWND)CreateStatusWindow(WS_CHILD | WS_VISIBLE, L"", m_hMainWindow, StatusBarID);
     SendMessage((HWND)m_hStatusWnd, SB_SETTEXT, 0, (LPARAM)"");
+    ShowWindow(m_hStatusWnd, g_Settings->LoadBool((SettingID)UserInterface_ShowStatusBar) ? SW_SHOW : SW_HIDE);
 }
 
 WPARAM CMainGui::ProcessAllMessages(void)
 {
     MSG msg;
 
-    while (GetMessage(&msg, NULL, 0, 0))
+    while (GetMessage(&msg, nullptr, 0, 0))
     {
         if (m_ResetPlugins)
         {
             m_ResetPlugins = false;
             m_ResetInfo->res = m_ResetInfo->plugins->Reset(m_ResetInfo->system);
             SetEvent(m_ResetInfo->hEvent);
-            m_ResetInfo = NULL;
+            m_ResetInfo = nullptr;
         }
-        if ((m_CheatsUI.m_hWnd != NULL && IsDialogMessage(m_CheatsUI.m_hWnd, &msg)) ||
-            (m_EnhancementUI.m_hWnd != NULL && IsDialogMessage(m_EnhancementUI.m_hWnd, &msg)))
+        if ((m_CheatsUI.m_hWnd != nullptr && IsDialogMessage(m_CheatsUI.m_hWnd, &msg)) ||
+            (m_EnhancementUI.m_hWnd != nullptr && IsDialogMessage(m_EnhancementUI.m_hWnd, &msg)))
         {
             continue;
         }
@@ -409,7 +428,7 @@ bool CMainGui::ProcessGuiMessages(void)
 {
     MSG msg;
 
-    while (PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE))
+    while (PeekMessage(&msg, nullptr, 0, 0, PM_NOREMOVE))
     {
         if (m_ResetPlugins)
         {
@@ -419,7 +438,7 @@ bool CMainGui::ProcessGuiMessages(void)
         {
             return true;
         }
-        PeekMessage(&msg, NULL, 0, 0, PM_REMOVE);
+        PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE);
         if (m_Menu->ProcessAccelerator(m_hMainWindow, &msg)) { continue; }
         TranslateMessage(&msg);
         DispatchMessage(&msg);
@@ -431,14 +450,14 @@ void CMainGui::Resize(DWORD /*fwSizeType*/, WORD nWidth, WORD nHeight)
 {
     RECT clrect, swrect;
     GetClientRect(m_hMainWindow, &clrect);
-    GetClientRect((HWND)m_hStatusWnd, &swrect);
+    GetClientRect(m_hStatusWnd, &swrect);
 
     int Parts[2];
     Parts[0] = (int) (nWidth - 135 * DPIScale(m_hStatusWnd));
     Parts[1] = nWidth;
 
-    SendMessage((HWND)m_hStatusWnd, SB_SETPARTS, 2, (LPARAM)&Parts[0]);
-    MoveWindow((HWND)m_hStatusWnd, 0, clrect.bottom - swrect.bottom, nWidth, nHeight, TRUE);
+    SendMessage(m_hStatusWnd, SB_SETPARTS, 2, (LPARAM)&Parts[0]);
+    MoveWindow(m_hStatusWnd, 0, clrect.bottom - swrect.bottom, nWidth, nHeight, TRUE);
 }
 
 void CMainGui::Show(bool Visible)
@@ -481,20 +500,21 @@ int CMainGui::Width(void)
     return rect.right - rect.left;
 }
 
-float CMainGui::DPIScale(HWND hWnd) {
+float CMainGui::DPIScale(HWND hWnd) 
+{
     return CClientDC(hWnd).GetDeviceCaps(LOGPIXELSX) / 96.0f;
 }
 
 void CMainGui::SetPos(int X, int Y)
 {
-    SetWindowPos(m_hMainWindow, NULL, X, Y, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
+    SetWindowPos(m_hMainWindow, nullptr, X, Y, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
 }
 
 void CMainGui::SetWindowMenu(CBaseMenu * Menu)
 {
     m_AttachingMenu = true;
 
-    HMENU hMenu = NULL;
+    HMENU hMenu = nullptr;
     {
         CGuard Guard(m_CS);
         m_Menu = Menu;
@@ -530,16 +550,17 @@ void CMainGui::SetStatusText(int Panel, const wchar_t * Text)
     Msg[(sizeof(Message[0]) / sizeof(Message[0][0])) - 1] = 0;
     if (GetCurrentThreadId() == m_ThreadId)
     {
-        SendMessage((HWND)m_hStatusWnd, SB_SETTEXT, Panel, (LPARAM)Msg);
+        SendMessage(m_hStatusWnd, SB_SETTEXT, Panel, (LPARAM)Msg);
     }
-    else {
-        PostMessage((HWND)m_hStatusWnd, SB_SETTEXT, Panel, (LPARAM)Msg);
+    else 
+    {
+        PostMessage(m_hStatusWnd, SB_SETTEXT, Panel, (LPARAM)Msg);
     }
 }
 
 void CMainGui::ShowStatusBar(bool ShowBar)
 {
-    ShowWindow((HWND)m_hStatusWnd, ShowBar ? SW_SHOW : SW_HIDE);
+    ShowWindow(m_hStatusWnd, ShowBar ? SW_SHOW : SW_HIDE);
 }
 
 void CMainGui::SaveWindowLoc(void)
@@ -573,7 +594,7 @@ LRESULT CALLBACK CMainGui::MainGui_Proc(HWND hWnd, DWORD uMsg, DWORD wParam, DWO
     {
     case WM_CREATE:
         {
-            //record class for future usage
+            // Record class for future usage
             LPCREATESTRUCT lpcs = (LPCREATESTRUCT)lParam;
             CMainGui * _this = (CMainGui *)lpcs->lpCreateParams;
             SetProp(hWnd, L"Class", _this);
@@ -581,7 +602,7 @@ LRESULT CALLBACK CMainGui::MainGui_Proc(HWND hWnd, DWORD uMsg, DWORD wParam, DWO
             _this->m_hMainWindow = hWnd;
             _this->CreateStatusBar();
 
-            //Move the Main window to the location last executed from or center the window
+            // Move the main window to the location last executed from or center the window
             int X = (GetSystemMetrics(SM_CXSCREEN) - _this->Width()) / 2;
             int	Y = (GetSystemMetrics(SM_CYSCREEN) - _this->Height()) / 2;
 
@@ -641,16 +662,16 @@ LRESULT CALLBACK CMainGui::MainGui_Proc(HWND hWnd, DWORD uMsg, DWORD wParam, DWO
             {
                 if (_this->RomBrowserVisible())
                 {
-                    // save that browser is maximized
+                    // Save that browser is maximized
                 }
                 break;
             }
 
-            //get the current position of the window
+            // Get the current position of the window
             RECT WinRect;
             GetWindowRect(hWnd, &WinRect);
 
-            //save the location of the window
+            // Save the location of the window
             if (_this->RomBrowserVisible())
             {
                 _this->m_SaveRomBrowserPos = true;
@@ -664,7 +685,7 @@ LRESULT CALLBACK CMainGui::MainGui_Proc(HWND hWnd, DWORD uMsg, DWORD wParam, DWO
                 _this->m_SaveMainWindowLeft = WinRect.left;
             }
             KillTimer(hWnd, Timer_SetWindowPos);
-            SetTimer(hWnd, Timer_SetWindowPos, 1000, NULL);
+            SetTimer(hWnd, Timer_SetWindowPos, 1000, nullptr);
         }
         if (CGuiSettings::bCPURunning() && g_BaseSystem)
         {
@@ -712,7 +733,7 @@ LRESULT CALLBACK CMainGui::MainGui_Proc(HWND hWnd, DWORD uMsg, DWORD wParam, DWO
     case WM_NOTIFY:
         {
             CMainGui * _this = (CMainGui *)GetProp(hWnd, L"Class");
-            if (_this == NULL || !_this->RomBrowserVisible() || !_this->RomListNotify(wParam, lParam))
+            if (_this == nullptr || !_this->RomBrowserVisible() || !_this->RomListNotify(wParam, lParam))
             {
                 return DefWindowProc(hWnd, uMsg, wParam, lParam);
             }
@@ -741,7 +762,7 @@ LRESULT CALLBACK CMainGui::MainGui_Proc(HWND hWnd, DWORD uMsg, DWORD wParam, DWO
             //					Plugins->Gfx()->DrawScreen();
             //				}
             //			}
-            ValidateRect(hWnd, NULL);
+            ValidateRect(hWnd, nullptr);
         }
         break;
     case WM_KEYUP:
@@ -821,7 +842,7 @@ LRESULT CALLBACK CMainGui::MainGui_Proc(HWND hWnd, DWORD uMsg, DWORD wParam, DWO
             }
             if (_this->m_bMainWindow && bCPURunning())
             {
-                if (!fActive && UISettingsLoadBool(UserInterface_InFullScreen))
+                if (!fActive && UISettingsLoadBool(UserInterface_InFullScreen) && UISettingsLoadBool(UserInterface_ExitFullscreenOnLoseFocus))
                 {
                     Notify().WindowMode();
                     if (bAutoSleep() && g_BaseSystem)
@@ -865,7 +886,7 @@ LRESULT CALLBACK CMainGui::MainGui_Proc(HWND hWnd, DWORD uMsg, DWORD wParam, DWO
     case WM_RESET_PLUGIN:
         {
             CMainGui * _this = (CMainGui *)GetProp(hWnd, L"Class");
-            if (_this->m_ResetInfo != NULL)
+            if (_this->m_ResetInfo != nullptr)
             {
                 g_Notify->BreakPoint(__FILE__, __LINE__);
             }
@@ -890,7 +911,7 @@ LRESULT CALLBACK CMainGui::MainGui_Proc(HWND hWnd, DWORD uMsg, DWORD wParam, DWO
     case WM_COMMAND:
         {
             CMainGui * _this = (CMainGui *)GetProp(hWnd, L"Class");
-            if (_this == NULL) { break; }
+            if (_this == nullptr) { break; }
 
             switch (LOWORD(wParam)) {
             case ID_POPUPMENU_PLAYGAME: 
@@ -941,12 +962,12 @@ LRESULT CALLBACK CMainGui::MainGui_Proc(HWND hWnd, DWORD uMsg, DWORD wParam, DWO
                         else if (LOWORD(wParam) == ID_POPUPMENU_EDITCHEATS)
                         {
                             g_Enhancements->ResetActive(nullptr);
-                            g_Enhancements->Load(nullptr, nullptr);
+                            g_Enhancements->LoadActive(nullptr, nullptr);
                             _this->m_CheatsUI.Display(hWnd, true);
                         }
                         else if (LOWORD(wParam) == ID_POPUPMENU_CHOOSEENHANCEMENT)
                         {
-                            g_Enhancements->Load(nullptr, nullptr);
+                            g_Enhancements->LoadActive(nullptr, nullptr);
                             _this->m_EnhancementUI.Display(hWnd, true);
                         }
 
@@ -1007,7 +1028,7 @@ LRESULT CALLBACK CMainGui::MainGui_Proc(HWND hWnd, DWORD uMsg, DWORD wParam, DWO
                     }
                     else if (LOWORD(wParam) > 5200 && LOWORD(wParam) <= 5300)
                     {
-                        if (g_Plugins->Gfx() && g_Plugins->Gfx()->OnRomBrowserMenuItem != NULL)
+                        if (g_Plugins->Gfx() && g_Plugins->Gfx()->OnRomBrowserMenuItem != nullptr)
                         {
                             CN64Rom Rom;
                             if (!Rom.LoadN64Image(_this->CurrentedSelectedRom(), true))
@@ -1015,7 +1036,7 @@ LRESULT CALLBACK CMainGui::MainGui_Proc(HWND hWnd, DWORD uMsg, DWORD wParam, DWO
                                 break;
                             }
                             Rom.SaveRomSettingID(true);
-                            g_Notify->DisplayMessage(0, "");
+                            g_Notify->DisplayMessage(0, EMPTY_STRING);
                             BYTE * RomHeader = Rom.GetRomAddress();
                             WriteTrace(TraceGFXPlugin, TraceDebug, "OnRomBrowserMenuItem - Starting");
                             g_Plugins->Gfx()->OnRomBrowserMenuItem(LOWORD(wParam), hWnd, RomHeader);
@@ -1065,7 +1086,7 @@ LRESULT CALLBACK CMainGui::MainGui_Proc(HWND hWnd, DWORD uMsg, DWORD wParam, DWO
             {
                 Notify().WindowMode();
             }
-            _this->m_hMainWindow = NULL;
+            _this->m_hMainWindow = nullptr;
             WriteTrace(TraceUserInterface, TraceDebug, "WM_DESTROY - 1");
             if (_this->m_bMainWindow)
             {

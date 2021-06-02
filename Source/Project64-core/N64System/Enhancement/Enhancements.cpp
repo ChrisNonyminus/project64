@@ -2,9 +2,9 @@
 #include <Project64-core/N64System/Enhancement/Enhancements.h>
 #include <Project64-core/N64System/Enhancement/EnhancementFile.h>
 #include <Project64-core/N64System/Mips/MemoryVirtualMem.h>
-#include <Project64-core/N64System/Recompiler/RecompilerClass.h>
+#include <Project64-core/N64System/Recompiler/Recompiler.h>
 #include <Project64-core/N64System/SystemGlobals.h>
-#include <Project64-core/Plugins/PluginClass.h>
+#include <Project64-core/Plugins/Plugin.h>
 #include <Project64-core/Plugins/GFXPlugin.h>
 #include <Project64-core/Plugins/AudioPlugin.h>
 #include <Project64-core/Plugins/RSPPlugin.h>
@@ -51,7 +51,7 @@ void CEnhancements::ApplyActive(CMipsMemoryVM & MMU, CPlugins * Plugins, bool Up
     if (m_UpdateCheats && UpdateChanges)
     {
         m_UpdateCheats = false;
-        Load(&MMU, Plugins);
+        LoadActive(&MMU, Plugins);
     }
     for (size_t i = 0, n = m_ActiveCodes.size(); i < n; i++)
     {
@@ -261,14 +261,20 @@ void CEnhancements::LoadEnhancements(const char * Ident, SectionFiles & Files, s
     }
 }
 
-void CEnhancements::Load(CMipsMemoryVM * MMU, CPlugins * Plugins)
+void CEnhancements::Load(void)
 {
     WaitScanDone();
     CGuard Guard(m_CS);
 
     LoadEnhancements(CEnhancement::CheatIdent, m_CheatFiles, m_CheatFile, m_Cheats);
     LoadEnhancements(CEnhancement::EnhancementIdent, m_EnhancementFiles, m_EnhancementFile, m_Enhancements);
+}
 
+void CEnhancements::LoadActive(CMipsMemoryVM * MMU, CPlugins * Plugins)
+{
+    Load();
+
+    CGuard Guard(m_CS);
     m_OverClock = false;
     m_OverClockModifier = 1;
 
@@ -316,22 +322,22 @@ void CEnhancements::LoadActive(CEnhancementList & List, CPlugins * Plugins)
             for (size_t i = 0, n = PluginList.size(); i < n; i++)
             {
                 std::string PluginName = stdstr(PluginList[i]).Trim();
-                if (Plugins->Gfx() != NULL && strstr(Plugins->Gfx()->PluginName(), PluginName.c_str()) != nullptr)
+                if (Plugins->Gfx() != nullptr && strstr(Plugins->Gfx()->PluginName(), PluginName.c_str()) != nullptr)
                 {
                     LoadEntry = true;
                     break;
                 }
-                if (Plugins->Audio() != NULL && strstr(Plugins->Audio()->PluginName(), PluginName.c_str()) != nullptr)
+                if (Plugins->Audio() != nullptr && strstr(Plugins->Audio()->PluginName(), PluginName.c_str()) != nullptr)
                 {
                     LoadEntry = true;
                     break;
                 }
-                if (Plugins->RSP() != NULL && strstr(Plugins->RSP()->PluginName(), PluginName.c_str()) != nullptr)
+                if (Plugins->RSP() != nullptr && strstr(Plugins->RSP()->PluginName(), PluginName.c_str()) != nullptr)
                 {
                     LoadEntry = true;
                     break;
                 }
-                if (Plugins->Control() != NULL && strstr(Plugins->Control()->PluginName(), PluginName.c_str()) != nullptr)
+                if (Plugins->Control() != nullptr && strstr(Plugins->Control()->PluginName(), PluginName.c_str()) != nullptr)
                 {
                     LoadEntry = true;
                     break;
@@ -405,7 +411,7 @@ void CEnhancements::ApplyGameSharkCodes(CMipsMemoryVM & MMU, CODES & CodeEntry, 
 
     switch (Code.Command() & 0xFF000000)
     {
-    case 0x50000000: // Gameshark / AR
+    case 0x50000000: // Gameshark / Action Replay
         if ((CurrentEntry + 1) >= (int)CodeEntry.size())
         {
             g_Notify->BreakPoint(__FILE__, __LINE__);
@@ -526,7 +532,7 @@ void CEnhancements::ApplyGameSharkCodes(CMipsMemoryVM & MMU, CODES & CodeEntry, 
     case 0x89000000:
     case 0xA8000000:
     case 0xA9000000:
-        //Ignore - GS Button
+        // Ignore - Gameshark (GS) button
         break;
     default:
         g_Notify->BreakPoint(__FILE__, __LINE__);
@@ -675,7 +681,7 @@ void CEnhancements::ScanFileThread(void)
     {
         do
         {
-            CEnhancmentFile EnhancmentFile(File, "Enhancment");
+            CEnhancmentFile EnhancmentFile(File, CEnhancement::EnhancementIdent);
             CEnhancmentFile::SectionList Sections;
             EnhancmentFile.GetSections(Sections);
             for (CEnhancmentFile::SectionList::const_iterator itr = Sections.begin(); itr != Sections.end(); itr++)
@@ -693,7 +699,7 @@ void CEnhancements::ScanFileThread(void)
     {
         do
         {
-            CEnhancmentFile EnhancmentFile(File, "Enhancment");
+            CEnhancmentFile EnhancmentFile(File, CEnhancement::EnhancementIdent);
             CEnhancmentFile::SectionList Sections;
             EnhancmentFile.GetSections(Sections);
             for (CEnhancmentFile::SectionList::const_iterator itr = Sections.begin(); itr != Sections.end(); itr++)

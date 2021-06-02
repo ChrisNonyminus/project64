@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Common/IniFileClass.h>
+#include <Common/IniFile.h>
 #include <Project64-core/Settings/SettingType/SettingsType-Base.h>
 
 class CSettingTypeRomDatabase :
@@ -18,17 +18,17 @@ public:
     virtual SettingType GetSettingType(void) const { return SettingType_RomDatabase; }
     virtual bool IsSettingSet(void) const { return false; }
 
-    //return the values
+    // Return the values
     virtual bool Load(uint32_t Index, bool & Value) const;
     virtual bool Load(uint32_t Index, uint32_t & Value) const;
     virtual bool Load(uint32_t Index, std::string & Value) const;
 
-    //return the default values
+    // Return the default values
     virtual void LoadDefault(uint32_t Index, bool & Value) const;
     virtual void LoadDefault(uint32_t Index, uint32_t & Value) const;
     virtual void LoadDefault(uint32_t Index, std::string & Value) const;
 
-    //Update the settings
+    // Update the settings
     virtual void Save(uint32_t Index, bool Value);
     virtual void Save(uint32_t Index, uint32_t Value);
     virtual void Save(uint32_t Index, const std::string & Value);
@@ -63,9 +63,9 @@ protected:
     static CIniFile * m_AudioIniFile;
 
 private:
-    CSettingTypeRomDatabase();                                          // Disable default constructor
-    CSettingTypeRomDatabase(const CSettingTypeRomDatabase&);            // Disable copy constructor
-    CSettingTypeRomDatabase& operator=(const CSettingTypeRomDatabase&); // Disable assignment
+    CSettingTypeRomDatabase();
+    CSettingTypeRomDatabase(const CSettingTypeRomDatabase&);
+    CSettingTypeRomDatabase& operator=(const CSettingTypeRomDatabase&);
 
 	bool Load(uint32_t & Value) const;
 };

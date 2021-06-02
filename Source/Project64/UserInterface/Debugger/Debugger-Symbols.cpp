@@ -21,7 +21,7 @@ const CSetValueDlg::ComboItem CDebugSymbols::ModalChangeTypeItems[] = {
     { "v2", SYM_VECTOR2 },
     { "v3", SYM_VECTOR3 },
     { "v4", SYM_VECTOR4 },
-    { NULL, 0 }
+    { nullptr, 0 }
 };
 
 CDebugSymbols::CDebugSymbols(CDebuggerUI * debugger) :
@@ -51,7 +51,7 @@ LRESULT CDebugSymbols::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*l
 
     Refresh();
 
-    SetTimer(TIMER_ID_AUTO_REFRESH, 100, NULL);
+    SetTimer(TIMER_ID_AUTO_REFRESH, 100, nullptr);
 
     LoadWindowPos();
     WindowCreated();
@@ -106,7 +106,7 @@ LRESULT CDebugSymbols::OnClicked(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*
 
 LRESULT    CDebugSymbols::OnListDblClicked(NMHDR* pNMHDR)
 {
-    if (g_MMU == NULL)
+    if (g_MMU == nullptr)
     {
         return true;
     }
@@ -119,7 +119,7 @@ LRESULT    CDebugSymbols::OnListDblClicked(NMHDR* pNMHDR)
 
     int nSelectedCol = -1;
 
-    // hit test for column
+    // Hit test for column
 
     POINT mousePt;
     RECT listRect;
@@ -153,11 +153,11 @@ LRESULT    CDebugSymbols::OnListDblClicked(NMHDR* pNMHDR)
     {
     case SymbolsListView_Col_Address:
         // Open it in memory viewer/commands viewer
-        if (symbol.m_Type == SYM_CODE) // code
+        if (symbol.m_Type == SYM_CODE) // Code
         {
             m_Debugger->Debug_ShowCommandsLocation(symbol.m_Address, true);
         }
-        else // data/number
+        else // Data/number
         {
             m_Debugger->Debug_ShowMemoryLocation(symbol.m_Address, true);
         }
@@ -167,7 +167,7 @@ LRESULT    CDebugSymbols::OnListDblClicked(NMHDR* pNMHDR)
         {
             ValueType t = (ValueType)m_SetValueDlg.GetEnteredData();
 
-            //Is there a better way?
+            // TODO: Is there a better way?
             m_Debugger->SymbolTable()->RemoveSymbolById(id);
             m_Debugger->SymbolTable()->AddSymbol(t, symbol.m_Address, symbol.m_Name, symbol.m_Description);
         }
@@ -175,9 +175,8 @@ LRESULT    CDebugSymbols::OnListDblClicked(NMHDR* pNMHDR)
     case SymbolsListView_Col_Name:
         if (m_SetValueDlg.DoModal("Set name", "New name:", symbol.m_Name))
         {
-            wchar_t* szEnteredString = m_SetValueDlg.GetEnteredString();
             m_Debugger->SymbolTable()->RemoveSymbolById(id);
-            m_Debugger->SymbolTable()->AddSymbol(symbol.m_Type, symbol.m_Address, stdstr().FromUTF16(szEnteredString).c_str(), symbol.m_Description);
+            m_Debugger->SymbolTable()->AddSymbol(symbol.m_Type, symbol.m_Address, m_SetValueDlg.GetEnteredString().c_str(), symbol.m_Description);
         }
         break;
     case SymbolsListView_Col_Value:
@@ -187,7 +186,7 @@ LRESULT    CDebugSymbols::OnListDblClicked(NMHDR* pNMHDR)
         m_Debugger->SymbolTable()->GetValueString(szValue, &symbol);
         if (m_SetValueDlg.DoModal("Change value", "New value:", szValue))
         {
-            stdstr EnteredString = stdstr().FromUTF16(m_SetValueDlg.GetEnteredString());
+            const std::string & EnteredString = m_SetValueDlg.GetEnteredString();
 
             switch (symbol.m_Type)
             {
@@ -272,9 +271,8 @@ LRESULT    CDebugSymbols::OnListDblClicked(NMHDR* pNMHDR)
     case SymbolsListView_Col_Description:
         if (m_SetValueDlg.DoModal("Set description", "New description:", symbol.m_Description))
         {
-            stdstr szEnteredString = stdstr().FromUTF16(m_SetValueDlg.GetEnteredString());
             m_Debugger->SymbolTable()->RemoveSymbolById(id);
-            m_Debugger->SymbolTable()->AddSymbol(symbol.m_Type, symbol.m_Address, symbol.m_Name, szEnteredString.c_str());
+            m_Debugger->SymbolTable()->AddSymbol(symbol.m_Type, symbol.m_Address, symbol.m_Name, m_SetValueDlg.GetEnteredString().c_str());
         }
         break;
     } 
@@ -287,7 +285,7 @@ LRESULT    CDebugSymbols::OnListDblClicked(NMHDR* pNMHDR)
 
 void CDebugSymbols::Refresh()
 {
-    if (m_SymbolsListView.m_hWnd == NULL)
+    if (m_SymbolsListView.m_hWnd == nullptr)
     {
         return;
     }
@@ -319,7 +317,7 @@ void CDebugSymbols::Refresh()
 
 void CDebugSymbols::RefreshValues()
 {
-    if (g_MMU == NULL)
+    if (g_MMU == nullptr)
     {
         return;
     }

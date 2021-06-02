@@ -46,7 +46,7 @@ protected:
     }
     bool Create(HWND hParent, const RECT & rcDispay)
     {
-        BOOL result = m_thunk.Init(NULL, NULL);
+        BOOL result = m_thunk.Init(nullptr, nullptr);
         if (result == FALSE)
         {
             SetLastError(ERROR_OUTOFMEMORY);
@@ -58,7 +58,7 @@ protected:
         m_bModal = false;
 #endif //_DEBUG
         m_hWnd = ::CreateDialogParam(_AtlBaseModule.GetResourceInstance(), MAKEINTRESOURCE(static_cast<T*>(this)->IDD), hParent, T::StartDialogProc, NULL);
-        if (m_hWnd == NULL)
+        if (m_hWnd == nullptr)
         {
             return false;
         }
@@ -86,7 +86,7 @@ protected:
     {
         if (EditBox.IsChanged())
         {
-            stdstr Value = EditBox.GetWindowText();
+            stdstr Value = GetCWindowText(EditBox);
             if (EditBox.IsbString())
             {
                 g_Settings->SaveString(Type, Value);
@@ -162,21 +162,16 @@ protected:
         if (item == m_TxtBoxList.end())
         {
             CModifiedEditBox * EditBox = new CModifiedEditBox(bString);
-            if (EditBox == NULL)
+            if (EditBox == nullptr)
             {
-                return NULL;
+                return nullptr;
             }
             EditBox->Attach(hWnd);
 
             m_TxtBoxList.insert(TextBoxList::value_type(Type, EditBox));
             return EditBox;
         }
-        return NULL;
-    }
-
-    CModifiedEditBox * AddModTextBox(HWND hWnd, UISettingID Type, bool bString)
-    {
-        return AddModTextBox(hWnd, (SettingID)(FirstUISettings + Type), bString);
+        return nullptr;
     }
 
     void AddModCheckBox(HWND hWnd, SettingID Type)
@@ -185,7 +180,7 @@ protected:
         if (item == m_ButtonList.end())
         {
             CModifiedButton * Button = new CModifiedButton;
-            if (Button == NULL)
+            if (Button == nullptr)
             {
                 return;
             }
@@ -193,11 +188,6 @@ protected:
 
             m_ButtonList.insert(ButtonList::value_type(Type, Button));
         }
-    }
-
-    void AddModCheckBox(HWND hWnd, UISettingID Type)
-    {
-        AddModCheckBox(hWnd, (SettingID)(FirstUISettings + Type));
     }
 
     CModifiedComboBox * AddModComboBox(HWND hWnd, SettingID Type)
@@ -208,10 +198,10 @@ protected:
             return item->second;
         }
 
-        CModifiedComboBox * ComboBox = new CModifiedComboBox(g_Settings->LoadDefaultDword(Type), NULL, false);
-        if (ComboBox == NULL)
+        CModifiedComboBox * ComboBox = new CModifiedComboBox(g_Settings->LoadDefaultDword(Type), nullptr, false);
+        if (ComboBox == nullptr)
         {
-            return NULL;
+            return nullptr;
         }
         ComboBox->Attach(hWnd);
         m_ComboBoxList.insert(ComboBoxList::value_type(Type, ComboBox));
@@ -227,18 +217,13 @@ protected:
         }
 
         CModifiedComboBoxTxt * ComboBox = new CModifiedComboBoxTxt(g_Settings->LoadDefaultString(Type));
-        if (ComboBox == NULL)
+        if (ComboBox == nullptr)
         {
-            return NULL;
+            return nullptr;
         }
         ComboBox->Attach(hWnd);
         m_ComboBoxTxtList.insert(ComboBoxTxtList::value_type(Type, ComboBox));
         return ComboBox;
-    }
-
-    CModifiedComboBoxTxt * AddModComboBoxTxt(HWND hWnd, UISettingID Type)
-    {
-        return AddModComboBoxTxt(hWnd, (SettingID)(FirstUISettings + Type));
     }
 
     void UpdateCheckBoxes(void)

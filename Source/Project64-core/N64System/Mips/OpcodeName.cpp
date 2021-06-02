@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "OpCode.h"
-#include <Project64-core/N64System/Mips/RegisterClass.h>
+#include <Project64-core/N64System/Mips/Register.h>
 
 #define FPR_Type(Reg)	(Reg) == R4300i_COP1_S ? "S" : (Reg) == R4300i_COP1_D ? "D" :\
 						(Reg) == R4300i_COP1_W ? "W" : "L"
@@ -557,7 +557,7 @@ const char * R4300iOpcodeName(uint32_t OpCode, uint32_t PC)
         sprintf(CommandName, "ADDI\t%s, %s, 0x%04X", CRegName::GPR[command.rt], CRegName::GPR[command.rs], command.immediate);
         break;
     case R4300i_ADDIU:
-        // special case for stack
+        // Special case for stack
         if (command.rt == 29)
         {
             short imm = (short)command.immediate;

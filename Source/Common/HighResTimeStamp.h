@@ -1,5 +1,5 @@
 #pragma once
-#include "stdtypes.h"
+#include <stdint.h>
 
 class HighResTimeStamp
 {
@@ -15,4 +15,4 @@ private:
     static uint64_t m_Freq;
 #endif
     uint64_t m_time;
-}; 
+};

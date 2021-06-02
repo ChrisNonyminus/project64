@@ -15,7 +15,7 @@ CMixed::TypeNameEntry CMixed::TypeNames[] = {
     { "char",    ValueType_string },
     { "char",    ValueType_unkstring },
     { "char",    ValueType_unkstring },
-    { NULL,      ValueType_invalid}
+    { nullptr,      ValueType_invalid}
 };
 
 const char* CMixed::GetTypeName(void)
@@ -38,12 +38,12 @@ const char* CMixed::GetTypeName(void)
         return "char";
     }
 
-    return NULL;
+    return nullptr;
 }
 
 ValueType CMixed::GetTypeFromString(const char* name, int* charArrayLength)
 {
-    for (int i = 0; TypeNames[i].name != NULL; i++)
+    for (int i = 0; TypeNames[i].name != nullptr; i++)
     {
         if (strcmp(name, TypeNames[i].name) == 0)
         {
@@ -141,8 +141,7 @@ CScanResult::CScanResult(AddressType addressType, DisplayFormat displayFormat) :
     m_AddressType(addressType),
     m_Address(0),
     m_DisplayFormat(displayFormat),
-    m_bSelected(false),
-    m_Description(NULL)
+    m_bSelected(false)
 {
 }
 
@@ -152,33 +151,17 @@ CScanResult::~CScanResult(void)
 
 void CScanResult::SetDescription(const char* str)
 {
-    if (m_Description != NULL)
-    {
-        free(m_Description);
-    }
-
-    size_t len = strlen(str);
-    m_Description = (char*)malloc(len + 1);
-    strcpy(m_Description, str);
-    m_Description[len] = '\0';
+    m_Description = str;
 }
 
 void CScanResult::DeleteDescription(void)
 {
-    if (m_Description != NULL)
-    {
-        free(m_Description);
-        m_Description = NULL;
-    }
+    m_Description.clear();
 }
 
 const char* CScanResult::GetDescription(void)
 {
-    if (m_Description == NULL)
-    {
-        return "";
-    }
-    return m_Description;
+    return m_Description.c_str();
 }
 
 int CScanResult::GetValueString(char *buffer, size_t size)
@@ -189,7 +172,7 @@ int CScanResult::GetValueString(char *buffer, size_t size)
 
 bool CScanResult::GetMemoryValue(CMixed* v)
 {
-    if (g_MMU == NULL)
+    if (g_MMU == nullptr)
     {
         return false;
     }
@@ -230,7 +213,7 @@ bool CScanResult::GetMemoryValue(CMixed* v)
 
 int CScanResult::GetMemoryValueString(char* buffer, size_t size, bool bIgnoreHex)
 {
-    if (g_MMU == NULL)
+    if (g_MMU == nullptr)
     {
         sprintf(buffer, "?");
         return 1;
@@ -298,14 +281,14 @@ uint32_t CScanResult::GetVirtualAddress(void)
     }
     else
     {
-        // convert physical to virtual kseg0
+        // Convert physical to virtual kseg0
         return (m_Address | 0x80000000);
     }
 }
 
 bool CScanResult::SetMemoryValueFromString(const char* str)
 {
-    if (g_MMU == NULL)
+    if (g_MMU == nullptr)
     {
         //sprintf(buffer, "?");
         return false;
@@ -366,7 +349,7 @@ bool CScanResult::SetMemoryValueFromString(const char* str)
     case ValueType_unkstring:
         if (bHex)
         {
-            int size = CMemoryScanner::ParseHexString(NULL, str);
+            int size = CMemoryScanner::ParseHexString(nullptr, str);
             if (size == 0)
             {
                 return false;
@@ -470,9 +453,6 @@ bool CScanResult::SetStrLengthSafe(int length)
 //    m_bSelected = bSelected;
 //}
 
-
-/*********************/
-
 CMemoryScanner::CMemoryScanner(void) :
     m_DidFirstScan(false),
     m_ValueType(ValueType_uint8),
@@ -481,7 +461,7 @@ CMemoryScanner::CMemoryScanner(void) :
     m_SearchType(SearchType_ExactValue),
     m_AddressType(AddressType_Virtual),
     m_VAddrBits(0x80000000),
-    m_Memory(NULL)
+    m_Memory(nullptr)
 {
     m_Value._uint64 = 0;
     SetAddressRange(0x80000000, 0x803FFFFF);
@@ -499,7 +479,7 @@ bool CMemoryScanner::AddrCheck(uint32_t addr, uint32_t rangeStart, uint32_t rang
 
 bool CMemoryScanner::PAddrValid(uint32_t physAddr)
 {
-    if (g_MMU == NULL || g_Rom == NULL)
+    if (g_MMU == nullptr || g_Rom == nullptr)
     {
         g_Notify->BreakPoint(__FILE__, __LINE__);
     }
@@ -550,13 +530,13 @@ bool CMemoryScanner::SetAddressRange(uint32_t startAddress, uint32_t endAddress)
     {
         m_VAddrBits = startAddress & 0xE0000000;
 
-        // don't allow TLB
+        // Don't allow TLB
         if (!RangeCheck(startAddress, endAddress, 0x80000000, 0xBFFFFFFF))
         {
             return false;
         }
 
-        // use physical addresses internally
+        // Use physical addresses internally
         startAddress = startAddress & 0x1FFFFFFF;
         endAddress = endAddress & 0x1FFFFFFF;
     }
@@ -589,7 +569,7 @@ bool CMemoryScanner::SetAddressRange(uint32_t startAddress, uint32_t endAddress)
     }
     else
     {
-        return false; // invalid range
+        return false; // Invalid range
     }
     
     m_Memory = GetMemoryPool(startAddress);
@@ -603,7 +583,7 @@ uint8_t* CMemoryScanner::GetMemoryPool(uint32_t physAddr)
 {
     if (!g_MMU || !g_Rom)
     {
-        return NULL;
+        return nullptr;
     }
 
     if ((physAddr >= 0x00000000 && physAddr < g_MMU->RdramSize()) ||
@@ -617,7 +597,7 @@ uint8_t* CMemoryScanner::GetMemoryPool(uint32_t physAddr)
     }
     else
     {
-        return NULL;
+        return nullptr;
     }
 
 }
@@ -695,7 +675,7 @@ CScanResult* CMemoryScanner::GetResult(size_t index)
 {
     if (index >= m_Results.size())
     {
-        return NULL;
+        return nullptr;
     }
 
     return &m_Results[index];
@@ -711,7 +691,7 @@ void CMemoryScanner::RemoveResult(size_t index)
     m_Results.erase(m_Results.begin() + index);
 }
 
-// scan for text or hex array
+// Scan for text or hexadecimal array
 void CMemoryScanner::FirstScanLoopString(DisplayFormat resultDisplayFormat)
 {
     int length = m_StringValueLength;
@@ -734,13 +714,13 @@ void CMemoryScanner::FirstScanLoopString(DisplayFormat resultDisplayFormat)
         }
 
         result.m_Address = addr | m_VAddrBits;
-        result.Set((const wchar_t*)NULL);
+        result.Set((const wchar_t*)nullptr);
         m_Results.push_back(result);
     next_addr:;
     }
 }
 
-// scan for text (case-insensitive)
+// Scan for text (case-insensitive)
 void CMemoryScanner::FirstScanLoopIString(DisplayFormat resultDisplayFormat)
 {
     int length = m_StringValueLength;
@@ -763,13 +743,13 @@ void CMemoryScanner::FirstScanLoopIString(DisplayFormat resultDisplayFormat)
         }
 
         result.m_Address = addr | m_VAddrBits;
-        result.Set((const wchar_t*)NULL);
+        result.Set((const wchar_t*)nullptr);
         m_Results.push_back(result);
     next_addr:;
     }
 }
 
-// scan for text of unknown single-byte encoding
+// Scan for text of unknown single-byte encoding
 void CMemoryScanner::FirstScanLoopUnkString(void)
 {
     const char* str = stdstr().FromUTF16(m_Value._string).c_str();
@@ -836,7 +816,7 @@ void CMemoryScanner::FirstScanLoopUnkString(void)
         }
 
         result.m_Address = addr | m_VAddrBits;
-        result.Set((const wchar_t*)NULL);
+        result.Set((const wchar_t*)nullptr);
         m_Results.push_back(result);
 
     next_addr:;
@@ -921,7 +901,7 @@ bool CMemoryScanner::FirstScan(DisplayFormat resDisplayFormat)
 #define _NextScanLoopPrimitive64(T, Compare) NextScanLoopPrimitive64<T>(Compare<T>)
 #define _NextScanLoopPrimitiveResults64(T, Compare) NextScanLoopPrimitiveResults64<T>(Compare<T>)
 
-// compare result's current value in memory against m_Value
+// Compare result's current value in memory against m_Value
 #define NEXT_SCAN_PRIMITIVES_AGAINST_VALUE(CompareFunc) \
     switch(m_ValueType)                                 \
     {                                                   \
@@ -937,7 +917,7 @@ bool CMemoryScanner::FirstScan(DisplayFormat resDisplayFormat)
     case ValueType_double: _NextScanLoopPrimitive64(double,   CompareFunc); break; \
     }
 
-// compare result's current value in memory against result's old value
+// Compare result's current value in memory against result's old value
 #define NEXT_SCAN_PRIMITIVES_AGAINST_RESULTS(CompareFunc) \
     switch(m_ValueType)                                   \
     {                                                     \
@@ -1036,7 +1016,7 @@ int CMemoryScanner::ParseHexString(char *dst, const char* src)
         else
         {
             curByte |= HexDigitVal(src[i]);
-            if (dst != NULL)
+            if (dst != nullptr)
             {
                 dst[size] = curByte;
             }

@@ -2,18 +2,18 @@
 
 #include "DebugMMU.h"
 #include <Common/MemoryManagement.h>
-#include <Project64-core/N64System/N64DiskClass.h>
+#include <Project64-core/N64System/N64Disk.h>
 
 #define PJMEM_CARTROM    1
 
 uint8_t* CDebugMMU::GetPhysicalPtr(uint32_t paddr, WORD* flags)
 {
-    if (g_MMU == NULL)
+    if (g_MMU == nullptr)
     {
-        return NULL;
+        return nullptr;
     }
 
-    uint8_t* ptr = NULL;
+    uint8_t* ptr = nullptr;
     int nbyte = paddr & 3;
     paddr = paddr & ~3;
     
@@ -21,7 +21,7 @@ uint8_t* CDebugMMU::GetPhysicalPtr(uint32_t paddr, WORD* flags)
     bool bCartRom = false;
 
     if ((paddr < g_MMU->RdramSize()) || 
-        (paddr >= 0x04000000 && paddr <= 0x04001FFF)) // RDRAM & DMEM/IMEM
+        (paddr >= 0x04000000 && paddr <= 0x04001FFF)) // RDRAM and DMEM/IMEM
     {
         ptr = (uint8_t*)(g_MMU->Rdram() + paddr);
     }
@@ -29,11 +29,11 @@ uint8_t* CDebugMMU::GetPhysicalPtr(uint32_t paddr, WORD* flags)
     {
         // todo
     }
-    else if (paddr >= 0x06000000 && paddr <= 0x06FFFFFF) // Cartridge Domain 1 (Address 1) (64DD IPL ROM)
+    else if (paddr >= 0x06000000 && paddr <= 0x06FFFFFF) // Cartridge domain 1 (address 1) (64DD IPL ROM)
     {
         uint32_t iplRomOffset = paddr - 0x06000000;
 
-        if (g_DDRom != NULL && iplRomOffset < g_DDRom->GetRomSize())
+        if (g_DDRom != nullptr && iplRomOffset < g_DDRom->GetRomSize())
         {
             ptr = (uint8_t*)(g_MMU->Rdram() + paddr);
         }
@@ -41,7 +41,7 @@ uint8_t* CDebugMMU::GetPhysicalPtr(uint32_t paddr, WORD* flags)
     else if (paddr >= 0x10000000 && paddr <= 0x1FBFFFFF) // Cartridge ROM
     {
         uint32_t cartRomOffset = paddr - 0x10000000;
-        if (g_Rom != NULL && cartRomOffset < g_Rom->GetRomSize())
+        if (g_Rom != nullptr && cartRomOffset < g_Rom->GetRomSize())
         {
             ptr = (uint8_t*)(g_Rom->GetRomAddress() + cartRomOffset);
             bCartRom = true;
@@ -55,7 +55,7 @@ uint8_t* CDebugMMU::GetPhysicalPtr(uint32_t paddr, WORD* flags)
     }
     else
     {
-        // note: write-only registers are excluded
+        // Note: write-only registers are excluded
         switch (paddr)
         {
         case 0x03F00000: ptr = (uint8_t*)&g_Reg->RDRAM_CONFIG_REG; break;
@@ -140,12 +140,12 @@ uint8_t* CDebugMMU::GetPhysicalPtr(uint32_t paddr, WORD* flags)
         }
     }
 
-    if (ptr == NULL)
+    if (ptr == nullptr)
     {
-        return NULL;
+        return nullptr;
     }
 
-    if (flags != NULL)
+    if (flags != nullptr)
     {
         *flags = (bCartRom ? PJMEM_CARTROM : 0);
     }
@@ -162,9 +162,9 @@ uint8_t* CDebugMMU::GetPhysicalPtr(uint32_t paddr, WORD* flags)
 
 bool CDebugMMU::GetPhysicalByte(uint32_t paddr, uint8_t* value)
 {
-    uint8_t* ptr = GetPhysicalPtr(paddr, NULL);
+    uint8_t* ptr = GetPhysicalPtr(paddr, nullptr);
 
-    if (ptr != NULL)
+    if (ptr != nullptr)
     {
         *value = *ptr;
         return true;
@@ -172,11 +172,11 @@ bool CDebugMMU::GetPhysicalByte(uint32_t paddr, uint8_t* value)
 
     int nByte = paddr & 3;
 
-    if (paddr >= 0x08000000 && paddr <= 0x08FFFFFF) // Cartridge Domain 2 (Address 2)
+    if (paddr >= 0x08000000 && paddr <= 0x08FFFFFF) // Cartridge domain 2 (address 2)
     {
         uint32_t saveOffset = paddr & 0x000FFFFF;
 
-        if (g_System->m_SaveUsing == SaveChip_Sram && saveOffset <= 0x7FFF) // sram
+        if (g_System->m_SaveUsing == SaveChip_Sram && saveOffset <= 0x7FFF) // SRAM
         {
             uint32_t wordpaddr = paddr & ~3;
             uint8_t data[4];
@@ -186,7 +186,7 @@ bool CDebugMMU::GetPhysicalByte(uint32_t paddr, uint8_t* value)
             *value = data[nByte ^ 3];
             return true;
         }
-        else if (g_System->m_SaveUsing == SaveChip_FlashRam && saveOffset <= 3) // flash ram status
+        else if (g_System->m_SaveUsing == SaveChip_FlashRam && saveOffset <= 3) // FlashRAM status
         {
             CFlashram* flashRam = g_MMU->GetFlashram();
             uint32_t flashStatus = flashRam->ReadFromFlashStatus(0x08000000);
@@ -206,7 +206,7 @@ bool CDebugMMU::GetPhysicalByte(uint32_t paddr, uint8_t* value)
         else
         {
             CAudioPlugin* audioPlg = g_Plugins->Audio();
-            audioLength = audioPlg->AiReadLength != NULL ? audioPlg->AiReadLength() : 0;
+            audioLength = audioPlg->AiReadLength != nullptr ? audioPlg->AiReadLength() : 0;
         }
 
         *value = (audioLength >> (24 - nByte * 8)) & 0xFF;
@@ -229,7 +229,7 @@ bool CDebugMMU::SetPhysicalByte(uint32_t paddr, uint8_t value)
     uint8_t* ptr = GetPhysicalPtr(paddr, &flags);
     bool bCartRom = flags & PJMEM_CARTROM;
 
-    if (ptr != NULL)
+    if (ptr != nullptr)
     {
         if (!bCartRom)
         {
@@ -246,7 +246,7 @@ bool CDebugMMU::SetPhysicalByte(uint32_t paddr, uint8_t value)
 
     int nByte = paddr & 3;
 
-    if (paddr >= 0x08000000 && paddr <= 0x08FFFFFF) // Cartridge Domain 2 (Address 2)
+    if (paddr >= 0x08000000 && paddr <= 0x08FFFFFF) // Cartridge domain 2 (address 2)
     {
         uint32_t saveOffset = paddr & 0x000FFFFF;
 

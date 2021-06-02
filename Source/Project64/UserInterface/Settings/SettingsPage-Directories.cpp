@@ -6,7 +6,7 @@ COptionsDirectoriesPage::COptionsDirectoriesPage(HWND hParent, const RECT & rcDi
 m_InUpdateSettings(false)
 {
     Create(hParent);
-    if (m_hWnd == NULL)
+    if (m_hWnd == nullptr)
     {
         return;
     }
@@ -35,7 +35,7 @@ m_InUpdateSettings(false)
     m_TextureDefault.Attach(GetDlgItem(IDC_TEXTURE_DEFAULT));
     m_TextureSelected.Attach(GetDlgItem(IDC_TEXTURE_OTHER));
 
-    //Set Text language for the dialog box
+    // Set text language for the dialog box
     ::SetWindowText(m_PluginGroup.m_hWnd, wGS(DIR_PLUGIN).c_str());
     ::SetWindowText(m_AutoSaveGroup.m_hWnd, wGS(DIR_AUTO_SAVE).c_str());
     ::SetWindowText(m_InstantSaveGroup.m_hWnd, wGS(DIR_INSTANT_SAVE).c_str());
@@ -50,8 +50,8 @@ int CALLBACK COptionsDirectoriesPage::SelectDirCallBack(HWND hwnd, DWORD uMsg, D
     switch (uMsg)
     {
     case BFFM_INITIALIZED:
-        // WParam is TRUE since you are passing a path.
-        // It would be FALSE if you were passing a pidl.
+        // WParam is true since you are passing a path
+        // It would be false if you were passing a PIDL
         if (lpData)
         {
             SendMessage(hwnd, BFFM_SETSELECTION, TRUE, lpData);
@@ -67,16 +67,16 @@ void COptionsDirectoriesPage::SelectDirectory(LanguageStringID Title, CModifiedE
     LPITEMIDLIST pidl;
     BROWSEINFO bi;
 
-    stdstr InitialDir = EditBox.GetWindowText();
+    std::string InitialDir = GetCWindowText(EditBox);
     std::wstring wTitle = wGS(Title);
     bi.hwndOwner = m_hWnd;
-    bi.pidlRoot = NULL;
+    bi.pidlRoot = nullptr;
     bi.pszDisplayName = Buffer;
     bi.lpszTitle = wTitle.c_str();
     bi.ulFlags = BIF_RETURNFSANCESTORS | BIF_RETURNONLYFSDIRS;
     bi.lpfn = (BFFCALLBACK)SelectDirCallBack;
     bi.lParam = (DWORD)InitialDir.c_str();
-    if ((pidl = SHBrowseForFolder(&bi)) != NULL)
+    if ((pidl = SHBrowseForFolder(&bi)) != nullptr)
     {
         if (SHGetPathFromIDList(pidl, Directory))
         {
@@ -194,7 +194,7 @@ void COptionsDirectoriesPage::UpdatePageSettings()
 
 void COptionsDirectoriesPage::UseSelectedClicked(UINT /*Code*/, int id, HWND /*ctl*/)
 {
-    CModifiedButton * Button = NULL;
+    CModifiedButton * Button = nullptr;
     switch (id)
     {
     case IDC_PLUGIN_DEFAULT: Button = &m_PluginDefault; break;
@@ -209,7 +209,7 @@ void COptionsDirectoriesPage::UseSelectedClicked(UINT /*Code*/, int id, HWND /*c
     case IDC_TEXTURE_OTHER: Button = &m_TextureDefault; break;
     }
 
-    if (Button == NULL)
+    if (Button == nullptr)
     {
         return;
     }
@@ -264,8 +264,7 @@ void COptionsDirectoriesPage::UpdateDirectory(CModifiedEditBox & EditBox, Settin
 {
     if (EditBox.IsChanged())
     {
-        stdstr dir = EditBox.GetWindowText();
-        g_Settings->SaveString(Type, dir.c_str());
+        g_Settings->SaveString(Type, GetCWindowText(EditBox).c_str());
     }
     if (EditBox.IsReset())
     {

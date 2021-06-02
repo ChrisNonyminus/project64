@@ -1,9 +1,11 @@
 #pragma once
 #include <string>
-#include <Common/stdtypes.h>
+#include <stdint.h>
 
 enum UISettingID
 {
+    StartUISetting = SettingID::FirstUISettings,
+
     // Information - temporary keys
     Info_ShortCutsChanged,
 
@@ -28,6 +30,9 @@ enum UISettingID
     UserInterface_MainWindowTop,
     UserInterface_MainWindowLeft,
     UserInterface_AlwaysOnTop,
+    UserInterface_ShowStatusBar,
+    UserInterface_ExitFullscreenOnLoseFocus,
+    UserInterface_ShowingNagWindow,
 
     RomBrowser_Enabled,
     RomBrowser_ColoumnsChanged,

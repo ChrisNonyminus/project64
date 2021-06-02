@@ -10,7 +10,7 @@ CGamePluginPage::CGamePluginPage(HWND hParent, const RECT & rcDispay)
         return;
     }
 
-    //Set the text for all gui Items
+    // Set the text for all GUI items
     SetDlgItemText(RSP_ABOUT, wGS(PLUG_ABOUT).c_str());
     SetDlgItemText(GFX_ABOUT, wGS(PLUG_ABOUT).c_str());
     SetDlgItemText(AUDIO_ABOUT, wGS(PLUG_ABOUT).c_str());
@@ -56,7 +56,7 @@ void CGamePluginPage::AddPlugins(int ListId, SettingID Type, PLUGIN_TYPE PluginT
     for (int i = 0, n = m_PluginList.GetPluginCount(); i < n; i++)
     {
         const CPluginList::PLUGIN * Plugin = m_PluginList.GetPluginInfo(i);
-        if (Plugin == NULL)
+        if (Plugin == nullptr)
         {
             continue;
         }
@@ -74,7 +74,7 @@ void CGamePluginPage::AddPlugins(int ListId, SettingID Type, PLUGIN_TYPE PluginT
 
 void CGamePluginPage::ShowAboutButton(int id)
 {
-    CModifiedComboBox * ComboBox = NULL;
+    CModifiedComboBox * ComboBox = nullptr;
     for (ComboBoxList::iterator cb_iter = m_ComboBoxList.begin(); cb_iter != m_ComboBoxList.end(); cb_iter++)
     {
         if ((int)(cb_iter->second->GetMenu()) != id)
@@ -84,7 +84,7 @@ void CGamePluginPage::ShowAboutButton(int id)
         ComboBox = cb_iter->second;
         break;
     }
-    if (ComboBox == NULL)
+    if (ComboBox == nullptr)
     {
         return;
     }
@@ -95,31 +95,31 @@ void CGamePluginPage::ShowAboutButton(int id)
     }
 
     const CPluginList::PLUGIN ** PluginPtr = (const CPluginList::PLUGIN **)ComboBox->GetItemDataPtr(index);
-    if (PluginPtr == NULL)
+    if (PluginPtr == nullptr)
     {
         return;
     }
 
     const CPluginList::PLUGIN * Plugin = *PluginPtr;
-    if (Plugin == NULL)
+    if (Plugin == nullptr)
     {
         return;
     }
 
-    //Load the plugin
+    // Load the plugin
     UINT LastErrorMode = SetErrorMode(SEM_FAILCRITICALERRORS);
     HMODULE hLib = LoadLibrary(stdstr((const char *)Plugin->FullPath).ToUTF16().c_str());
     SetErrorMode(LastErrorMode);
-    if (hLib == NULL)
+    if (hLib == nullptr)
     {
         return;
     }
 
-    //Get DLL about
+    // Get DLL about
     void(CALL *DllAbout) (HWND hWnd);
     DllAbout = (void(CALL *)(HWND))GetProcAddress(hLib, "DllAbout");
 
-    //call the function from the dll
+    // Call the function from the DLL
     DllAbout(m_hWnd);
 
     FreeLibrary(hLib);
@@ -127,7 +127,7 @@ void CGamePluginPage::ShowAboutButton(int id)
 
 void CGamePluginPage::PluginItemChanged(int id, int AboutID, bool bSetChanged)
 {
-    CModifiedComboBox * ComboBox = NULL;
+    CModifiedComboBox * ComboBox = nullptr;
     for (ComboBoxList::iterator cb_iter = m_ComboBoxList.begin(); cb_iter != m_ComboBoxList.end(); cb_iter++)
     {
         if ((int)(cb_iter->second->GetMenu()) != id)
@@ -137,7 +137,7 @@ void CGamePluginPage::PluginItemChanged(int id, int AboutID, bool bSetChanged)
         ComboBox = cb_iter->second;
         break;
     }
-    if (ComboBox == NULL)
+    if (ComboBox == nullptr)
     {
         return;
     }
@@ -179,7 +179,7 @@ void CGamePluginPage::UpdatePageSettings(void)
             for (int i = 0, n = m_PluginList.GetPluginCount(); i < n; i++)
             {
                 const CPluginList::PLUGIN * Plugin = m_PluginList.GetPluginInfo(i);
-                if (Plugin == NULL)
+                if (Plugin == nullptr)
                 {
                     continue;
                 }
@@ -240,7 +240,7 @@ void CGamePluginPage::ApplyComboBoxes(void)
             }
 
             const CPluginList::PLUGIN ** PluginPtr = (const CPluginList::PLUGIN **)ComboBox->GetItemDataPtr(index);
-            if (PluginPtr == NULL)
+            if (PluginPtr == nullptr)
             {
                 return;
             }
@@ -277,11 +277,11 @@ bool CGamePluginPage::ResetComboBox(CModifiedComboBox & ComboBox, SettingID /*Ty
     for (int i = 0, n = ComboBox.GetCount(); i < n; i++)
     {
         const CPluginList::PLUGIN ** PluginPtr = (const CPluginList::PLUGIN **)ComboBox.GetItemDataPtr(i);
-        if (PluginPtr == NULL)
+        if (PluginPtr == nullptr)
         {
             continue;
         }
-        if (*PluginPtr != NULL)
+        if (*PluginPtr != nullptr)
         {
             continue;
         }

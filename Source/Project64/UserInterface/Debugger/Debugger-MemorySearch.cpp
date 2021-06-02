@@ -2,8 +2,8 @@
 #include "DebuggerUI.h"
 #include "MemoryScanner.h"
 
-CDebugMemorySearch* CDebugMemorySearch::_this = NULL;
-HHOOK CDebugMemorySearch::hWinMessageHook = NULL;
+CDebugMemorySearch* CDebugMemorySearch::_this = nullptr;
+HHOOK CDebugMemorySearch::hWinMessageHook = nullptr;
 
 const CSetValueDlg::ComboItem CDebugMemorySearch::ModalChangeTypeItems[] = {
     { "uint8",  ValueType_uint8 },
@@ -17,7 +17,7 @@ const CSetValueDlg::ComboItem CDebugMemorySearch::ModalChangeTypeItems[] = {
     { "float",  ValueType_float },
     { "double", ValueType_double },
     { "string", ValueType_string },
-    { NULL, 0 }
+    { nullptr, 0 }
 };
 
 CDebugMemorySearch::CDebugMemorySearch(CDebuggerUI * debugger) :
@@ -53,7 +53,7 @@ LRESULT CDebugMemorySearch::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARA
     m_AddrEnd.SetDisplayType(CEditNumber32::DisplayHex);
     m_AddrStart.SetDisplayType(CEditNumber32::DisplayHex);
 
-    UpdateOptions(); // setup search type combobox
+    UpdateOptions(); // Setup search type combo box
 
     CComboBox & vtcb = m_ValueTypeOptions;
     vtcb.SetItemData(vtcb.AddString(L"int8"), ValueType_int8);
@@ -96,28 +96,28 @@ LRESULT CDebugMemorySearch::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARA
     m_bDraggingSeparator = false;
     ::GetWindowRect(GetDlgItem(IDC_SEPARATOR), &m_InitialSeparatorRect);
     ScreenToClient(&m_InitialSeparatorRect);
-    
-    uint32_t ramSize = (g_MMU != NULL) ? g_MMU->RdramSize() : 0x00400000;
+
+    uint32_t ramSize = (g_MMU != nullptr) ? g_MMU->RdramSize() : 0x00400000;
 
     m_AddrStart.SetValue(0x80000000, DisplayMode::AllHex);
     m_AddrEnd.SetValue(0x80000000 + ramSize - 1, DisplayMode::AllHex);
 
     FixListHeader(m_WatchListCtrl);
     FixListHeader(m_ResultsListCtrl);
-    
+
     UpdateResultsList(true);
     UpdateWatchList();
 
     LoadWindowPos();
     WindowCreated();
 
-    m_hCursorSizeNS = LoadCursor(NULL, IDC_SIZENS);
+    m_hCursorSizeNS = LoadCursor(nullptr, IDC_SIZENS);
 
-    SetTimer(TIMER_ID_AUTO_REFRESH, 100, NULL);
+    SetTimer(TIMER_ID_AUTO_REFRESH, 100, nullptr);
 
     _this = this;
     m_ThreadId = ::GetCurrentThreadId();
-    hWinMessageHook = SetWindowsHookEx(WH_GETMESSAGE, (HOOKPROC)HookProc, NULL, m_ThreadId);
+    hWinMessageHook = SetWindowsHookEx(WH_GETMESSAGE, (HOOKPROC)HookProc, nullptr, m_ThreadId);
 
     GameReset();
 
@@ -148,7 +148,7 @@ LRESULT CDebugMemorySearch::OnDestroy(void)
 
 void CDebugMemorySearch::GameReset(void)
 {
-    if (m_hWnd == NULL)
+    if (m_hWnd == nullptr)
     {
         return;
     }
@@ -236,8 +236,8 @@ LRESULT CDebugMemorySearch::OnSearchButton(WORD /*wNotifyCode*/, WORD /*wID*/, H
 {
     g_BaseSystem->ExternalEvent(SysEvent_PauseCPU_SearchMemory);
     Search();
-    // emulator won't resume sometimes unless there's a sleep() here
-    Sleep(50); // todo fix?
+    // Emulator won't resume sometimes unless there's a sleep() here
+    Sleep(50); // TODO: fix?
     g_BaseSystem->ExternalEvent(SysEvent_ResumeCPU_SearchMemory);
     return FALSE;
 }
@@ -262,7 +262,7 @@ LRESULT CDebugMemorySearch::OnScanTypeChanged(WORD /*wNotifyCode*/, WORD /*wID*/
         SetComboBoxSelByData(m_ValueTypeOptions, ValueType_int32);
         m_ValueTypeOptions.EnableWindow(FALSE);
 
-        // remember checkbox states
+        // Remember checkbox states
         m_bJalHexWasChecked = (m_HexCheckbox.GetCheck() == BST_CHECKED);
         m_bJalUnsignedWasChecked = (m_UnsignedCheckbox.GetCheck() == BST_CHECKED);
 
@@ -336,7 +336,7 @@ LRESULT CDebugMemorySearch::OnRdramButton(WORD /*wNotifyCode*/, WORD /*wID*/, HW
 {
     bool bPhysicalChecked = (m_PhysicalCheckbox.GetCheck() == BST_CHECKED);
     uint32_t addrStart = bPhysicalChecked ? 0 : 0x80000000;
-    uint32_t ramSize = (g_MMU != NULL) ? g_MMU->RdramSize() : 0x00400000;
+    uint32_t ramSize = (g_MMU != nullptr) ? g_MMU->RdramSize() : 0x00400000;
     m_AddrStart.SetValue(addrStart, DisplayMode::AllHex);
     m_AddrEnd.SetValue(addrStart + ramSize - 1, DisplayMode::AllHex);
     return FALSE;
@@ -383,7 +383,7 @@ LRESULT CDebugMemorySearch::OnResultsCustomDraw(LPNMHDR lpnmh)
     case ResultsListCtrl_Col_Address:
         if (presult->m_AddressType == AddressType_Physical)
         {
-            // green if address is physical
+            // Green if address is physical
             pLVCD->clrText = RGB(0x44, 0x88, 0x44);
         }
         break;
@@ -399,13 +399,13 @@ LRESULT CDebugMemorySearch::OnResultsCustomDraw(LPNMHDR lpnmh)
                 pLVCD->clrText = RGB(0, 0, 0);
                 if (presult->m_DisplayFormat == DisplayHex)
                 {
-                    // blue if hex string
+                    // Blue if hex string
                     pLVCD->clrText = RGB(0, 0, 255);
                 }
             }
             else if (strcmp(szCurrentValue, szOldValue) != 0)
             {
-                // red if value has changed
+                // Red if value has changed
                 pLVCD->clrText = RGB(255, 0, 0);
             }
         }
@@ -442,16 +442,16 @@ LRESULT CDebugMemorySearch::OnResultsRClick(LPNMHDR /*lpnmh*/)
         return true;
     }
 
-    //Load the menu
-    HMENU hMenu = LoadMenu(GetModuleHandle(NULL), MAKEINTRESOURCE(IDR_MEM_SEARCH));
+    // Load the menu
+    HMENU hMenu = LoadMenu(GetModuleHandle(nullptr), MAKEINTRESOURCE(IDR_MEM_SEARCH));
     HMENU hPopupMenu = GetSubMenu(hMenu, 0);
 
-    //Get the current Mouse location
+    // Get the current mouse location
     POINT Mouse;
     GetCursorPos(&Mouse);
 
-    //Show the menu
-    TrackPopupMenu(hPopupMenu, 0, Mouse.x, Mouse.y, 0, m_hWnd, NULL);
+    // Show the menu
+    TrackPopupMenu(hPopupMenu, 0, Mouse.x, Mouse.y, 0, m_hWnd, nullptr);
     DestroyMenu(hMenu);
     return true;
 }
@@ -460,7 +460,7 @@ LRESULT CDebugMemorySearch::OnResultsPopupViewMemory(WORD /*wNotifyCode*/, WORD 
 {
     CScanResult* presult = GetFirstSelectedScanResult();
 
-    if (presult == NULL)
+    if (presult == nullptr)
     {
         return FALSE;
     }
@@ -503,7 +503,7 @@ LRESULT CDebugMemorySearch::OnResultsPopupSetValue(WORD /*wNotifyCode*/, WORD /*
 {
     CScanResult* pFirstResult = GetFirstSelectedScanResult();
 
-    if (pFirstResult == NULL)
+    if (pFirstResult == nullptr)
     {
         return FALSE;
     }
@@ -523,9 +523,9 @@ LRESULT CDebugMemorySearch::OnResultsPopupSetValue(WORD /*wNotifyCode*/, WORD /*
             {
                 int index = m_ResultsListCtrl.GetItemData(iItem);
                 CScanResult* presult = m_MemoryScanner.GetResult(index);
-                wchar_t* enteredString = m_SetValueDlg.GetEnteredString();
-                presult->SetMemoryValueFromString(stdstr().FromUTF16(enteredString).c_str());
-                m_ResultsListCtrl.SetItemText(iItem, ResultsListCtrl_Col_Value, enteredString);
+                const std::string & enteredString = m_SetValueDlg.GetEnteredString();
+                presult->SetMemoryValueFromString(enteredString.c_str());
+                m_ResultsListCtrl.SetItemText(iItem, ResultsListCtrl_Col_Value, stdstr(enteredString).ToUTF16().c_str());
             }
         }
     }
@@ -597,7 +597,7 @@ LRESULT CDebugMemorySearch::OnWatchListCustomDraw(LPNMHDR lpnmh)
     case WatchListCtrl_Col_Address:
         if (presult->m_AddressType == AddressType_Physical)
         {
-            // green if address is physical
+            // Green if address is physical
             pLVCD->clrText = RGB(0x44, 0x88, 0x44);
         }
         break;
@@ -607,7 +607,7 @@ LRESULT CDebugMemorySearch::OnWatchListCustomDraw(LPNMHDR lpnmh)
             pLVCD->clrText = RGB(0, 0, 0);
             if (presult->m_DisplayFormat == DisplayHex)
             {
-                // blue if hex string
+                // Blue if hex string
                 pLVCD->clrText = RGB(0, 0, 255);
             }
         }
@@ -633,7 +633,7 @@ LRESULT CDebugMemorySearch::OnWatchListDblClick(LPNMHDR /*lpnmh*/)
 
     int nSelectedCol = -1;
 
-    // hit test for column
+    // Hit test for column
 
     POINT mousePt;
     RECT listRect;
@@ -662,8 +662,7 @@ LRESULT CDebugMemorySearch::OnWatchListDblClick(LPNMHDR /*lpnmh*/)
         {
             if (m_SetValueDlg.DoModal("Change address", "New address:", stdstr_f("0x%08X", presult->m_Address).c_str()))
             {
-                std::string szEnteredString = stdstr().FromUTF16(m_SetValueDlg.GetEnteredString());
-                uint32_t newAddr = strtoul(szEnteredString.c_str(), NULL, 0);
+                uint32_t newAddr = strtoul(m_SetValueDlg.GetEnteredString().c_str(), nullptr, 0);
                 if (presult->SetAddressSafe(newAddr))
                 {
                     m_WatchListCtrl.SetItemText(iItem, WatchListCtrl_Col_Address, stdstr_f("0x%08X", newAddr).ToUTF16().c_str());
@@ -677,7 +676,7 @@ LRESULT CDebugMemorySearch::OnWatchListDblClick(LPNMHDR /*lpnmh*/)
             presult->GetMemoryValueString(szInitialValue, 1024);
             if (m_SetValueDlg.DoModal("Change value", "New value:", szInitialValue))
             {
-                presult->SetMemoryValueFromString(stdstr().FromUTF16(m_SetValueDlg.GetEnteredString()).c_str());
+                presult->SetMemoryValueFromString(m_SetValueDlg.GetEnteredString().c_str());
             }
         }
         break;
@@ -685,9 +684,9 @@ LRESULT CDebugMemorySearch::OnWatchListDblClick(LPNMHDR /*lpnmh*/)
         {
             if (m_SetValueDlg.DoModal("Set description", "New description:", presult->GetDescription()))
             {
-                stdstr szEnteredString = stdstr().FromUTF16(m_SetValueDlg.GetEnteredString());
-                presult->SetDescription(szEnteredString.c_str());
-                m_WatchListCtrl.SetItemText(iItem, WatchListCtrl_Col_Description, stdstr(szEnteredString).ToUTF16().c_str());
+                stdstr EnteredString = m_SetValueDlg.GetEnteredString();
+                presult->SetDescription(EnteredString.c_str());
+                m_WatchListCtrl.SetItemText(iItem, WatchListCtrl_Col_Description, EnteredString.ToUTF16().c_str());
             }
         }
         break;
@@ -702,8 +701,7 @@ LRESULT CDebugMemorySearch::OnWatchListDblClick(LPNMHDR /*lpnmh*/)
                 {
                     if (m_SetValueDlg.DoModal("String length", "New string length:", stdstr_f("%d", presult->GetStrLength()).c_str()))
                     {
-                        stdstr enteredString = stdstr().FromUTF16(m_SetValueDlg.GetEnteredString());
-                        int length = atoi(enteredString.c_str());
+                        int length = atoi(m_SetValueDlg.GetEnteredString().c_str());
                         presult->SetStrLengthSafe(length);
                     }
 
@@ -732,11 +730,11 @@ LRESULT CDebugMemorySearch::OnWatchListRClick(LPNMHDR /*lpnmh*/)
     int index = m_WatchListCtrl.GetItemData(iItem);
     CScanResult *presult = &m_WatchList[index];
 
-    //Load the menu
-    HMENU hMenu = LoadMenu(GetModuleHandle(NULL), MAKEINTRESOURCE(IDR_MEM_WATCHLIST));
+    // Load the menu
+    HMENU hMenu = LoadMenu(GetModuleHandle(nullptr), MAKEINTRESOURCE(IDR_MEM_WATCHLIST));
     HMENU hPopupMenu = GetSubMenu(hMenu, 0);
 
-    //Get the current Mouse location
+    // Get the current mouse location
     POINT Mouse;
     GetCursorPos(&Mouse);
 
@@ -752,8 +750,8 @@ LRESULT CDebugMemorySearch::OnWatchListRClick(LPNMHDR /*lpnmh*/)
     CheckMenuItem(hPopupMenu, ID_WATCHLIST_WRITEBP, bHaveWriteBP ? MF_CHECKED : MF_UNCHECKED);
     CheckMenuItem(hPopupMenu, ID_WATCHLIST_HEXADECIMAL, bHex ? MF_CHECKED : MF_UNCHECKED);
 
-    //Show the menu
-    TrackPopupMenu(hPopupMenu, 0, Mouse.x, Mouse.y, 0, m_hWnd, NULL);
+    // Show the menu
+    TrackPopupMenu(hPopupMenu, 0, Mouse.x, Mouse.y, 0, m_hWnd, nullptr);
     DestroyMenu(hMenu);
     return true;
 }
@@ -762,7 +760,7 @@ LRESULT CDebugMemorySearch::OnWatchListPopupViewMemory(WORD /*wNotifyCode*/, WOR
 {
     CScanResult* presult = GetFirstSelectedWatchListResult();
 
-    if (presult == NULL)
+    if (presult == nullptr)
     {
         return FALSE;
     }
@@ -794,7 +792,7 @@ LRESULT CDebugMemorySearch::OnWatchListPopupReadBP(WORD /*wNotifyCode*/, WORD /*
 {
     CScanResult* presult = GetFirstSelectedWatchListResult();
 
-    if (presult == NULL)
+    if (presult == nullptr)
     {
         return FALSE;
     }
@@ -807,7 +805,7 @@ LRESULT CDebugMemorySearch::OnWatchListPopupWriteBP(WORD /*wNotifyCode*/, WORD /
 {
     CScanResult* presult = GetFirstSelectedWatchListResult();
 
-    if (presult == NULL)
+    if (presult == nullptr)
     {
         return FALSE;
     }
@@ -820,12 +818,12 @@ LRESULT CDebugMemorySearch::OnWatchListPopupAddSymbol(WORD /*wNotifyCode*/, WORD
 {
     CScanResult* presult = GetFirstSelectedWatchListResult();
 
-    if (presult == NULL)
+    if (presult == nullptr)
     {
         return FALSE;
     }
 
-    // todo fix magic numbers
+    // TODO: fix magic numbers
     int nSymType = 1;
 
     switch (presult->GetType())
@@ -877,7 +875,7 @@ LRESULT CDebugMemorySearch::OnWatchListPopupChangeValue(WORD /*wNotifyCode*/, WO
 {
     CScanResult* pFirstResult = GetFirstSelectedWatchListResult();
 
-    if (pFirstResult == NULL)
+    if (pFirstResult == nullptr)
     {
         return FALSE;
     }
@@ -896,10 +894,9 @@ LRESULT CDebugMemorySearch::OnWatchListPopupChangeValue(WORD /*wNotifyCode*/, WO
             {
                 int index = m_WatchListCtrl.GetItemData(iItem);
                 CScanResult* presult = &m_WatchList[index];
-                stdstr enteredString = stdstr().FromUTF16(m_SetValueDlg.GetEnteredString());
-                // todo prompt for size change if string is too long
-                presult->SetMemoryValueFromString(enteredString.c_str()); 
-                m_WatchListCtrl.SetItemText(iItem, WatchListCtrl_Col_Value, stdstr(enteredString).ToUTF16().c_str());
+                // TODO: prompt for size change if string is too long
+                presult->SetMemoryValueFromString(m_SetValueDlg.GetEnteredString().c_str());
+                m_WatchListCtrl.SetItemText(iItem, WatchListCtrl_Col_Value, stdstr(m_SetValueDlg.GetEnteredString()).ToUTF16().c_str());
             }
         }
     }
@@ -911,7 +908,7 @@ LRESULT CDebugMemorySearch::OnWatchListPopupChangeDescription(WORD /*wNotifyCode
 {
     CScanResult* pFirstResult = GetFirstSelectedWatchListResult();
 
-    if (pFirstResult == NULL)
+    if (pFirstResult == nullptr)
     {
         return FALSE;
     }
@@ -927,7 +924,7 @@ LRESULT CDebugMemorySearch::OnWatchListPopupChangeDescription(WORD /*wNotifyCode
             {
                 int index = m_WatchListCtrl.GetItemData(iItem);
                 CScanResult* presult = &m_WatchList[index];
-                stdstr description = stdstr().FromUTF16(m_SetValueDlg.GetEnteredString());
+                stdstr description = m_SetValueDlg.GetEnteredString();
                 presult->SetDescription(description.c_str());
                 m_WatchListCtrl.SetItemText(iItem, WatchListCtrl_Col_Description, description.ToUTF16().c_str());
             }
@@ -941,7 +938,7 @@ LRESULT CDebugMemorySearch::OnWatchListPopupChangeType(WORD /*wNotifyCode*/, WOR
 {
     CScanResult* pFirstResult = GetFirstSelectedWatchListResult();
 
-    if (pFirstResult == NULL)
+    if (pFirstResult == nullptr)
     {
         return FALSE;
     }
@@ -956,8 +953,7 @@ LRESULT CDebugMemorySearch::OnWatchListPopupChangeType(WORD /*wNotifyCode*/, WOR
             if (m_SetValueDlg.DoModal("String length", "New string length:",
                 stdstr_f("%d", pFirstResult->GetStrLength()).c_str()))
             {
-                stdstr enteredString = stdstr().FromUTF16(m_SetValueDlg.GetEnteredString());
-                length = atoi(enteredString.c_str());
+                length = atoi(m_SetValueDlg.GetEnteredString().c_str());
 
                 if (length <= 0)
                 {
@@ -998,22 +994,21 @@ LRESULT CDebugMemorySearch::OnWatchListPopupChangeAddress(WORD /*wNotifyCode*/, 
 {
     CScanResult* pFirstResult = GetFirstSelectedWatchListResult();
 
-    if (pFirstResult == NULL)
+    if (pFirstResult == nullptr)
     {
         return FALSE;
     }
 
     if (m_SetValueDlg.DoModal("Change address", "New address:", stdstr_f("0x%08X", pFirstResult->m_Address).c_str()))
     {
-        stdstr enteredString = stdstr().FromUTF16(m_SetValueDlg.GetEnteredString());
-        uint32_t newAddr = strtoul(enteredString.c_str(), NULL, 0);
+        uint32_t newAddr = strtoul(m_SetValueDlg.GetEnteredString().c_str(), nullptr, 0);
         stdstr newAddrStr = stdstr_f("0x%08X", newAddr);
 
         int nItems = m_WatchListCtrl.GetItemCount();
         for (int iItem = 0; iItem < nItems; iItem++)
         {
             bool bSelected = (m_WatchListCtrl.GetItemState(iItem, LVNI_SELECTED) != 0);
-        
+
             if (bSelected)
             {
                 int index = m_WatchListCtrl.GetItemData(iItem);
@@ -1031,21 +1026,20 @@ LRESULT CDebugMemorySearch::OnWatchListPopupChangeAddressBy(WORD /*wNotifyCode*/
 {
     CScanResult* pFirstResult = GetFirstSelectedWatchListResult();
 
-    if (pFirstResult == NULL)
+    if (pFirstResult == nullptr)
     {
         return FALSE;
     }
 
     if (m_SetValueDlg.DoModal("Adjust address", "Address offset (+/-):", "0"))
     {
-        stdstr szEnteredString = stdstr().FromUTF16(m_SetValueDlg.GetEnteredString());
-        int offset = atoi(szEnteredString.c_str());
+        int offset = atoi(m_SetValueDlg.GetEnteredString().c_str());
 
         int nItems = m_WatchListCtrl.GetItemCount();
         for (int iItem = 0; iItem < nItems; iItem++)
         {
             bool bSelected = (m_WatchListCtrl.GetItemState(iItem, LVNI_SELECTED) != 0);
-        
+
             if (bSelected)
             {
                 int index = m_WatchListCtrl.GetItemData(iItem);
@@ -1102,7 +1096,7 @@ LRESULT CDebugMemorySearch::OnWatchListPopupCopyGamesharkCode(WORD /*wNotifyCode
 
             bool haveOddLength = (length & 1) != 0;
             int evenLength = length & ~1;
-                
+
             if (length >= 2)
             {
                 for (int j = 0; j < evenLength; j += 2)
@@ -1206,7 +1200,7 @@ LRESULT CDebugMemorySearch::OnWatchListPopupCopyAddressAndDescription(WORD /*wNo
 
 LRESULT CDebugMemorySearch::OnSetFont(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& /*bHandled*/)
 {
-    // set row height for the results list and watch list
+    // Set row height for the results list and watch list
     CClientDC dc(m_hWnd);
     dc.SelectFont((HFONT)wParam);
     TEXTMETRIC tm;
@@ -1306,27 +1300,27 @@ void CDebugMemorySearch::OnInterceptMouseMove(WPARAM /*wParam*/, LPARAM /*lParam
         CRect sepRect, windowRect;
         int yChange = cursorPos.y - m_LastSeparatorRect.top;
 
-        // move separator
+        // Move separator
         HWND hSeparator = GetDlgItem(IDC_SEPARATOR);
         ::GetWindowRect(hSeparator, &sepRect);
         ScreenToClient(&sepRect);
-        ::SetWindowPos(hSeparator, NULL, sepRect.left, cursorPos.y, 0, 0,
+        ::SetWindowPos(hSeparator, nullptr, sepRect.left, cursorPos.y, 0, 0,
             SWP_NOSIZE | SWP_NOZORDER);
-        ::InvalidateRect(hSeparator, NULL, true);
+        ::InvalidateRect(hSeparator, nullptr, true);
 
-        // move and resize controls
+        // Move and resize controls
         SeparatorMoveCtrl(IDC_LST_WATCHLIST, yChange, false);
         SeparatorMoveCtrl(IDC_SCRL_WATCHLIST, yChange, false);
         SeparatorMoveCtrl(IDC_NUM_RESULTS, yChange, true);
         SeparatorMoveCtrl(IDC_LST_RESULTS, yChange, true);
         SeparatorMoveCtrl(IDC_SCRL_RESULTS, yChange, true);
 
-        // adjust window height
+        // Adjust window height
         GetWindowRect(&windowRect);
         windowRect.bottom += yChange;
         SetWindowPos(HWND_TOP, &windowRect, SWP_NOMOVE);
 
-        // save separator pos
+        // Save separator position
         ::GetWindowRect(hSeparator, &m_LastSeparatorRect);
         ScreenToClient(&m_LastSeparatorRect);
     }
@@ -1338,21 +1332,21 @@ void CDebugMemorySearch::OnInterceptMouseWheel(WPARAM wParam, LPARAM /*lParam*/)
 
     if (MouseHovering(IDC_LST_RESULTS) || MouseHovering(IDC_SCRL_RESULTS))
     {
-        // scroll results list
+        // Scroll results list
         int scrollPos = m_ResultsScrollbar.GetScrollPos();
         m_ResultsScrollbar.SetScrollPos(scrollPos + nScroll);
         UpdateResultsList();
     }
     else if (MouseHovering(IDC_LST_WATCHLIST) || MouseHovering(IDC_SCRL_WATCHLIST))
     {
-        // scroll watch list
+        // Scroll watch list
         int scrollPos = m_WatchListScrollbar.GetScrollPos();
         m_WatchListScrollbar.SetScrollPos(scrollPos + nScroll);
         UpdateWatchList();
     }
 }
 
-// util
+// Utility
 
 void CDebugMemorySearch::ClearWatchList(void)
 {
@@ -1400,7 +1394,7 @@ CScanResult* CDebugMemorySearch::GetFirstSelectedScanResult(void)
 
     if (iItem == -1)
     {
-        return NULL;
+        return nullptr;
     }
 
     int index = m_ResultsListCtrl.GetItemData(iItem);
@@ -1414,7 +1408,7 @@ CScanResult* CDebugMemorySearch::GetFirstSelectedWatchListResult(void)
 
     if (iItem == -1)
     {
-        return NULL;
+        return nullptr;
     }
 
     int index = m_WatchListCtrl.GetItemData(iItem);
@@ -1451,7 +1445,7 @@ bool CDebugMemorySearch::MouseHovering(WORD ctrlId, int hMargin, int vMargin)
     }
 
     ::GetWindowRect(GetDlgItem(ctrlId), &ctrlRect);
-    
+
     return (
         pointerPos.x >= ctrlRect.left - hMargin &&
         pointerPos.x <= ctrlRect.right + hMargin &&
@@ -1466,18 +1460,18 @@ void CDebugMemorySearch::SeparatorMoveCtrl(WORD ctrlId, int yChange, bool bResiz
     ::GetWindowRect(hControl, &rect);
     ScreenToClient(&rect);
 
-    if (bResize) // resize control
+    if (bResize) // Resize control
     {
-        ::SetWindowPos(hControl, NULL, 0, 0, rect.Width(), rect.Height() + yChange,
+        ::SetWindowPos(hControl, nullptr, 0, 0, rect.Width(), rect.Height() + yChange,
             SWP_NOMOVE | SWP_NOZORDER);
     }
-    else // move control
+    else // Move control
     {
-        ::SetWindowPos(hControl, NULL, rect.left, rect.top + yChange, 0, 0,
+        ::SetWindowPos(hControl, nullptr, rect.left, rect.top + yChange, 0, 0,
             SWP_NOSIZE | SWP_NOZORDER);
     }
 
-    ::InvalidateRect(hControl, NULL, true);
+    ::InvalidateRect(hControl, nullptr, true);
 }
 
 int CDebugMemorySearch::GetNumVisibleRows(CListViewCtrl& list)
@@ -1641,7 +1635,6 @@ void CDebugMemorySearch::Search(void)
                     goto value_parse_error;
                 }
             }
-            
             m_MemoryScanner.SetValue<const wchar_t*>(value._string);
             m_MemoryScanner.SetStringValueLength(stringValueLength);
             break;
@@ -1651,7 +1644,7 @@ void CDebugMemorySearch::Search(void)
             {
                 goto value_parse_error;
             }
-        
+
             m_MemoryScanner.SetValue<const wchar_t*>(value._string);
             m_MemoryScanner.SetStringValueLength(stringValueLength);
             break;
@@ -1660,7 +1653,7 @@ void CDebugMemorySearch::Search(void)
             return;
         }
     }
-    
+
     if (!m_MemoryScanner.DidFirstScan())
     {
         m_MemoryScanner.SetAddressType(bPhysicalChecked ? AddressType_Physical : AddressType_Virtual);
@@ -1768,7 +1761,7 @@ void CDebugMemorySearch::UpdateOptions(void)
             valueType == ValueType_istring ||
             valueType == ValueType_unkstring)
         {
-            // complex search types, disable next search
+            // Complex search types, disable next search
             ::EnableWindow(GetDlgItem(IDC_BTN_SEARCH), false);
             m_SearchTypeOptions.EnableWindow(FALSE);
         }
@@ -1919,7 +1912,7 @@ void CDebugMemorySearch::RefreshResultsListValues(void)
     }
 
     int numShownResults = m_ResultsListCtrl.GetItemCount();
-    
+
     if (numShownResults > 0)
     {
         m_ResultsListCtrl.SetRedraw(FALSE);
@@ -1929,7 +1922,7 @@ void CDebugMemorySearch::RefreshResultsListValues(void)
             size_t index = m_ResultsListCtrl.GetItemData(nItem);
             CScanResult *presult = m_MemoryScanner.GetResult(index);
 
-            if (presult == NULL)
+            if (presult == nullptr)
             {
                 g_Notify->BreakPoint(__FILE__, __LINE__);
                 break;
@@ -2044,7 +2037,7 @@ void CDebugMemorySearch::LoadWatchList(void)
     {
         ClearWatchList();
     }
-    
+
     CPath wlPath = GetWatchListPath();
     m_WatchListFile.Open(wlPath, CFileBase::modeRead);
 
@@ -2052,18 +2045,18 @@ void CDebugMemorySearch::LoadWatchList(void)
     {
         return;
     }
-    
+
     uint32_t length = m_WatchListFile.GetLength();
     char* szWlFile = new char[length + 1];
-    
+
     m_WatchListFile.SeekToBegin();
     m_WatchListFile.Read(szWlFile, length);
     szWlFile[length] = '\0';
 
     m_WatchListFile.Close();
-    
+
     char* p = szWlFile;
-    
+
     while (*p)
     {
         CScanResult result(AddressType_Virtual, DisplayDefault);
@@ -2083,7 +2076,7 @@ void CDebugMemorySearch::LoadWatchList(void)
         default: goto parse_error;
         }
 
-        uint32_t address = strtoul(szAddress, NULL, 16);
+        uint32_t address = strtoul(szAddress, nullptr, 16);
         result.m_Address = address;
 
         ValueType type;
@@ -2100,7 +2093,7 @@ void CDebugMemorySearch::LoadWatchList(void)
         if (result.IsStringType())
         {
             // g_MMU is null here, can't use SetStrLengthSafe
-            // todo fix
+            // TODO: fix
             result.SetStrLength(charArrayLength);
         }
 
@@ -2126,10 +2119,10 @@ void CDebugMemorySearch::LoadWatchList(void)
     }
 
     UpdateWatchList();
-    
+
     parse_error:
     delete[] szWlFile;
-    
+
 }
 
 void CDebugMemorySearch::FixListHeader(CListViewCtrl& listCtrl)
@@ -2167,8 +2160,6 @@ CPath CDebugMemorySearch::GetWatchListPath(void)
     return wlFilePath;
 }
 
-////////////////////////
-
 INT_PTR CSetValueDlg::DoModal(const char* caption, const char* label, const char* initialText)
 {
     m_Mode = Mode_TextBox;
@@ -2188,7 +2179,7 @@ INT_PTR CSetValueDlg::DoModal(const char* caption, const char* label, DWORD_PTR 
     return CDialogImpl<CSetValueDlg>::DoModal();
 }
 
-wchar_t* CSetValueDlg::GetEnteredString(void)
+const std::string & CSetValueDlg::GetEnteredString(void)
 {
     return m_EnteredString;
 }
@@ -2224,7 +2215,7 @@ LRESULT CSetValueDlg::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lP
     {
         m_Value.ShowWindow(SW_HIDE);
 
-        for (int i = 0; m_ComboItems[i].str != NULL; i++)
+        for (int i = 0; m_ComboItems[i].str != nullptr; i++)
         {
             int idx = m_CmbValue.AddString(stdstr(m_ComboItems[i].str).ToUTF16().c_str());
             m_CmbValue.SetItemData(idx, m_ComboItems[i].data);
@@ -2248,24 +2239,14 @@ LRESULT CSetValueDlg::OnDestroy(void)
 
 LRESULT CSetValueDlg::OnOK(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hwnd*/, BOOL& /*bHandled*/)
 {
-    if (m_EnteredString != NULL)
-    {
-        delete[] m_EnteredString;
-        m_EnteredString = NULL;
-    }
-
+    m_EnteredString.clear();
     if (m_Mode == Mode_TextBox)
     {
-        int length = m_Value.GetWindowTextLength();
-        m_EnteredString = new wchar_t[length + 1];
-        m_Value.GetWindowText(m_EnteredString, length + 1);
+        m_EnteredString = GetCWindowText(m_Value);
     }
     else if (m_Mode == Mode_ComboBox)
     {
-        int length = m_CmbValue.GetWindowTextLength();
-        m_EnteredString = new wchar_t[length + 1];
-        m_CmbValue.GetWindowText(m_EnteredString, length + 1);
-
+        m_EnteredString = GetCWindowText(m_CmbValue);
         m_EnteredData = m_CmbValue.GetItemData(m_CmbValue.GetCurSel());
     }
 
@@ -2279,32 +2260,21 @@ LRESULT CSetValueDlg::OnCancel(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hwnd*/
     return FALSE;
 }
 
-CSetValueDlg::CSetValueDlg(void) :
-    m_EnteredString(NULL)
+CSetValueDlg::CSetValueDlg(void)
 {
 }
 
 CSetValueDlg::~CSetValueDlg(void)
 {
-    if (m_EnteredString != NULL)
-    {
-        delete[] m_EnteredString;
-    }
 }
 
-////////////////////////
-
 CEditMixed::CEditMixed(void) :
-    m_String(NULL)
+    m_String(nullptr)
 {
 }
 
 CEditMixed::~CEditMixed(void)
 {
-    if (m_String != NULL)
-    {
-        delete[] m_String;
-    }
 }
 
 DisplayFormat CEditMixed::GetDisplayFormat(void)
@@ -2319,7 +2289,7 @@ void CEditMixed::SetDisplayFormat(DisplayFormat fmt)
 
 void CEditMixed::ReloadString(void)
 {
-    if (m_String != NULL)
+    if (m_String != nullptr)
     {
         delete[] m_String;
     }
@@ -2442,7 +2412,7 @@ bool CEditMixed::GetValue(uint64_t& value)
 
     if (*end != '\0')
     {
-        return false; // parse failure
+        return false; // Parse failure
     }
 
     value = res;
@@ -2463,7 +2433,7 @@ bool CEditMixed::GetValue(int64_t& value)
 
     if (*end != '\0')
     {
-        return false; // parse failure
+        return false; // Parse failure
     }
 
     value = res;
@@ -2540,7 +2510,7 @@ bool CEditMixed::GetValueHexString(const wchar_t*& value, int& length)
     }
 
     stdstr string = stdstr().FromUTF16(m_String);
-    int numBytes = CMemoryScanner::ParseHexString(NULL, string.c_str());
+    int numBytes = CMemoryScanner::ParseHexString(nullptr, string.c_str());
 
     if (numBytes == 0)
     {

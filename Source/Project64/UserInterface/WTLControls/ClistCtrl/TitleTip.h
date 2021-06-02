@@ -6,7 +6,7 @@ class CTitleTip : public CWindowImpl< CTitleTip >
 public:
 	CTitleTip()
 	{
-		m_hWndParent = NULL;
+		m_hWndParent = nullptr;
 	}
 	
 	~CTitleTip()
@@ -41,21 +41,21 @@ public:
 		m_rgbBackgroundTop = RGB( 250, 250, 250 );
 		m_rgbBackgroundBottom = RGB( 235, 235, 235 );
 		
-		CRect Area(NULL);
-		if ( CWindowImpl< CTitleTip >::Create( hWndParent, Area, NULL, WS_POPUP, WS_EX_TOOLWINDOW | WS_EX_TOPMOST ) == NULL )
+		CRect Area(nullptr);
+		if ( CWindowImpl< CTitleTip >::Create( hWndParent, Area, nullptr, WS_POPUP, WS_EX_TOOLWINDOW | WS_EX_TOPMOST ) == nullptr )
 			return FALSE;
 		
-		// create the tooltip
+		// Create the tooltip
 		if ( !m_ttToolTip.Create( m_hWnd ) )
 			return FALSE;
 		m_ttToolTip.SetMaxTipWidth( SHRT_MAX );
 		
-		// get system message font
+		// Get system message font
 		WTL::CLogFont logFont;
 		logFont.SetMessageBoxFont();
 		if ( !m_fntTitleFont.IsNull() )
 			m_fntTitleFont.DeleteObject();
-		return ( m_fntTitleFont.CreateFontIndirect( &logFont ) != NULL );
+		return ( m_fntTitleFont.CreateFontIndirect( &logFont ) != nullptr );
 	}
 	
 	BOOL Show( CRect& rcRect, LPCTSTR lpszItemText, LPCTSTR lpszToolTip )
@@ -75,12 +75,12 @@ public:
 			
 		CRect rcTextExtent( rcRect );
 				
-		// calculate item text extent...
+		// Calculate item text extent
 		dcClient.DrawTextW( strItemText.ToUTF16().c_str(), (int)strItemText.length(), rcTextExtent, DT_LEFT | DT_SINGLELINE | DT_NOPREFIX | DT_VCENTER | DT_CALCRECT );
 		
 		dcClient.SelectFont( hOldFont );
 		
-		// do not show titletip if entire text is visible
+		// Do not show title tip if entire text is visible
 		if ( rcTextExtent.Width() <= rcRect.Width() - 1 )
 			return FALSE;
 		
@@ -92,8 +92,8 @@ public:
 			m_ttToolTip.AddTool( m_hWnd, (LPCTSTR)m_strToolTip. substr(0,SHRT_MAX).c_str() );
 		}
 		
-		// show titletip at new location
-		if ( !SetWindowPos( NULL, rcRect.left - 4, rcRect.top, rcTextExtent.Width() + 11, rcRect.Height(), SWP_NOZORDER | SWP_SHOWWINDOW | SWP_NOACTIVATE | SWP_NOCOPYBITS ) )
+		// Show title tip at new location
+		if ( !SetWindowPos( nullptr, rcRect.left - 4, rcRect.top, rcTextExtent.Width() + 11, rcRect.Height(), SWP_NOZORDER | SWP_SHOWWINDOW | SWP_NOACTIVATE | SWP_NOCOPYBITS ) )
 			return FALSE;
 		
 		SetCapture();
@@ -119,7 +119,7 @@ public:
 	{
 		if ( m_ttToolTip.IsWindow() )
 			m_ttToolTip.DestroyWindow();
-		m_ttToolTip.m_hWnd = NULL;
+		m_ttToolTip.m_hWnd = nullptr;
 	}
 	
 	LRESULT OnMouseRange( UINT nMessage, WPARAM wParam, LPARAM lParam )
@@ -147,7 +147,7 @@ public:
 		CWindow wndParent( m_hWndParent );
 		UINT nHitTest = (UINT)wndParent.SendMessage( WM_NCHITTEST, 0, MAKELPARAM( ptMouse.x, ptMouse.y ) );
 		
-		// forward notifcation through to parent
+		// Forward notification through to parent
 		if ( nHitTest == HTCLIENT )
 		{
 			wndParent.ScreenToClient( &ptMouse );
@@ -198,7 +198,7 @@ public:
 		CRect rcTitleTip( rcClient );
 					
 		dcPaint.SetBkColor( m_rgbBackground );
-		dcPaint.ExtTextOut( rcTitleTip.left, rcTitleTip.top, ETO_OPAQUE, rcTitleTip, _T( "" ), 0, NULL );
+		dcPaint.ExtTextOut( rcTitleTip.left, rcTitleTip.top, ETO_OPAQUE, rcTitleTip, _T( "" ), 0, nullptr );
 		
 		CBrush bshTitleFrame;
 		bshTitleFrame.CreateSolidBrush( m_rgbTextColour );

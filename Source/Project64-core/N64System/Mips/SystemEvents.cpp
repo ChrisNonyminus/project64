@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include <Project64-core/N64System/Mips/SystemEvents.h>
 #include <Project64-core/N64System/SystemGlobals.h>
-#include <Project64-core/N64System/N64Class.h>
+#include <Project64-core/N64System/N64System.h>
 
 const char * SystemEventName(SystemEvent event)
 {
@@ -50,7 +50,7 @@ const char * SystemEventName(SystemEvent event)
     case SysEvent_ResetRecompilerCode: return "SysEvent_ResetRecompilerCode";
     }
     static char unknown[100];
-    sprintf(unknown, "unknown(%d)", event);
+    sprintf(unknown, "Unknown(%d)", event);
     return unknown;
 }
 

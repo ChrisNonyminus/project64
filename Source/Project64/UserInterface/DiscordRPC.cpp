@@ -5,14 +5,14 @@
 #define UNIX_TIME_START    0x019DB1DED53E8000
 #define TICKS_PER_SECOND   10000000
 
-//Discord Project64 App ID
+// Discord Project64 app ID
 #define PJ64_DISCORD_APPID "704794684387491891"
 
 void CDiscord::Init()
 {
 	DiscordEventHandlers handlers = {};
 
-	Discord_Initialize(PJ64_DISCORD_APPID, &handlers, 1, NULL);
+	Discord_Initialize(PJ64_DISCORD_APPID, &handlers, 1, nullptr);
 }
 
 void CDiscord::Shutdown()
@@ -29,7 +29,7 @@ static stdstr GetTitle()
 		return g_Settings->LoadStringVal(Rdb_GoodName);
 	else {
 		Default = CPath(g_Settings->LoadStringVal(Game_File)).GetName().c_str();
-		if (strstr(const_cast<char*>(Default.c_str()), "?") != NULL) {
+		if (strstr(const_cast<char*>(Default.c_str()), "?") != nullptr) {
 			return Default.substr(Default.find("?") + 1);
 		}
 		return Default;
@@ -38,14 +38,14 @@ static stdstr GetTitle()
 
 void CDiscord::Update(bool bHaveGame)
 {
-	//Variables we use later
-	//title uses the Rdb_GoodName to display a proper game name over DiscordRPC
-	//artwork uses the Header of the rom to easily add game pictures through the discord developer panel using the ID above
+	// Variables we use later
+	// Title uses the Rdb_GoodName to display a proper game name over DiscordRPC
+	// Artwork uses the header of the ROM to easily add game images through the Discord developer panel using the ID above
 	stdstr title = bHaveGame ? GetTitle() : "";
 	stdstr artwork = bHaveGame ? g_Settings->LoadStringVal(Rdb_RPCKey) : "";
 
-	//Load Game Into DiscordRPC
-	DiscordRichPresence discordPresence = {}; //activates DiscordRPC
+	// Load game into DiscordRPC
+	DiscordRichPresence discordPresence = {}; // Activates DiscordRPC
 	if (artwork.empty())
 	{
 		discordPresence.largeImageKey = "pj64_icon";
@@ -61,7 +61,7 @@ void CDiscord::Update(bool bHaveGame)
 	discordPresence.details = title.empty() ? "Not in-game" : title.c_str();
 	discordPresence.startTimestamp = Timestamp();
 
-	Discord_UpdatePresence(&discordPresence); //end DiscordRPC
+	Discord_UpdatePresence(&discordPresence); // End DiscordRPC
 }
 
 int64_t CDiscord::Timestamp()

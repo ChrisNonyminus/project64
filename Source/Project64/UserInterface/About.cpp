@@ -16,7 +16,7 @@ LRESULT CAboutDlg::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lPara
     {
         AboutMsg += stdstr_f("Thank you %s for the support!\n\n", m_Support.Name());
     }
-    AboutMsg += "Project64 is a completely free and open-source emulator for the Nintendo 64 and 64DD written in C++.\n\nCapable of playing your favorite N64 games on your PC with high definition graphics, excellent compatibility, save states, built - in cheat codes, and more.";
+    AboutMsg += "Project64 is a completely free and open-source emulator for the Nintendo 64 and 64DD written in C++.\n\nCapable of playing your favorite N64 games on your PC with high-definition graphics, excellent compatibility, save states, built - in cheat codes, and more!";
 
     CDC hDC = GetDC();
     float DPIScale = hDC.GetDeviceCaps(LOGPIXELSX) / 96.0f;
@@ -30,10 +30,10 @@ LRESULT CAboutDlg::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lPara
 
     SetWindowDetais(IDC_VERSION, IDC_BMP_LOGO, stdstr_f("Version: %s", VER_FILE_VERSION_STR).ToUTF16().c_str(), m_BoldFont);
     SetWindowDetais(IDC_ABOUT_PROJECT, IDC_VERSION, AboutMsg.ToUTF16().c_str(), m_TextFont);
-    SetWindowDetais(IDC_THANKS_CORE, IDC_ABOUT_PROJECT, L"Special Thanks to previous core members:", m_BoldFont);
+    SetWindowDetais(IDC_THANKS_CORE, IDC_ABOUT_PROJECT, L"Special thanks to previous core members:", m_BoldFont);
     SetWindowDetais(IDC_CORE_THANK_LIST, IDC_THANKS_CORE, L"Jabo, Smiff, Gent", m_TextFont);
     SetWindowDetais(IDC_THANKYOU, IDC_CORE_THANK_LIST, L"Thanks also goes to:", m_BoldFont);
-    SetWindowDetais(IDC_THANKYOU_LIST, IDC_THANKYOU, L"Jahra!n, Witten, RadeonUser, Azimer, Shygoo, Frank, LuigiBlood, theboy181, Gonetz, BlueToonYoshi, Kimbjo, Melchior, retroben, AIO, krom", m_TextFont);
+    SetWindowDetais(IDC_THANKYOU_LIST, IDC_THANKYOU, L"Jahra!n, Witten, RadeonUser, Azimer, Shygoo, Frank, LuigiBlood, theboy181, Gonetz, BlueToonYoshi, Kimbjo, Melchior, retroben, AIO, and krom", m_TextFont);
 
     return TRUE;
 }
@@ -50,20 +50,20 @@ void CAboutDlg::SetWindowDetais(int nIDDlgItem, int nAboveIDDlgItem, const wchar
 
     CRect rcWin;
     Wnd.GetWindowRect(&rcWin);
-    ::MapWindowPoints(NULL, m_hWnd, (LPPOINT)&rcWin, 2);
+    ::MapWindowPoints(nullptr, m_hWnd, (LPPOINT)&rcWin, 2);
     if (hDC.DrawText(Text, -1, &rcWin, DT_LEFT | DT_CALCRECT | DT_WORDBREAK | DT_NOCLIP) > 0)
     {
-        Wnd.SetWindowPos(NULL, 0, 0, rcWin.Width(), rcWin.Height(), SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOOWNERZORDER);
+        Wnd.SetWindowPos(nullptr, 0, 0, rcWin.Width(), rcWin.Height(), SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOOWNERZORDER);
     }
     
     CWindow AboveWnd = GetDlgItem(nAboveIDDlgItem);
     AboveWnd.GetWindowRect(&rcWin);
-    ::MapWindowPoints(NULL, m_hWnd, (LPPOINT)&rcWin, 2);
+    ::MapWindowPoints(nullptr, m_hWnd, (LPPOINT)&rcWin, 2);
     LONG Top = rcWin.bottom + (LONG)(8 * DPIScale);
 
     Wnd.GetWindowRect(&rcWin);
-    ::MapWindowPoints(NULL, m_hWnd, (LPPOINT)&rcWin, 2);
-    Wnd.SetWindowPos(NULL, rcWin.left, Top, 0, 0, SWP_NOACTIVATE | SWP_NOSIZE | SWP_NOOWNERZORDER);
+    ::MapWindowPoints(nullptr, m_hWnd, (LPPOINT)&rcWin, 2);
+    Wnd.SetWindowPos(nullptr, rcWin.left, Top, 0, 0, SWP_NOACTIVATE | SWP_NOSIZE | SWP_NOOWNERZORDER);
 }
 
 

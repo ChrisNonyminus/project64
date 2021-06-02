@@ -2,16 +2,16 @@
 #include "InterpreterCPU.h"
 
 #include <Project64-core/N64System/SystemGlobals.h>
-#include <Project64-core/N64System/N64Class.h>
+#include <Project64-core/N64System/N64System.h>
 #include <Project64-core/N64System/Mips/MemoryVirtualMem.h>
 #include <Project64-core/N64System/Mips/OpcodeName.h>
 #include <Project64-core/N64System/Interpreter/InterpreterOps32.h>
-#include <Project64-core/Plugins/PluginClass.h>
+#include <Project64-core/Plugins/Plugin.h>
 #include <Project64-core/Plugins/GFXPlugin.h>
 #include <Project64-core/ExceptionHandler.h>
 #include <Project64-core/Debugger.h>
 
-R4300iOp::Func * CInterpreterCPU::m_R4300i_Opcode = NULL;
+R4300iOp::Func * CInterpreterCPU::m_R4300i_Opcode = nullptr;
 
 void ExecuteInterpreterOps(uint32_t /*Cycles*/)
 {
@@ -88,7 +88,7 @@ bool DelaySlotEffectsCompare(uint32_t PC, uint32_t Reg1, uint32_t Reg2)
         default:
             if (CDebugSettings::HaveDebugger())
             {
-                g_Notify->DisplayError(stdstr_f("Does %s effect Delay slot at %X?", R4300iOpcodeName(Command.Hex, PC + 4), PC).c_str());
+                g_Notify->DisplayError(stdstr_f("Does %s effect delay slot at %X?", R4300iOpcodeName(Command.Hex, PC + 4), PC).c_str());
             }
             return true;
         }
@@ -119,7 +119,7 @@ bool DelaySlotEffectsCompare(uint32_t PC, uint32_t Reg1, uint32_t Reg2)
                 default:
                     if (CDebugSettings::HaveDebugger())
                     {
-                        g_Notify->DisplayError(stdstr_f("Does %s effect Delay slot at %X?\n6", R4300iOpcodeName(Command.Hex, PC + 4), PC).c_str());
+                        g_Notify->DisplayError(stdstr_f("Does %s effect delay slot at %X?\n6", R4300iOpcodeName(Command.Hex, PC + 4), PC).c_str());
                     }
                     return true;
                 }
@@ -128,7 +128,7 @@ bool DelaySlotEffectsCompare(uint32_t PC, uint32_t Reg1, uint32_t Reg2)
             {
                 if (CDebugSettings::HaveDebugger())
                 {
-                    g_Notify->DisplayError(stdstr_f("Does %s effect Delay slot at %X?\n7", R4300iOpcodeName(Command.Hex, PC + 4), PC).c_str());
+                    g_Notify->DisplayError(stdstr_f("Does %s effect delay slot at %X?\n7", R4300iOpcodeName(Command.Hex, PC + 4), PC).c_str());
                 }
                 return true;
             }
@@ -157,7 +157,7 @@ bool DelaySlotEffectsCompare(uint32_t PC, uint32_t Reg1, uint32_t Reg2)
         default:
             if (CDebugSettings::HaveDebugger())
             {
-                g_Notify->DisplayError(stdstr_f("Does %s effect Delay slot at %X?", R4300iOpcodeName(Command.Hex, PC + 4), PC).c_str());
+                g_Notify->DisplayError(stdstr_f("Does %s effect delay slot at %X?", R4300iOpcodeName(Command.Hex, PC + 4), PC).c_str());
             }
             return true;
         }
@@ -205,7 +205,7 @@ bool DelaySlotEffectsCompare(uint32_t PC, uint32_t Reg1, uint32_t Reg2)
     default:
         if (CDebugSettings::HaveDebugger())
         {
-            g_Notify->DisplayError(stdstr_f("Does %s effect Delay slot at %X?", R4300iOpcodeName(Command.Hex, PC + 4), PC).c_str());
+            g_Notify->DisplayError(stdstr_f("Does %s effect delay slot at %X?", R4300iOpcodeName(Command.Hex, PC + 4), PC).c_str());
         }
         return true;
     }
@@ -230,19 +230,19 @@ void CInterpreterCPU::BuildCPU()
 
 void CInterpreterCPU::InPermLoop()
 {
-    // *** Changed ***/
+    // Changed
     //if (CPU_Type == CPU_SyncCores)
     //{
     //	SyncRegisters.CP0[9] +=5;
     //}
 
-    /* Interrupts enabled */
+    // Interrupts enabled
     if ((g_Reg->STATUS_REGISTER & STATUS_IE) == 0 ||
         (g_Reg->STATUS_REGISTER & STATUS_EXL) != 0 ||
         (g_Reg->STATUS_REGISTER & STATUS_ERL) != 0 ||
         (g_Reg->STATUS_REGISTER & 0xFF00) == 0)
     {
-        if (g_Plugins->Gfx()->UpdateScreen != NULL)
+        if (g_Plugins->Gfx()->UpdateScreen != nullptr)
         {
             g_Plugins->Gfx()->UpdateScreen();
         }
@@ -294,7 +294,7 @@ void CInterpreterCPU::ExecuteCPU()
                     g_Settings->SaveBool(Debugger_SteppingOps, true);
                 }
 
-                g_Debugger->CPUStepStarted(); // may set stepping ops/skip op
+                g_Debugger->CPUStepStarted(); // May set stepping ops/skip op
 
                 if (isStepping())
                 {
@@ -320,7 +320,7 @@ void CInterpreterCPU::ExecuteCPU()
             } */
 
             m_R4300i_Opcode[Opcode.op]();
-            _GPR[0].DW = 0; /* MIPS $zero hard-wired to 0 */
+            _GPR[0].DW = 0; // MIPS $zero hard-wired to 0
             NextTimer -= CountPerOp;
 
             if (CDebugSettings::HaveDebugger()) { g_Debugger->CPUStepEnded(); }

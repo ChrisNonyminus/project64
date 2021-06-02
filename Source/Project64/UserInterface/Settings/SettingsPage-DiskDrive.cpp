@@ -9,7 +9,7 @@ CDiskDrivePage::CDiskDrivePage(HWND hParent, const RECT & rcDispay)
         return;
     }
 
-    //Set the text for all gui Items
+    // Set the text for all GUI items
     SetDlgItemText(IDC_IPLDIR_JP_TXT, wGS(OPTION_IPL_ROM_PATH).c_str());
     SetDlgItemText(IDC_IPLDIR_US_TXT, wGS(OPTION_IPL_ROM_USA_PATH).c_str());
     SetDlgItemText(IDC_IPLDIR_TL_TXT, wGS(OPTION_IPL_ROM_TOOL_PATH).c_str());
@@ -44,8 +44,7 @@ void CDiskDrivePage::ApplySettings(bool UpdateScreen)
 {
     if (m_IplDirJp.IsChanged())
     {
-        stdstr file = m_IplDirJp.GetWindowText();
-        g_Settings->SaveString(File_DiskIPLPath, file.c_str());
+        g_Settings->SaveString(File_DiskIPLPath, GetCWindowText(m_IplDirJp).c_str());
     }
     if (m_IplDirJp.IsReset())
     {
@@ -54,8 +53,7 @@ void CDiskDrivePage::ApplySettings(bool UpdateScreen)
 
     if (m_IplDirUs.IsChanged())
     {
-        stdstr file = m_IplDirUs.GetWindowText();
-        g_Settings->SaveString(File_DiskIPLUSAPath, file.c_str());
+        g_Settings->SaveString(File_DiskIPLUSAPath, GetCWindowText(m_IplDirUs).c_str());
     }
     if (m_IplDirUs.IsReset())
     {
@@ -64,8 +62,7 @@ void CDiskDrivePage::ApplySettings(bool UpdateScreen)
 
     if (m_IplDirTl.IsChanged())
     {
-        stdstr file = m_IplDirTl.GetWindowText();
-        g_Settings->SaveString(File_DiskIPLTOOLPath, file.c_str());
+        g_Settings->SaveString(File_DiskIPLTOOLPath, GetCWindowText(m_IplDirTl).c_str());
     }
     if (m_IplDirTl.IsReset())
     {
@@ -140,7 +137,7 @@ void CDiskDrivePage::UpdatePageSettings(void)
 
 void CDiskDrivePage::SelectFile(LanguageStringID /*Title*/, CModifiedEditBox & EditBox)
 {
-    const char * Filter = "64DD IPL ROM Image (*.zip, *.7z, *.?64, *.rom, *.usa, *.jap, *.pal, *.bin)\0*.?64;*.zip;*.7z;*.bin;*.rom;*.usa;*.jap;*.pal\0All files (*.*)\0*.*\0";
+    const char * Filter = "64DD IPL ROM image (*.zip, *.7z, *.?64, *.rom, *.usa, *.jap, *.pal, *.bin)\0*.?64;*.zip;*.7z;*.bin;*.rom;*.usa;*.jap;*.pal\0All files (*.*)\0*.*\0";
 
     CPath FileName;
     if (FileName.SelectFile(m_hWnd, g_Settings->LoadStringVal(RomList_GameDir).c_str(), Filter, true))

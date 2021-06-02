@@ -3,7 +3,7 @@
 #if defined(__i386__) || defined(_M_IX86)
 #include <Project64-core/N64System/Recompiler/RegBase.h>
 #include <Project64-core/N64System/Recompiler/x86/x86ops.h>
-#include <Project64-core/N64System/Mips/RegisterClass.h>
+#include <Project64-core/N64System/Mips/Register.h>
 #include <Project64-core/Settings/DebugSettings.h>
 
 class CX86RegInfo :
@@ -13,7 +13,7 @@ class CX86RegInfo :
     private CSystemRegisters
 {
 public:
-    //enums
+    // Enums
     enum REG_MAPPED
     {
         NotMapped = 0,
@@ -92,7 +92,7 @@ public:
 private:
     x86Reg UnMap_8BitTempReg();
 
-    //r4k
+    // r4k
     x86Reg      m_RegMapHi[32];
     x86Reg      m_RegMapLo[32];
 
@@ -100,7 +100,7 @@ private:
     uint32_t    m_x86reg_MapOrder[10];
     bool        m_x86reg_Protected[10];
 
-    //FPU
+    // FPU
     int32_t     m_Stack_TopPos;
     int32_t     m_x86fpu_MappedTo[8];
     FPU_STATE   m_x86fpu_State[8];

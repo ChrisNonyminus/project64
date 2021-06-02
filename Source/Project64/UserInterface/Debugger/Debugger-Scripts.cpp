@@ -5,8 +5,8 @@
 CDebugScripts::CDebugScripts(CDebuggerUI* debugger) :
     CDebugDialog<CDebugScripts>(debugger),
     CToolTipDialog<CDebugScripts>(),
-    m_hQuitScriptDirWatchEvent(NULL),
-    m_hScriptDirWatchThread(NULL)
+    m_hQuitScriptDirWatchEvent(nullptr),
+    m_hScriptDirWatchThread(nullptr)
 {
 }
 
@@ -52,8 +52,8 @@ LRESULT CDebugScripts::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*l
     LoadWindowPos();
     WindowCreated();
 
-    m_hQuitScriptDirWatchEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
-    m_hScriptDirWatchThread = CreateThread(NULL, 0, ScriptDirWatchProc, (void*)this, 0, NULL);
+    m_hQuitScriptDirWatchEvent = CreateEvent(nullptr, TRUE, FALSE, nullptr);
+    m_hScriptDirWatchThread = CreateThread(nullptr, 0, ScriptDirWatchProc, (void*)this, 0, nullptr);
     return 0;
 }
 
@@ -148,7 +148,7 @@ void CDebugScripts::ConsoleCopy()
 
 void CDebugScripts::ConsolePrint(const char* text)
 {
-    if (m_hWnd != NULL)
+    if (m_hWnd != nullptr)
     {
         SendMessage(WM_CONSOLE_PRINT, (WPARAM)text);
     }
@@ -156,7 +156,7 @@ void CDebugScripts::ConsolePrint(const char* text)
 
 void CDebugScripts::ConsoleClear()
 {
-    if (m_hWnd != NULL)
+    if (m_hWnd != nullptr)
     {
         SendMessage(WM_CONSOLE_CLEAR);
     }
@@ -164,7 +164,7 @@ void CDebugScripts::ConsoleClear()
 
 void CDebugScripts::RefreshList()
 {
-    if (m_hWnd != NULL)
+    if (m_hWnd != nullptr)
     {
         PostMessage(WM_REFRESH_LIST);
     }
@@ -195,7 +195,7 @@ LRESULT CDebugScripts::OnClicked(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*
         ConsoleCopy();
         break;
     case IDC_SCRIPTDIR_BTN:
-        ShellExecute(NULL, L"open", L"Scripts", NULL, NULL, SW_SHOW);
+        ShellExecute(nullptr, L"open", L"Scripts", nullptr, nullptr, SW_SHOW);
         break;
     }
     return FALSE;
@@ -253,7 +253,7 @@ LRESULT CDebugScripts::OnScriptListRClicked(NMHDR* pNMHDR)
 
     INSTANCE_STATE state = m_Debugger->ScriptSystem()->GetInstanceState(m_SelectedScriptName.c_str());
 
-    HMENU hMenu = LoadMenu(GetModuleHandle(NULL), MAKEINTRESOURCE(IDR_SCRIPT_POPUP));
+    HMENU hMenu = LoadMenu(GetModuleHandle(nullptr), MAKEINTRESOURCE(IDR_SCRIPT_POPUP));
     HMENU hPopupMenu = GetSubMenu(hMenu, 0);
 
     if (state == STATE_STARTED || state == STATE_RUNNING)
@@ -267,7 +267,7 @@ LRESULT CDebugScripts::OnScriptListRClicked(NMHDR* pNMHDR)
     
     POINT mouse;
     GetCursorPos(&mouse);
-    TrackPopupMenu(hPopupMenu, TPM_LEFTALIGN, mouse.x, mouse.y, 0, m_hWnd, NULL);
+    TrackPopupMenu(hPopupMenu, TPM_LEFTALIGN, mouse.x, mouse.y, 0, m_hWnd, nullptr);
     DestroyMenu(hMenu);
 
     return 0;
@@ -439,7 +439,7 @@ void CDebugScripts::RunSelected()
     }
     else
     {
-        m_Debugger->Debug_LogScriptsWindow("[Error: Script is already running]\n");
+        m_Debugger->Debug_LogScriptsWindow("[Error: script is already running]\n");
     }
 }
 
@@ -464,7 +464,7 @@ void CDebugScripts::ToggleSelected()
 
 void CDebugScripts::EditSelected()
 {
-    ShellExecute(NULL, L"edit", stdstr(m_SelectedScriptName).ToUTF16().c_str(), NULL, L"Scripts", SW_SHOWNORMAL);
+    ShellExecute(nullptr, L"edit", stdstr(m_SelectedScriptName).ToUTF16().c_str(), nullptr, L"Scripts", SW_SHOWNORMAL);
 }
 
 // Console input
@@ -474,10 +474,9 @@ LRESULT CEditEval::OnKeyDown(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BO
     {
         if (m_HistoryIdx > 0)
         {
-            wchar_t* code = m_History[--m_HistoryIdx];
-            SetWindowText(code);
-            int selEnd = wcslen(code);
-            SetSel(selEnd, selEnd);
+            const std::string & Code = m_History[--m_HistoryIdx];
+            SetWindowText(stdstr(Code).ToUTF16().c_str());
+            SetSel((int)Code.length(), (int)Code.length());
         }
     }
     else if (wParam == VK_DOWN)
@@ -485,10 +484,9 @@ LRESULT CEditEval::OnKeyDown(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BO
         int size = m_History.size();
         if (m_HistoryIdx < size - 1)
         {
-            wchar_t* code = m_History[++m_HistoryIdx];
-            SetWindowText(code);
-            int selEnd = wcslen(code);
-            SetSel(selEnd, selEnd);
+            const std::string & Code = m_History[++m_HistoryIdx];
+            SetWindowText(stdstr(Code).ToUTF16().c_str());
+            SetSel((int)Code.length(), (int)Code.length());
         }
         else if (m_HistoryIdx < size)
         {
@@ -498,42 +496,38 @@ LRESULT CEditEval::OnKeyDown(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BO
     }
     else if (wParam == VK_RETURN)
     {
-        if (m_ScriptWindow == NULL)
+        if (m_ScriptWindow == nullptr)
         {
             bHandled = FALSE;
             return 0;
         }
 
-        size_t codeLength = GetWindowTextLength() + 1;
-        wchar_t* code = (wchar_t*)malloc(codeLength * sizeof(wchar_t));
-        GetWindowText(code, codeLength);
-
-        m_ScriptWindow->EvaluateInSelectedInstance(stdstr().FromUTF16(code).c_str());
+        std::string Code = GetCWindowText(*this);
+        m_ScriptWindow->EvaluateInSelectedInstance(Code.c_str());
 
         SetWindowText(L"");
         int historySize = m_History.size();
 
-        // remove duplicate
+        // Remove duplicate
         for (int i = 0; i < historySize; i++)
         {
-            if (wcscmp(code, m_History[i]) == 0)
+            if (strcmp(Code.c_str(), m_History[i].c_str()) == 0)
             {
-                free(m_History[i]);
                 m_History.erase(m_History.begin() + i);
                 historySize--;
                 break;
             }
         }
 
-        // remove oldest if maxed
+        // Remove oldest if maxed
         if (historySize >= HISTORY_MAX_ENTRIES)
         {
             m_History.erase(m_History.begin() + 0);
             historySize--;
         }
 
-        m_History.push_back(code);
-        m_HistoryIdx = ++historySize;
+        m_History.push_back(Code);
+        m_HistoryIdx = historySize++;
     }
     bHandled = FALSE;
     return 0;

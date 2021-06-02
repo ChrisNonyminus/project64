@@ -15,13 +15,13 @@ void WelcomeScreen::SelectGameDir(UINT /*Code*/, int /*id*/, HWND /*ctl*/)
     stdstr InitialDir = g_Settings->LoadStringVal(RomList_GameDir);
     std::wstring wTitle = L"Select Game Directory";
     bi.hwndOwner = m_hWnd;
-    bi.pidlRoot = NULL;
+    bi.pidlRoot = nullptr;
     bi.pszDisplayName = Buffer;
     bi.lpszTitle = wTitle.c_str();
     bi.ulFlags = BIF_RETURNFSANCESTORS | BIF_RETURNONLYFSDIRS;
     bi.lpfn = (BFFCALLBACK)SelectDirCallBack;
     bi.lParam = (DWORD)InitialDir.c_str();
-    if ((pidl = SHBrowseForFolder(&bi)) != NULL)
+    if ((pidl = SHBrowseForFolder(&bi)) != nullptr)
     {
         if (SHGetPathFromIDList(pidl, Directory))
         {
@@ -119,8 +119,8 @@ int CALLBACK WelcomeScreen::SelectDirCallBack(HWND hwnd, DWORD uMsg, DWORD /*lp*
     switch (uMsg)
     {
     case BFFM_INITIALIZED:
-        // WParam is TRUE since you are passing a path.
-        // It would be FALSE if you were passing a pidl.
+        // WParam is TRUE since you are passing a path
+        // It would be FALSE if you were passing a PIDL
         if (lpData)
         {
             SendMessage(hwnd, BFFM_SETSELECTION, TRUE, lpData);

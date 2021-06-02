@@ -1,5 +1,5 @@
 // Project64 - A Nintendo 64 emulator
-// http://www.pj64-emu.com/
+// https://www.pj64-emu.com/
 // Copyright(C) 2001-2021 Project64
 // Copyright(C) 2007 Hiroshi Morii
 // Copyright(C) 2003 Rice1964
@@ -11,7 +11,7 @@
 
 #include "TxFilter.h"
 
-TxFilter *txFilter = NULL;
+TxFilter *txFilter = nullptr;
 
 #ifdef __cplusplus
 extern "C" {
@@ -34,7 +34,7 @@ extern "C" {
     {
         if (txFilter) delete txFilter;
 
-        txFilter = NULL;
+        txFilter = nullptr;
     }
 
     TAPI bool TAPIENTRY

@@ -26,8 +26,9 @@
 #define pop_new
 #endif
 
-// template class helpers with functions for comparing elements
-// override if using complex types without operator==
+// Template class helpers with functions for comparing elements
+// Override if using complex types without operator==
+
 template <class T>
 class CListCtrlArrayEqualHelper
 {
@@ -42,8 +43,8 @@ template <class T, class TEqual = CListCtrlArrayEqualHelper< T > >
 class CListCtrlArray
 {
 public:
-	// Construction/destruction
-	CListCtrlArray() : m_aT(NULL), m_nSize(0), m_nAllocSize(0)
+	// Construction / destruction
+	CListCtrlArray() : m_aT(nullptr), m_nSize(0), m_nAllocSize(0)
 	{ }
 
 	~CListCtrlArray()
@@ -51,10 +52,10 @@ public:
 		RemoveAll();
 	}
 
-	CListCtrlArray(const CListCtrlArray< T, TEqual >& src) : m_aT(NULL), m_nSize(0), m_nAllocSize(0)
+	CListCtrlArray(const CListCtrlArray< T, TEqual >& src) : m_aT(nullptr), m_nSize(0), m_nAllocSize(0)
 	{
 		m_aT = (T*)malloc(src.GetSize() * sizeof(T));
-		if (m_aT != NULL)
+		if (m_aT != nullptr)
 		{
 			m_nAllocSize = src.GetSize();
 			for (int i=0; i<src.GetSize(); i++)
@@ -67,7 +68,7 @@ public:
 		{
 			RemoveAll();
 			m_aT = (T*)malloc(src.GetSize() * sizeof(T));
-			if (m_aT != NULL)
+			if (m_aT != nullptr)
 				m_nAllocSize = src.GetSize();
 		}
 		else
@@ -92,7 +93,7 @@ public:
 			T* aT;
 			int nNewAllocSize = (m_nAllocSize == 0) ? 1 : (m_nSize * 2);
 			aT = (T*)realloc(m_aT, nNewAllocSize * sizeof(T));
-			if(aT == NULL)
+			if(aT == nullptr)
 				return FALSE;
 			m_nAllocSize = nNewAllocSize;
 			m_aT = aT;
@@ -108,7 +109,7 @@ public:
 			T* aT;
 			int nNewAllocSize = (m_nAllocSize == 0) ? 1 : (m_nSize * 2);
 			aT = (T*)realloc(m_aT, nNewAllocSize * sizeof(T));
-			if(aT == NULL)
+			if(aT == nullptr)
 				return FALSE;
 			m_nAllocSize = nNewAllocSize;
 			m_aT = aT;
@@ -142,12 +143,12 @@ public:
 	}
 	void RemoveAll()
 	{
-		if(m_aT != NULL)
+		if(m_aT != nullptr)
 		{
 			for(int i = 0; i < m_nSize; i++)
 				m_aT[i].~T();
 			free(m_aT);
-			m_aT = NULL;
+			m_aT = nullptr;
 		}
 		m_nSize = 0;
 		m_nAllocSize = 0;
@@ -157,7 +158,7 @@ public:
 		ATLASSERT(nIndex >= 0 && nIndex < m_nSize);
 		if(nIndex < 0 || nIndex >= m_nSize)
 		{
-			RaiseException(EXCEPTION_ARRAY_BOUNDS_EXCEEDED, EXCEPTION_NONCONTINUABLE, 0, NULL);					
+			RaiseException(EXCEPTION_ARRAY_BOUNDS_EXCEEDED, EXCEPTION_NONCONTINUABLE, 0, nullptr);					
 		}
 		return m_aT[nIndex];
 	}
@@ -166,7 +167,7 @@ public:
 		ATLASSERT(nIndex >= 0 && nIndex < m_nSize);
 		if(nIndex < 0 || nIndex >= m_nSize)
 		{
-			RaiseException(EXCEPTION_ARRAY_BOUNDS_EXCEEDED, EXCEPTION_NONCONTINUABLE, 0, NULL);					
+			RaiseException(EXCEPTION_ARRAY_BOUNDS_EXCEEDED, EXCEPTION_NONCONTINUABLE, 0, nullptr);					
 		}
 		return m_aT[nIndex];
 	}
@@ -182,7 +183,7 @@ public:
 			if(TEqual::IsEqual(m_aT[i], t))
 				return i;
 		}
-		return -1;  // not found
+		return -1;  // Not found
 	}
 
 	BOOL SetAtIndex(int nIndex, const T& t)

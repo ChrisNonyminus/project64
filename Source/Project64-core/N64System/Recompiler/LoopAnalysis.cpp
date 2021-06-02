@@ -82,7 +82,7 @@ bool LoopAnalysis::SetupEnterSection(CCodeSection * Section, bool & bChanged, bo
         CCodeSection * Parent = *iter;
 
         CPU_Message("%s: Parent Section ID %d Test: %X Section Test: %X CompiledLocation: %X", __FUNCTION__, Parent->m_SectionID, m_Test, Parent->m_Test, Parent->m_CompiledLocation);
-        if (Parent->m_Test != m_Test && (m_EnterSection != Section || Parent->m_CompiledLocation == NULL) && Parent->m_InLoop)
+        if (Parent->m_Test != m_Test && (m_EnterSection != Section || Parent->m_CompiledLocation == nullptr) && Parent->m_InLoop)
         {
             CPU_Message("%s: Ignore Parent Section ID %d Test: %X  Section Test: %X CompiledLocation: %X", __FUNCTION__, Parent->m_SectionID, m_Test, Parent->m_Test, Parent->m_CompiledLocation);
             bSkipedSection = true;
@@ -140,7 +140,7 @@ bool LoopAnalysis::SetupEnterSection(CCodeSection * Section, bool & bChanged, bo
 
 bool LoopAnalysis::CheckLoopRegisterUsage(CCodeSection * Section)
 {
-    if (Section == NULL) { return true; }
+    if (Section == nullptr) { return true; }
     if (!Section->m_InLoop) { return true; }
 
     CPU_Message("%s: Section %d Block PC: 0x%X", __FUNCTION__, Section->m_SectionID, m_BlockInfo->VAddrEnter());
@@ -235,7 +235,7 @@ bool LoopAnalysis::CheckLoopRegisterUsage(CCodeSection * Section)
                 g_Notify->BreakPoint(__FILE__, __LINE__);
 #ifdef legacycode
                 if (m_Command.Hex == 0x00000001) { break; }
-                g_Notify->DisplayError("Unhandled R4300i OpCode in FillSectionInfo 5\n%s",
+                g_Notify->DisplayError("Unhandled R4300i opcode in FillSectionInfo 5\n%s",
                     R4300iOpcodeName(m_Command.Hex, m_PC));
 #endif
                 m_NextInstruction = END_BLOCK;
@@ -253,13 +253,13 @@ bool LoopAnalysis::CheckLoopRegisterUsage(CCodeSection * Section)
                 m_NextInstruction = DELAY_SLOT;
 #ifdef CHECKED_BUILD
                 if (Section->m_Cont.TargetPC != m_PC + 8 &&
-                    Section->m_ContinueSection != NULL &&
+                    Section->m_ContinueSection != nullptr &&
                     Section->m_Cont.TargetPC != (uint32_t)-1)
                 {
                     g_Notify->BreakPoint(__FILE__, __LINE__);
                 }
                 if (Section->m_Jump.TargetPC != m_PC + ((int16_t)m_Command.offset << 2) + 4 &&
-                    Section->m_JumpSection != NULL &&
+                    Section->m_JumpSection != nullptr &&
                     Section->m_Jump.TargetPC != (uint32_t)-1)
                 {
                     g_Notify->BreakPoint(__FILE__, __LINE__);
@@ -278,13 +278,13 @@ bool LoopAnalysis::CheckLoopRegisterUsage(CCodeSection * Section)
                 m_NextInstruction = LIKELY_DELAY_SLOT;
 #ifdef CHECKED_BUILD
                 if (Section->m_Cont.TargetPC != m_PC + 8 &&
-                    Section->m_ContinueSection != NULL &&
+                    Section->m_ContinueSection != nullptr &&
                     Section->m_Cont.TargetPC != (uint32_t)-1)
                 {
                     g_Notify->BreakPoint(__FILE__, __LINE__);
                 }
                 if (Section->m_Jump.TargetPC != m_PC + 4 &&
-                    Section->m_JumpSection != NULL &&
+                    Section->m_JumpSection != nullptr &&
                     Section->m_Jump.TargetPC != (uint32_t)-1)
                 {
                     g_Notify->BreakPoint(__FILE__, __LINE__);
@@ -366,7 +366,7 @@ bool LoopAnalysis::CheckLoopRegisterUsage(CCodeSection * Section)
                 g_Notify->BreakPoint(__FILE__, __LINE__);
 #ifdef legacycode
                 if (m_Command.Hex == 0x0407000D) { break; }
-                g_Notify->DisplayError("Unhandled R4300i OpCode in FillSectionInfo 4\n%s",
+                g_Notify->DisplayError("Unhandled R4300i opcode in FillSectionInfo 4\n%s",
                     R4300iOpcodeName(m_Command.Hex, m_PC));
                 m_NextInstruction = END_BLOCK;
                 m_PC -= 4;
@@ -410,7 +410,7 @@ bool LoopAnalysis::CheckLoopRegisterUsage(CCodeSection * Section)
                 if (m_Command.rs != 0 || m_Command.rt != 0)
                 {
                     if (Section->m_Cont.TargetPC != m_PC + 8 &&
-                        Section->m_ContinueSection != NULL &&
+                        Section->m_ContinueSection != nullptr &&
                         Section->m_Cont.TargetPC != (uint32_t)-1)
                     {
                         g_Notify->BreakPoint(__FILE__, __LINE__);
@@ -445,13 +445,13 @@ bool LoopAnalysis::CheckLoopRegisterUsage(CCodeSection * Section)
                 m_NextInstruction = DELAY_SLOT;
 #ifdef CHECKED_BUILD
                 if (Section->m_Cont.TargetPC != m_PC + 8 &&
-                    Section->m_ContinueSection != NULL &&
+                    Section->m_ContinueSection != nullptr &&
                     Section->m_Cont.TargetPC != (uint32_t)-1)
                 {
                     g_Notify->BreakPoint(__FILE__, __LINE__);
                 }
                 if (Section->m_Jump.TargetPC != m_PC + ((int16_t)m_Command.offset << 2) + 4 &&
-                    Section->m_JumpSection != NULL &&
+                    Section->m_JumpSection != nullptr &&
                     Section->m_Jump.TargetPC != (uint32_t)-1)
                 {
                     g_Notify->BreakPoint(__FILE__, __LINE__);
@@ -542,14 +542,14 @@ bool LoopAnalysis::CheckLoopRegisterUsage(CCodeSection * Section)
                     case R4300i_COP0_CO_TLBP: break;
                     case R4300i_COP0_CO_ERET: m_NextInstruction = END_BLOCK; break;
                     default:
-                        g_Notify->DisplayError(stdstr_f("Unhandled R4300i OpCode in FillSectionInfo\n%s", R4300iOpcodeName(m_Command.Hex, m_PC)).c_str());
+                        g_Notify->DisplayError(stdstr_f("Unhandled R4300i opcode in FillSectionInfo\n%s", R4300iOpcodeName(m_Command.Hex, m_PC)).c_str());
                         m_NextInstruction = END_BLOCK;
                         m_PC -= 4;
                     }
                 }
                 else
                 {
-                    g_Notify->DisplayError(stdstr_f("Unhandled R4300i OpCode in FillSectionInfo 3\n%s", R4300iOpcodeName(m_Command.Hex, m_PC)).c_str());
+                    g_Notify->DisplayError(stdstr_f("Unhandled R4300i opcode in FillSectionInfo 3\n%s", R4300iOpcodeName(m_Command.Hex, m_PC)).c_str());
                     m_NextInstruction = END_BLOCK;
                     m_PC -= 4;
                 }
@@ -572,7 +572,7 @@ bool LoopAnalysis::CheckLoopRegisterUsage(CCodeSection * Section)
                     m_NextInstruction = LIKELY_DELAY_SLOT;
 #ifdef CHECKED_BUILD
                     if (Section->m_Cont.TargetPC != m_PC + 8 &&
-                        Section->m_ContinueSection != NULL &&
+                        Section->m_ContinueSection != nullptr &&
                         Section->m_Cont.TargetPC != (uint32_t)-1)
                     {
                         g_Notify->BreakPoint(__FILE__, __LINE__);
@@ -597,7 +597,7 @@ bool LoopAnalysis::CheckLoopRegisterUsage(CCodeSection * Section)
                     m_NextInstruction = DELAY_SLOT;
 #ifdef CHECKED_BUILD
                     if (Section->m_Cont.TargetPC != m_PC + 8 &&
-                        Section->m_ContinueSection != NULL &&
+                        Section->m_ContinueSection != nullptr &&
                         Section->m_Cont.TargetPC != (uint32_t)-1)
                     {
                         g_Notify->BreakPoint(__FILE__, __LINE__);
@@ -627,7 +627,7 @@ bool LoopAnalysis::CheckLoopRegisterUsage(CCodeSection * Section)
             case R4300i_COP1_W: break;
             case R4300i_COP1_L: break;
             default:
-                g_Notify->DisplayError(stdstr_f("Unhandled R4300i OpCode in FillSectionInfo 2\n%s", R4300iOpcodeName(m_Command.Hex, m_PC)).c_str());
+                g_Notify->DisplayError(stdstr_f("Unhandled R4300i opcode in FillSectionInfo 2\n%s", R4300iOpcodeName(m_Command.Hex, m_PC)).c_str());
                 m_NextInstruction = END_BLOCK;
                 m_PC -= 4;
             }
@@ -639,7 +639,7 @@ bool LoopAnalysis::CheckLoopRegisterUsage(CCodeSection * Section)
             m_NextInstruction = LIKELY_DELAY_SLOT;
 #ifdef CHECKED_BUILD
             if (Section->m_Cont.TargetPC != m_PC + 8 &&
-                Section->m_ContinueSection != NULL &&
+                Section->m_ContinueSection != nullptr &&
                 Section->m_Cont.TargetPC != (uint32_t)-1)
             {
                 g_Notify->BreakPoint(__FILE__, __LINE__);
@@ -727,7 +727,7 @@ bool LoopAnalysis::CheckLoopRegisterUsage(CCodeSection * Section)
             if (m_Command.Hex == 0xF1F3F5F7) { break; }
             if (m_Command.Hex == 0xC1200000) { break; }
             if (m_Command.Hex == 0x4C5A5353) { break; }
-            g_Notify->DisplayError(stdstr_f("Unhandled R4300i OpCode in FillSectionInfo 1\n%s\n%X", R4300iOpcodeName(m_Command.Hex, m_PC), m_Command.Hex).c_str());
+            g_Notify->DisplayError(stdstr_f("Unhandled R4300i opcode in FillSectionInfo 1\n%s\n%X", R4300iOpcodeName(m_Command.Hex, m_PC), m_Command.Hex).c_str());
         }
 
         CPU_Message("  %s state: %X value: %X", CRegName::GPR[5], m_Reg.GetMipsRegState(5), m_Reg.GetMipsRegLo(5));
@@ -953,12 +953,12 @@ void LoopAnalysis::SPECIAL_JALR()
 void LoopAnalysis::SPECIAL_SYSCALL(CCodeSection * Section)
 {
 #ifdef CHECKED_BUILD
-    if (Section->m_ContinueSection != NULL &&
+    if (Section->m_ContinueSection != nullptr &&
         Section->m_Cont.TargetPC != (uint32_t)-1)
     {
         g_Notify->BreakPoint(__FILE__, __LINE__);
     }
-    if (Section->m_JumpSection != NULL &&
+    if (Section->m_JumpSection != nullptr &&
         Section->m_Jump.TargetPC != (uint32_t)-1)
     {
         g_Notify->BreakPoint(__FILE__, __LINE__);
@@ -973,12 +973,12 @@ void LoopAnalysis::SPECIAL_SYSCALL(CCodeSection * Section)
 void LoopAnalysis::SPECIAL_BREAK(CCodeSection * Section)
 {
 #ifdef CHECKED_BUILD
-    if (Section->m_ContinueSection != NULL &&
+    if (Section->m_ContinueSection != nullptr &&
         Section->m_Cont.TargetPC != (uint32_t)-1)
     {
         g_Notify->BreakPoint(__FILE__, __LINE__);
     }
-    if (Section->m_JumpSection != NULL &&
+    if (Section->m_JumpSection != nullptr &&
         Section->m_Jump.TargetPC != (uint32_t)-1)
     {
         g_Notify->BreakPoint(__FILE__, __LINE__);

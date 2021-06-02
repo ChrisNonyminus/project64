@@ -27,15 +27,13 @@ bool CSettingTypeRDBRDRamSize::Load (uint32_t /*Index*/, bool & /*Value*/ ) cons
 bool CSettingTypeRDBRDRamSize::Load (uint32_t Index, uint32_t & Value ) const
 {
     uint32_t ulValue;
-    stdstr Default;
-    bool existsInRdb = g_Settings->LoadStringVal(Rdb_GoodName,Default);
     bool bRes = m_SettingsIniFile->GetNumber(m_SectionIdent->c_str(),m_KeyName.c_str(),m_DefaultValue,ulValue);
     if (!bRes)
     {
         LoadDefault(Index,ulValue);
     }
     Value = 0x400000;
-    if (ulValue == 8 || ulValue == 0x800000 || !existsInRdb) //default to 8MB if ROM is not in the RDB
+    if (ulValue == 8 || ulValue == 0x800000)
     {
         Value = 0x800000;
     }
@@ -48,7 +46,7 @@ bool CSettingTypeRDBRDRamSize::Load (uint32_t /*Index*/, std::string & /*Value*/
     return false;
 }
 
-//return the default values
+// Return the default values
 void CSettingTypeRDBRDRamSize::LoadDefault (uint32_t /*Index*/, bool & /*Value*/   ) const
 {
     g_Notify->BreakPoint(__FILE__, __LINE__);
@@ -64,7 +62,7 @@ void CSettingTypeRDBRDRamSize::LoadDefault (uint32_t /*Index*/, std::string & /*
     g_Notify->BreakPoint(__FILE__, __LINE__);
 }
 
-//Update the settings
+// Update the settings
 void CSettingTypeRDBRDRamSize::Save (uint32_t /*Index*/, bool /*Value*/ )
 {
     g_Notify->BreakPoint(__FILE__, __LINE__);
@@ -87,5 +85,5 @@ void CSettingTypeRDBRDRamSize::Save (uint32_t /*Index*/, const char * /*Value*/ 
 
 void CSettingTypeRDBRDRamSize::Delete(uint32_t /*Index*/ )
 {
-    m_SettingsIniFile->SaveString(m_SectionIdent->c_str(),m_KeyName.c_str(),NULL);
+    m_SettingsIniFile->SaveString(m_SectionIdent->c_str(),m_KeyName.c_str(),nullptr);
 }

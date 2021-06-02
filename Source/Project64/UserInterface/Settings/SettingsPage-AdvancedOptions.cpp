@@ -9,15 +9,18 @@ CAdvancedOptionsPage::CAdvancedOptionsPage(HWND hParent, const RECT & rcDispay)
         return;
     }
 
-    //Set the text for all gui Items
+    // Set the text for all GUI items
     SetDlgItemText(IDC_START_ON_ROM_OPEN, wGS(ADVANCE_AUTO_START).c_str());
     SetDlgItemText(IDC_ZIP, wGS(ADVANCE_COMPRESS).c_str());
     SetDlgItemText(IDC_DEBUGGER, wGS(ADVANCE_DEBUGGER).c_str());
     SetDlgItemText(IDC_REMEMBER_CHEAT, wGS(OPTION_REMEMBER_CHEAT).c_str());
+    SetDlgItemText(IDC_INTERPRETER, wGS(ADVANCE_ALWAYS_INTERPRETER).c_str());
     SetDlgItemText(IDC_UNIQUE_SAVE_DIR, wGS(OPTION_UNIQUE_SAVE_DIR).c_str());
     SetDlgItemText(IDC_CHECK_RUNNING, wGS(OPTION_CHECK_RUNNING).c_str());
     SetDlgItemText(IDC_ENABLE_ENHANCEMENTS, wGS(OPTION_ENABLE_ENHANCEMENTS).c_str());
     SetDlgItemText(IDC_DISPLAY_FRAMERATE, wGS(OPTION_CHANGE_FR).c_str());
+    SetDlgItemText(IDC_SHOW_STATUS_BAR, wGS(OPTION_SHOW_STATUS_BAR).c_str());
+    SetDlgItemText(IDC_EXIT_FULLSCREEN_ON_LOSE_FOCUS, wGS(OPTION_EXIT_FULLSCREEN_ON_LOSE_FOCUS).c_str());
 
     AddModCheckBox(GetDlgItem(IDC_START_ON_ROM_OPEN), Setting_AutoStart);
     AddModCheckBox(GetDlgItem(IDC_ZIP), Setting_AutoZipInstantSave);
@@ -28,6 +31,8 @@ CAdvancedOptionsPage::CAdvancedOptionsPage(HWND hParent, const RECT & rcDispay)
     AddModCheckBox(GetDlgItem(IDC_CHECK_RUNNING), Setting_CheckEmuRunning);
     AddModCheckBox(GetDlgItem(IDC_ENABLE_ENHANCEMENTS), Setting_Enhancement);
     AddModCheckBox(GetDlgItem(IDC_DISPLAY_FRAMERATE), UserInterface_DisplayFrameRate);
+    AddModCheckBox(GetDlgItem(IDC_SHOW_STATUS_BAR), (SettingID)UserInterface_ShowStatusBar);
+    AddModCheckBox(GetDlgItem(IDC_EXIT_FULLSCREEN_ON_LOSE_FOCUS), (SettingID)UserInterface_ExitFullscreenOnLoseFocus);
 
     CModifiedComboBox * ComboBox;
     ComboBox = AddModComboBox(GetDlgItem(IDC_FRAME_DISPLAY_TYPE), UserInterface_FrameDisplayType);

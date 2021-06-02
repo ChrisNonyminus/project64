@@ -23,7 +23,7 @@ COptionsGameBrowserPage::COptionsGameBrowserPage(HWND hParent, const RECT & rcDi
     SetDlgItemText(IDC_UP, wGS(RB_UP).c_str());
     SetDlgItemText(IDC_DOWN, wGS(RB_DOWN).c_str());
 
-    AddModCheckBox(GetDlgItem(IDC_USE_ROMBROWSER), RomBrowser_Enabled);
+    AddModCheckBox(GetDlgItem(IDC_USE_ROMBROWSER), (SettingID)RomBrowser_Enabled);
     AddModCheckBox(GetDlgItem(IDC_RECURSION), RomList_GameDirRecursive);
     AddModCheckBox(GetDlgItem(IDC_SHOW_FILE_EXTENSIONS), RomList_ShowFileExtensions);
 
@@ -93,16 +93,16 @@ void COptionsGameBrowserPage::AddFieldClicked(UINT /*Code*/, int /*id*/, HWND /*
     {
         return;
     }
-    //remove from list
+    // Remove from list
     int i = m_Avaliable.GetItemData(index);
     m_Avaliable.DeleteString(index);
 
-    //select next in list
+    // Select next in list
     int listCount = m_Avaliable.GetCount();
     if (index >= listCount) { index -= 1; }
     m_Avaliable.SetCurSel(index);
 
-    //Add to list
+    // Add to list
     index = m_Using.AddString(wGS(m_Fields[i].LangID()).c_str());
     m_Using.SetItemData(index, i);
     m_Using.SetCurSel(index);
@@ -119,16 +119,16 @@ void COptionsGameBrowserPage::RemoveFieldClicked(UINT /*Code*/, int /*id*/, HWND
     {
         return;
     }
-    //remove from list
+    // Remove from list
     int i = m_Using.GetItemData(index);
     m_Using.DeleteString(index);
 
-    //select next in list
+    // Select next in list
     int listCount = m_Using.GetCount();
     if (index >= listCount) { index -= 1; }
     m_Using.SetCurSel(index);
 
-    //Add to list
+    // Add to list
     index = m_Avaliable.AddString(wGS(m_Fields[i].LangID()).c_str());
     m_Avaliable.SetItemData(index, i);
     m_Avaliable.SetCurSel(index);

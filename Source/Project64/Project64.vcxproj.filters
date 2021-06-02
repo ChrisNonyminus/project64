@@ -99,9 +99,6 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="UserInterface\CheatClassUI.cpp">
-      <Filter>Source Files\User Interface Source</Filter>
-    </ClCompile>
     <ClCompile Include="UserInterface\MainWindow.cpp">
       <Filter>Source Files\User Interface Source</Filter>
     </ClCompile>
@@ -111,13 +108,7 @@
     <ClCompile Include="UserInterface\MainMenu.cpp">
       <Filter>Source Files\User Interface Source</Filter>
     </ClCompile>
-    <ClCompile Include="UserInterface\MenuClass.cpp">
-      <Filter>Source Files\User Interface Source</Filter>
-    </ClCompile>
     <ClCompile Include="UserInterface\MenuShortCuts.cpp">
-      <Filter>Source Files\User Interface Source</Filter>
-    </ClCompile>
-    <ClCompile Include="UserInterface\RomBrowserClass.cpp">
       <Filter>Source Files\User Interface Source</Filter>
     </ClCompile>
     <ClCompile Include="UserInterface\SettingsConfig.cpp">
@@ -128,9 +119,6 @@
     </ClCompile>
     <ClCompile Include="Settings\NotificationSettings.cpp">
       <Filter>Source Files\Settings Files</Filter>
-    </ClCompile>
-    <ClCompile Include="UserInterface\RomInformationClass.cpp">
-      <Filter>Source Files\User Interface Source</Filter>
     </ClCompile>
     <ClCompile Include="Settings\UISettings.cpp">
       <Filter>Source Files\Settings Files</Filter>
@@ -261,13 +249,22 @@
     <ClCompile Include="Vanguard\ManagedWrapper.cpp">
       <Filter>Vanguard</Filter>
     </ClCompile>
+    <ClCompile Include="UserInterface\RomInformation.cpp">
+      <Filter>Source Files\User Interface Source</Filter>
+    </ClCompile>
+    <ClCompile Include="UserInterface\MenuItem.cpp">
+      <Filter>Source Files\User Interface Source</Filter>
+    </ClCompile>
+    <ClCompile Include="UserInterface\CheatUI.cpp">
+      <Filter>Source Files\User Interface Source</Filter>
+    </ClCompile>
+    <ClCompile Include="UserInterface\RomBrowser.cpp">
+      <Filter>Source Files\User Interface Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="UserInterface\resource.h">
       <Filter>Resource Files</Filter>
-    </ClInclude>
-    <ClInclude Include="UserInterface\CheatClassUI.h">
-      <Filter>Header Files\User Interface Headers</Filter>
     </ClInclude>
     <ClInclude Include="UserInterface\MainWindow.h">
       <Filter>Header Files\User Interface Headers</Filter>
@@ -276,9 +273,6 @@
       <Filter>Header Files\User Interface Headers</Filter>
     </ClInclude>
     <ClInclude Include="UserInterface\MainMenu.h">
-      <Filter>Header Files\User Interface Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="UserInterface\MenuClass.h">
       <Filter>Header Files\User Interface Headers</Filter>
     </ClInclude>
     <ClInclude Include="UserInterface\MenuShortCuts.h">
@@ -349,9 +343,6 @@
     </ClInclude>
     <ClInclude Include="WTLApp.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="UserInterface\RomInformationClass.h">
-      <Filter>Header Files\User Interface Headers</Filter>
     </ClInclude>
     <ClInclude Include="Settings\GuiSettings.h">
       <Filter>Header Files\Settings</Filter>
@@ -502,6 +493,15 @@
     </ClInclude>
     <ClInclude Include="Vanguard\ManagedWrapper.h">
       <Filter>Vanguard</Filter>
+    </ClCompile>
+    <ClInclude Include="UserInterface\RomInformation.h">
+      <Filter>Header Files\User Interface Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="UserInterface\MenuItem.h">
+      <Filter>Header Files\User Interface Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="UserInterface\CheatUI.h">
+      <Filter>Header Files\User Interface Headers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

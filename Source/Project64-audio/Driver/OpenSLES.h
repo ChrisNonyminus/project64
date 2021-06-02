@@ -1,5 +1,5 @@
 // Project64 - A Nintendo 64 emulator
-// http://www.pj64-emu.com/
+// https://www.pj64-emu.com/
 // Copyright(C) 2001-2021 Project64.
 // Copyright(C) 2015 Gilles Siberlin
 // Copyright(C) 2007 - 2009 Richard Goedeken
@@ -7,6 +7,7 @@
 // Copyright(C) 2003 JttL
 // Copyright(C) 2002 Hacktarux
 // GNU/GPLv2 licensed: https://gnu.org/licenses/gpl-2.0.html
+
 #pragma once
 #include <Common/SyncEvent.h>
 #include <Project64-audio/Audio_1.1.h>

@@ -12,12 +12,11 @@ class CModifiedEditBox :
 
 public:
 	// Constructors
-	CModifiedEditBox(bool bString = true, HWND hWnd = NULL);
+	CModifiedEditBox(bool bString = true, HWND hWnd = nullptr);
 	~CModifiedEditBox();
 	
 	void SetReset ( bool Reset );
 	void SetChanged (bool Changed);
-	stdstr GetWindowText();
 	void SetTextField (HWND hWnd);
 
 	inline bool IsChanged ( void ) const 
@@ -33,4 +32,3 @@ public:
 		return m_bString;
 	}
 };
-

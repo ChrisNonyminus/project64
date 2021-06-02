@@ -29,7 +29,7 @@ CScriptSystem::CScriptSystem(CDebuggerUI* debugger)
     RegisterHook("gprvalue", m_HookCPUGPRValue);
     RegisterHook("draw", m_HookFrameDrawn);
 
-    HMODULE hInst = GetModuleHandle(NULL);
+    HMODULE hInst = GetModuleHandle(nullptr);
     HRSRC hRes = FindResource(hInst, MAKEINTRESOURCE(IDR_JSAPI_TEXT), L"TEXT");
 
     HGLOBAL hGlob = LoadResource(hInst, hRes);
@@ -62,7 +62,7 @@ void CScriptSystem::RunScript(const char * path)
 {
     CGuard guard(m_CS);
     CScriptInstance* scriptInstance = new CScriptInstance(m_Debugger);
-    char* pathSaved = (char*)malloc(strlen(path)+1); // freed via DeleteStoppedInstances
+    char* pathSaved = (char*)malloc(strlen(path)+1); // Freed via DeleteStoppedInstances
     strcpy(pathSaved, path);
 
     m_RunningInstances.push_back({ pathSaved, scriptInstance });
@@ -73,7 +73,7 @@ void CScriptSystem::StopScript(const char* path)
 {
     CScriptInstance* scriptInstance = GetInstance(path);
 
-    if (scriptInstance == NULL)
+    if (scriptInstance == nullptr)
     {
         return;
     }
@@ -128,7 +128,7 @@ CScriptInstance* CScriptSystem::GetInstance(const char* path)
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 bool CScriptSystem::HasCallbacksForInstance(CScriptInstance* scriptInstance)
@@ -180,7 +180,7 @@ CScriptHook* CScriptSystem::GetHook(const char* hookId)
             return m_Hooks[i].cbList;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 int CScriptSystem::GetNextCallbackId()

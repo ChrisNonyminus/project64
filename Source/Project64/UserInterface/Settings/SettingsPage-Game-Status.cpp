@@ -12,25 +12,25 @@ CGameStatusPage::CGameStatusPage(HWND hParent, const RECT & rcDispay)
 
     CIniFile RomIniFile(g_Settings->LoadStringVal(SupportFile_RomDatabase).c_str());
 	CIniFile::strlist Keys;
-    RomIniFile.GetKeyList("Rom Status", Keys);
+    RomIniFile.GetKeyList("ROM Status", Keys);
     stdstr Status = UISettingsLoadStringVal(Rdb_Status);
 
     CModifiedComboBoxTxt * ComboBox;
-    ComboBox = AddModComboBoxTxt(GetDlgItem(IDC_STATUS_TYPE), Rdb_Status);
+    ComboBox = AddModComboBoxTxt(GetDlgItem(IDC_STATUS_TYPE), (SettingID)Rdb_Status);
     if (ComboBox)
     {
         for (CIniFile::strlist::iterator item = Keys.begin(); item != Keys.end(); item++)
         {
-            if (strstr(item->c_str(), ".Sel") != NULL) { continue; }
-            if (strstr(item->c_str(), ".Auto") != NULL) { continue; }
+            if (strstr(item->c_str(), ".Sel") != nullptr) { continue; }
+            if (strstr(item->c_str(), ".Auto") != nullptr) { continue; }
             ComboBox->AddItem(stdstr(*item).ToUTF16().c_str(), item->c_str());
         }
         ComboBox->SetTextField(GetDlgItem(IDC_STATUS_TEXT));
     }
     CModifiedEditBox * TxtBox;
-    TxtBox = AddModTextBox(GetDlgItem(IDC_NOTES_CORE), Rdb_NotesCore, true);
+    TxtBox = AddModTextBox(GetDlgItem(IDC_NOTES_CORE), (SettingID)Rdb_NotesCore, true);
     TxtBox->SetTextField(GetDlgItem(IDC_NOTES_CORE_TEXT));
-    TxtBox = AddModTextBox(GetDlgItem(IDC_NOTES_PLUGIN), Rdb_NotesPlugin, true);
+    TxtBox = AddModTextBox(GetDlgItem(IDC_NOTES_PLUGIN), (SettingID)Rdb_NotesPlugin, true);
     TxtBox->SetTextField(GetDlgItem(IDC_NOTES_PLUGIN_TEXT));
 
     UpdatePageSettings();

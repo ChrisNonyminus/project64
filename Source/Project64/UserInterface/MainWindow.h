@@ -2,15 +2,15 @@
 
 #include "../Settings/GuiSettings.h"
 #include <Project64/UserInterface/Debugger/debugger.h>
-#include <Project64-core/Plugins/PluginClass.h>
-#include <Project64\UserInterface\CheatClassUI.h>
+#include <Project64-core/Plugins/Plugin.h>
+#include <Project64\UserInterface\CheatUI.h>
 #include <Project64\UserInterface\EnhancementUI.h>
 #include <Project64\UserInterface\ProjectSupport.h>
 
-class CGfxPlugin;      //Plugin that controls the rendering
-class CAudioPlugin;    //Plugin for audio, need the hwnd
-class CControl_Plugin; //Controller needs hwnd to see if it is the focused window
-class CBaseMenu;           //Menu for the gui
+class CGfxPlugin;      // Plugin that controls the rendering
+class CAudioPlugin;    // Plugin for audio, need the hwnd
+class CControl_Plugin; // Controller needs hwnd to see if it is the focused window
+class CBaseMenu;           // Menu for the GUI
 class CN64System;
 class CriticalSection;
 
@@ -70,7 +70,7 @@ public:
     void DisplayEnhancements(bool BlockExecution);
 
     void * GetWindowHandle(void) const { return m_hMainWindow; }
-    void * GetStatusBar(void) const { return m_hStatusWnd; }
+    void * GetStatusBar(void) const;
     void * GetModuleInstance(void) const;
 
     inline CProjectSupport & Support(void) { return m_Support; }
@@ -88,7 +88,7 @@ private:
     void ChangeWinSize(long width, long height);
     void Create(const char * WindowTitle);
     void CreateStatusBar(void);
-    void Resize(DWORD fwSizeType, WORD nWidth, WORD nHeight); //responding to WM_SIZE
+    void Resize(DWORD fwSizeType, WORD nWidth, WORD nHeight); // Responding to WM_SIZE
     void AddRecentRom(const char * ImagePath);
     void SetWindowCaption(const wchar_t * Caption);
     void ShowRomBrowser(void);
@@ -103,7 +103,8 @@ private:
     static void GameLoaded(CMainGui * Gui);
     static void GamePaused(CMainGui * Gui);
     static void GameCpuRunning(CMainGui * Gui);
-
+    static void ShowStatusBarChanged(CMainGui * Gui);
+    
     CBaseMenu * m_Menu;
 
     HWND m_hMainWindow, m_hStatusWnd;

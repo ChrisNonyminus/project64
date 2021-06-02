@@ -15,17 +15,17 @@ public:
 
     const char * GetName(void) const { return m_Name.c_str(); }
 
-    //return the values
+    // Return the values
     virtual bool Load(uint32_t Index, bool & Value) const;
     virtual bool Load(uint32_t Index, uint32_t & Value) const;
     virtual bool Load(uint32_t Index, std::string & Value) const;
 
-    //return the default values
+    // Return the default values
     virtual void LoadDefault(uint32_t Index, bool & Value) const;
     virtual void LoadDefault(uint32_t Index, uint32_t & Value) const;
     virtual void LoadDefault(uint32_t Index, std::string & Value) const;
 
-    //Update the settings
+    // Update the settings
     virtual void Save(uint32_t Index, bool Value);
     virtual void Save(uint32_t Index, uint32_t Value);
     virtual void Save(uint32_t Index, const std::string & Value);
@@ -35,9 +35,9 @@ public:
     virtual void Delete(uint32_t Index);
 
 private:
-    CSettingTypeSelectedDirectory(void);                                              // Disable default constructor
-    CSettingTypeSelectedDirectory(const CSettingTypeSelectedDirectory&);              // Disable copy constructor
-    CSettingTypeSelectedDirectory& operator=(const CSettingTypeSelectedDirectory&);   // Disable assignment
+    CSettingTypeSelectedDirectory(void);
+    CSettingTypeSelectedDirectory(const CSettingTypeSelectedDirectory&);
+    CSettingTypeSelectedDirectory& operator=(const CSettingTypeSelectedDirectory&);
 
     static void DirectoryChanged(CSettingTypeSelectedDirectory * _this);
 

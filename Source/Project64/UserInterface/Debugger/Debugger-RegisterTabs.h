@@ -12,7 +12,6 @@ public:
     LRESULT OnChar(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
     LRESULT OnLostFocus(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
     uint64_t GetValue();
-    stdstr GetValueText();
     void SetValue(uint32_t h, uint32_t l);
     void SetValue(uint64_t value);
 
@@ -50,8 +49,8 @@ public:
     void CopyAllRegisters();
 
 private:
-    CRegisterTabs(const CRegisterTabs&);              // Disable copy constructor
-    CRegisterTabs& operator=(const CRegisterTabs&);   // Disable assignment
+    CRegisterTabs(const CRegisterTabs&);
+    CRegisterTabs& operator=(const CRegisterTabs&);
 
     stdstr CopyTabRegisters(int id);
 
@@ -132,7 +131,7 @@ private:
         "Virtual coherency (data)"
     };
 
-    // for static dlgprocs, assumes single instance
+    // For static dlgprocs, assumes single instance
     static bool m_bColorsEnabled;
     static CDebuggerUI* m_Debugger;
 

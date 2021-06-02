@@ -45,8 +45,8 @@ COptionsShortCutsPage::COptionsShortCutsPage(HWND hParent, const RECT & rcDispay
 
 void COptionsShortCutsPage::CheckResetEnable(void)
 {
-    MSC_MAP & ShortCuts = m_ShortCuts.GetShortCuts();
-    for (MSC_MAP::iterator Item = ShortCuts.begin(); Item != ShortCuts.end(); Item++)
+    const MSC_MAP & ShortCuts = m_ShortCuts.GetShortCuts();
+    for (MSC_MAP::const_iterator Item = ShortCuts.begin(); Item != ShortCuts.end(); Item++)
     {
         const SHORTCUT_KEY_LIST & ShortCutList = Item->second.GetAccelItems();
         for (SHORTCUT_KEY_LIST::const_iterator ShortCut_item = ShortCutList.begin(); ShortCut_item != ShortCutList.end(); ShortCut_item++)
@@ -66,17 +66,17 @@ void COptionsShortCutsPage::OnCpuStateChanged(UINT /*Code*/, int /*id*/, HWND /*
 {
     RUNNING_STATE RunningState = (RUNNING_STATE)m_CpuState.GetItemData(m_CpuState.GetCurSel());
 
-    MSC_MAP & ShortCuts = m_ShortCuts.GetShortCuts();
+    const MSC_MAP & ShortCuts = m_ShortCuts.GetShortCuts();
     m_MenuItems.DeleteAllItems();
 
-    for (MSC_MAP::iterator Item = ShortCuts.begin(); Item != ShortCuts.end(); Item++)
+    for (MSC_MAP::const_iterator Item = ShortCuts.begin(); Item != ShortCuts.end(); Item++)
     {
         if (!Item->second.Avaliable(RunningState))
         {
             continue;
         }
 
-        //find Parent
+        // Find parent
         HTREEITEM hParent = m_MenuItems.GetChildItem(TVI_ROOT);
         while (hParent)
         {
@@ -87,7 +87,7 @@ void COptionsShortCutsPage::OnCpuStateChanged(UINT /*Code*/, int /*id*/, HWND /*
             hParent = m_MenuItems.GetNextSiblingItem(hParent);
         }
 
-        if (hParent == NULL)
+        if (hParent == nullptr)
         {
             hParent = m_MenuItems.InsertItem(TVIF_TEXT | TVIF_PARAM, wGS(Item->second.Section()).c_str(), 0, 0, 0, 0, Item->second.Section(), TVI_ROOT, TVI_LAST);
         }
@@ -125,13 +125,13 @@ void COptionsShortCutsPage::OnCpuStateChanged(UINT /*Code*/, int /*id*/, HWND /*
 void COptionsShortCutsPage::OnRemoveClicked(UINT /*Code*/, int /*id*/, HWND /*ctl*/)
 {
     HTREEITEM hSelectedItem = m_MenuItems.GetSelectedItem();
-    if (hSelectedItem == NULL)
+    if (hSelectedItem == nullptr)
     {
         g_Notify->DisplayWarning(GS(MSG_NO_SEL_SHORTCUT));
         return;
     }
     HTREEITEM hParent = m_MenuItems.GetParentItem(hSelectedItem);
-    if (hParent == NULL)
+    if (hParent == nullptr)
     {
         g_Notify->DisplayWarning(GS(MSG_NO_SEL_SHORTCUT));
         return;
@@ -139,7 +139,7 @@ void COptionsShortCutsPage::OnRemoveClicked(UINT /*Code*/, int /*id*/, HWND /*ct
 
     CShortCutItem * ShortCut = (CShortCutItem *)m_MenuItems.GetItemData(hSelectedItem);
 
-    //Make sure an item is selected
+    // Make sure an item is selected
     int index = m_CurrentKeys.GetCurSel();
     if (index < 0)
     {
@@ -157,12 +157,12 @@ void COptionsShortCutsPage::OnRemoveClicked(UINT /*Code*/, int /*id*/, HWND /*ct
 
 void COptionsShortCutsPage::OnDetectKeyClicked(UINT /*Code*/, int /*id*/, HWND /*ctl*/)
 {
-    CloseHandle(CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)stInputGetKeys, this, 0, NULL));
+    CloseHandle(CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)stInputGetKeys, this, 0, nullptr));
 }
 
 void COptionsShortCutsPage::OnAssignClicked(UINT /*Code*/, int /*id*/, HWND /*ctl*/)
 {
-    //Get the virtual key info
+    // Get the virtual key info
     int index = m_VirtualKeyList.GetCurSel();
     if (index < 0)
     {
@@ -178,13 +178,13 @@ void COptionsShortCutsPage::OnAssignClicked(UINT /*Code*/, int /*id*/, HWND /*ct
     RUNNING_STATE RunningState = (RUNNING_STATE)m_CpuState.GetItemData(m_CpuState.GetCurSel());
 
     HTREEITEM hSelectedItem = m_MenuItems.GetSelectedItem();
-    if (hSelectedItem == NULL)
+    if (hSelectedItem == nullptr)
     {
         g_Notify->DisplayWarning(GS(MSG_NO_MENUITEM_SEL));
         return;
     }
     HTREEITEM hParent = m_MenuItems.GetParentItem(hSelectedItem);
-    if (hParent == NULL)
+    if (hParent == nullptr)
     {
         g_Notify->DisplayWarning(GS(MSG_NO_MENUITEM_SEL));
         return;
@@ -216,7 +216,7 @@ void COptionsShortCutsPage::OnAssignClicked(UINT /*Code*/, int /*id*/, HWND /*ct
 
 void COptionsShortCutsPage::OnShortCutChanged(UINT /*Code*/, int /*id*/, HWND /*ctl*/)
 {
-    //Get the virtual key info
+    // Get the virtual key info
     int index = m_VirtualKeyList.GetCurSel();
     if (index < 0) { return; }
     WORD key = (WORD)m_VirtualKeyList.GetItemData(index);
@@ -247,7 +247,7 @@ LRESULT COptionsShortCutsPage::OnMenuItemChanged(LPNMHDR lpnmh)
 void COptionsShortCutsPage::RefreshShortCutOptions(HTREEITEM hItem)
 {
     HTREEITEM hParent = m_MenuItems.GetParentItem(hItem);
-    if (hParent == NULL)
+    if (hParent == nullptr)
     {
         return;
     }
@@ -293,15 +293,15 @@ BOOL CALLBACK KeyPromptDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM /*lPa
 
 void COptionsShortCutsPage::InputGetKeys(void)
 {
-    HWND hKeyDlg = CreateDialogParam(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_Key_Prompt), m_hWnd, (DLGPROC)KeyPromptDlgProc, (LPARAM)::GetDlgItem(m_hWnd, IDC_VIRTUALKEY));
+    HWND hKeyDlg = CreateDialogParam(GetModuleHandle(nullptr), MAKEINTRESOURCE(IDD_Key_Prompt), m_hWnd, (DLGPROC)KeyPromptDlgProc, (LPARAM)::GetDlgItem(m_hWnd, IDC_VIRTUALKEY));
     ::EnableWindow(GetParent(), false);
     MSG msg;
 
-    for (bool fDone = false; !fDone; MsgWaitForMultipleObjects(0, NULL, false, 45, QS_ALLINPUT)) {
+    for (bool fDone = false; !fDone; MsgWaitForMultipleObjects(0, nullptr, false, 45, QS_ALLINPUT)) {
         while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE)) {
             if (msg.message == WM_QUIT) {
                 fDone = true;
-                ::PostMessage(NULL, WM_QUIT, 0, 0);
+                ::PostMessage(nullptr, WM_QUIT, 0, 0);
                 break;
             }
             if (msg.message == WM_KEYDOWN || msg.message == WM_SYSKEYDOWN) {

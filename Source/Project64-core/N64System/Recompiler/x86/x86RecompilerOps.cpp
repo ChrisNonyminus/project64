@@ -8,19 +8,19 @@
 #include <Project64-core/N64System/Mips/MemoryVirtualMem.h>
 #include <Project64-core/N64System/Interpreter/InterpreterOps.h>
 #include <Project64-core/N64System/Interpreter/InterpreterCPU.h>
-#include <Project64-core/N64System/Recompiler/RecompilerClass.h>
+#include <Project64-core/N64System/Recompiler/Recompiler.h>
 #include <Project64-core/N64System/Recompiler/CodeSection.h>
 #include <Project64-core/N64System/Recompiler/RecompilerCodeLog.h>
 #include <Project64-core/N64System/Recompiler/SectionInfo.h>
 #include <Project64-core/N64System/Recompiler/LoopAnalysis.h>
 #include <Project64-core/N64System/Recompiler/x86/x86RecompilerOps.h>
-#include <Project64-core/N64System/N64Class.h>
-#include <Project64-core/N64System/N64RomClass.h>
+#include <Project64-core/N64System/N64System.h>
+#include <Project64-core/N64System/N64Rom.h>
 #include <Project64-core/ExceptionHandler.h>
 #include <Project64-core/Debugger.h>
 #include <stdio.h>
 
-CCodeSection * CX86RecompilerOps::m_Section = NULL;
+CCodeSection * CX86RecompilerOps::m_Section = nullptr;
 CRegInfo       CX86RecompilerOps::m_RegWorkingSet;
 STEP_TYPE      CX86RecompilerOps::m_NextInstruction;
 uint32_t       CX86RecompilerOps::m_CompilePC;
@@ -352,11 +352,11 @@ void CX86RecompilerOps::CompileWriteTLBMiss(x86Reg AddressReg, x86Reg LookUpReg)
 
 bool DelaySlotEffectsCompare(uint32_t PC, uint32_t Reg1, uint32_t Reg2);
 
-/*************************** Trap functions  *************************/
+// Trap functions
 void CX86RecompilerOps::Compile_TrapCompare(TRAP_COMPARE CompareType)
 {
-    void *FunctAddress = NULL;
-    const char *FunctName = NULL;
+    void *FunctAddress = nullptr;
+    const char *FunctName = nullptr;
     switch (CompareType)
     {
     case CompareTypeTEQ:
@@ -411,7 +411,7 @@ void CX86RecompilerOps::Compile_TrapCompare(TRAP_COMPARE CompareType)
         g_Notify->BreakPoint(__FILE__, __LINE__);
     }
 
-    if (FunctName != NULL && FunctAddress != NULL)
+    if (FunctName != nullptr && FunctAddress != nullptr)
     {
         if (IsMapped(m_Opcode.rs)) {
             UnMap_GPR(m_Opcode.rs, true);
@@ -430,7 +430,7 @@ void CX86RecompilerOps::Compile_TrapCompare(TRAP_COMPARE CompareType)
     }
 }
 
-/************************** Branch functions  ************************/
+// Branch functions
 void CX86RecompilerOps::Compile_BranchCompare(BRANCH_COMPARE CompareType)
 {
     switch (CompareType)
@@ -500,7 +500,7 @@ void CX86RecompilerOps::Compile_Branch(BRANCH_COMPARE CompareType, BRANCH_TYPE B
         }
         m_Section->m_Jump.JumpPC = m_CompilePC;
         m_Section->m_Jump.TargetPC = m_CompilePC + ((int16_t)m_Opcode.offset << 2) + 4;
-        if (m_Section->m_JumpSection != NULL)
+        if (m_Section->m_JumpSection != nullptr)
         {
             m_Section->m_Jump.BranchLabel.Format("Section_%d", m_Section->m_JumpSection->m_SectionID);
         }
@@ -508,12 +508,12 @@ void CX86RecompilerOps::Compile_Branch(BRANCH_COMPARE CompareType, BRANCH_TYPE B
         {
             m_Section->m_Jump.BranchLabel.Format("Exit_%X_jump_%X", m_Section->m_EnterPC, m_Section->m_Jump.TargetPC);
         }
-        m_Section->m_Jump.LinkLocation = NULL;
-        m_Section->m_Jump.LinkLocation2 = NULL;
+        m_Section->m_Jump.LinkLocation = nullptr;
+        m_Section->m_Jump.LinkLocation2 = nullptr;
         m_Section->m_Jump.DoneDelaySlot = false;
         m_Section->m_Cont.JumpPC = m_CompilePC;
         m_Section->m_Cont.TargetPC = m_CompilePC + 8;
-        if (m_Section->m_ContinueSection != NULL)
+        if (m_Section->m_ContinueSection != nullptr)
         {
             m_Section->m_Cont.BranchLabel.Format("Section_%d", m_Section->m_ContinueSection->m_SectionID);
         }
@@ -521,8 +521,8 @@ void CX86RecompilerOps::Compile_Branch(BRANCH_COMPARE CompareType, BRANCH_TYPE B
         {
             m_Section->m_Cont.BranchLabel.Format("Exit_%X_continue_%X", m_Section->m_EnterPC, m_Section->m_Cont.TargetPC);
         }
-        m_Section->m_Cont.LinkLocation = NULL;
-        m_Section->m_Cont.LinkLocation2 = NULL;
+        m_Section->m_Cont.LinkLocation = nullptr;
+        m_Section->m_Cont.LinkLocation2 = nullptr;
         m_Section->m_Cont.DoneDelaySlot = false;
         if (m_Section->m_Jump.TargetPC < m_Section->m_Cont.TargetPC)
         {
@@ -545,8 +545,8 @@ void CX86RecompilerOps::Compile_Branch(BRANCH_COMPARE CompareType, BRANCH_TYPE B
         {
             if ((m_CompilePC & 0xFFC) != 0xFFC)
             {
-                m_Section->m_Cont.BranchLabel = m_Section->m_ContinueSection != NULL ? "Continue" : "ExitBlock";
-                m_Section->m_Jump.BranchLabel = m_Section->m_JumpSection != NULL ? "Jump" : "ExitBlock";
+                m_Section->m_Cont.BranchLabel = m_Section->m_ContinueSection != nullptr ? "Continue" : "ExitBlock";
+                m_Section->m_Jump.BranchLabel = m_Section->m_JumpSection != nullptr ? "Jump" : "ExitBlock";
             }
             else
             {
@@ -559,14 +559,14 @@ void CX86RecompilerOps::Compile_Branch(BRANCH_COMPARE CompareType, BRANCH_TYPE B
             }
             if (!m_Section->m_Jump.FallThrough && !m_Section->m_Cont.FallThrough)
             {
-                if (m_Section->m_Jump.LinkLocation != NULL)
+                if (m_Section->m_Jump.LinkLocation != nullptr)
                 {
                     CPU_Message("");
                     CPU_Message("      %s:", m_Section->m_Jump.BranchLabel.c_str());
                     LinkJump(m_Section->m_Jump);
                     m_Section->m_Jump.FallThrough = true;
                 }
-                else if (m_Section->m_Cont.LinkLocation != NULL)
+                else if (m_Section->m_Cont.LinkLocation != nullptr)
                 {
                     CPU_Message("");
                     CPU_Message("      %s:", m_Section->m_Cont.BranchLabel.c_str());
@@ -576,10 +576,10 @@ void CX86RecompilerOps::Compile_Branch(BRANCH_COMPARE CompareType, BRANCH_TYPE B
             }
             if ((m_CompilePC & 0xFFC) == 0xFFC)
             {
-                uint8_t * DelayLinkLocation = NULL;
+                uint8_t * DelayLinkLocation = nullptr;
                 if (m_Section->m_Jump.FallThrough)
                 {
-                    if (m_Section->m_Jump.LinkLocation != NULL || m_Section->m_Jump.LinkLocation2 != NULL)
+                    if (m_Section->m_Jump.LinkLocation != nullptr || m_Section->m_Jump.LinkLocation2 != nullptr)
                     {
                         g_Notify->BreakPoint(__FILE__, __LINE__);
                     }
@@ -587,17 +587,17 @@ void CX86RecompilerOps::Compile_Branch(BRANCH_COMPARE CompareType, BRANCH_TYPE B
                 }
                 else if (m_Section->m_Cont.FallThrough)
                 {
-                    if (m_Section->m_Cont.LinkLocation != NULL || m_Section->m_Cont.LinkLocation2 != NULL)
+                    if (m_Section->m_Cont.LinkLocation != nullptr || m_Section->m_Cont.LinkLocation2 != nullptr)
                     {
                         g_Notify->BreakPoint(__FILE__, __LINE__);
                     }
                     MoveConstToVariable(m_Section->m_Cont.TargetPC, &R4300iOp::m_JumpToLocation, "R4300iOp::m_JumpToLocation");
                 }
 
-                if (m_Section->m_Jump.LinkLocation != NULL || m_Section->m_Jump.LinkLocation2 != NULL)
+                if (m_Section->m_Jump.LinkLocation != nullptr || m_Section->m_Jump.LinkLocation2 != nullptr)
                 {
                     JmpLabel8("DoDelaySlot", 0);
-                    if (DelayLinkLocation != NULL) { g_Notify->BreakPoint(__FILE__, __LINE__); }
+                    if (DelayLinkLocation != nullptr) { g_Notify->BreakPoint(__FILE__, __LINE__); }
                     DelayLinkLocation = (uint8_t *)(*g_RecompPos - 1);
 
                     CPU_Message("      ");
@@ -605,10 +605,10 @@ void CX86RecompilerOps::Compile_Branch(BRANCH_COMPARE CompareType, BRANCH_TYPE B
                     LinkJump(m_Section->m_Jump);
                     MoveConstToVariable(m_Section->m_Jump.TargetPC, &R4300iOp::m_JumpToLocation, "R4300iOp::m_JumpToLocation");
                 }
-                if (m_Section->m_Cont.LinkLocation != NULL || m_Section->m_Cont.LinkLocation2 != NULL)
+                if (m_Section->m_Cont.LinkLocation != nullptr || m_Section->m_Cont.LinkLocation2 != nullptr)
                 {
                     JmpLabel8("DoDelaySlot", 0);
-                    if (DelayLinkLocation != NULL) { g_Notify->BreakPoint(__FILE__, __LINE__); }
+                    if (DelayLinkLocation != nullptr) { g_Notify->BreakPoint(__FILE__, __LINE__); }
                     DelayLinkLocation = (uint8_t *)(*g_RecompPos - 1);
 
                     CPU_Message("      ");
@@ -643,7 +643,7 @@ void CX86RecompilerOps::Compile_Branch(BRANCH_COMPARE CompareType, BRANCH_TYPE B
                 FallInfo->RegSet = m_RegWorkingSet;
                 if (FallInfo == &m_Section->m_Jump)
                 {
-                    if (m_Section->m_JumpSection != NULL)
+                    if (m_Section->m_JumpSection != nullptr)
                     {
                         m_Section->m_Jump.BranchLabel.Format("Section_%d", m_Section->m_JumpSection->m_SectionID);
                     }
@@ -663,7 +663,7 @@ void CX86RecompilerOps::Compile_Branch(BRANCH_COMPARE CompareType, BRANCH_TYPE B
                 }
                 else
                 {
-                    if (m_Section->m_ContinueSection != NULL)
+                    if (m_Section->m_ContinueSection != nullptr)
                     {
                         m_Section->m_Cont.BranchLabel.Format("Section_%d", m_Section->m_ContinueSection->m_SectionID);
                     }
@@ -679,7 +679,7 @@ void CX86RecompilerOps::Compile_Branch(BRANCH_COMPARE CompareType, BRANCH_TYPE B
                     JmpLabel32(FallInfo->BranchLabel.c_str(), 0);
                     FallInfo->LinkLocation = (uint32_t *)(*g_RecompPos - 4);
 
-                    if (JumpInfo->LinkLocation != NULL)
+                    if (JumpInfo->LinkLocation != nullptr)
                     {
                         CPU_Message("      %s:", JumpInfo->BranchLabel.c_str());
                         LinkJump(*JumpInfo);
@@ -705,12 +705,12 @@ void CX86RecompilerOps::Compile_Branch(BRANCH_COMPARE CompareType, BRANCH_TYPE B
                 m_Section->m_Jump.FallThrough = false;
                 m_Section->m_Cont.FallThrough = true;
                 m_Section->m_Cont.RegSet = m_RegWorkingSet;
-                if (m_Section->m_ContinueSection == NULL && m_Section->m_JumpSection != NULL)
+                if (m_Section->m_ContinueSection == nullptr && m_Section->m_JumpSection != nullptr)
                 {
                     m_Section->m_ContinueSection = m_Section->m_JumpSection;
-                    m_Section->m_JumpSection = NULL;
+                    m_Section->m_JumpSection = nullptr;
                 }
-                if (m_Section->m_ContinueSection != NULL)
+                if (m_Section->m_ContinueSection != nullptr)
                 {
                     m_Section->m_Cont.BranchLabel.Format("Section_%d", m_Section->m_ContinueSection->m_SectionID);
                 }
@@ -763,7 +763,7 @@ void CX86RecompilerOps::Compile_BranchLikely(BRANCH_COMPARE CompareType, bool Li
             }
         }
 
-        if (m_Section->m_JumpSection != NULL)
+        if (m_Section->m_JumpSection != nullptr)
         {
             m_Section->m_Jump.BranchLabel.Format("Section_%d", ((CCodeSection *)m_Section->m_JumpSection)->m_SectionID);
         }
@@ -772,7 +772,7 @@ void CX86RecompilerOps::Compile_BranchLikely(BRANCH_COMPARE CompareType, bool Li
             m_Section->m_Jump.BranchLabel = "ExitBlock";
         }
 
-        if (m_Section->m_ContinueSection != NULL)
+        if (m_Section->m_ContinueSection != nullptr)
         {
             m_Section->m_Cont.BranchLabel.Format("Section_%d", ((CCodeSection *)m_Section->m_ContinueSection)->m_SectionID);
         }
@@ -782,11 +782,11 @@ void CX86RecompilerOps::Compile_BranchLikely(BRANCH_COMPARE CompareType, bool Li
         }
 
         m_Section->m_Jump.FallThrough = true;
-        m_Section->m_Jump.LinkLocation = NULL;
-        m_Section->m_Jump.LinkLocation2 = NULL;
+        m_Section->m_Jump.LinkLocation = nullptr;
+        m_Section->m_Jump.LinkLocation2 = nullptr;
         m_Section->m_Cont.FallThrough = false;
-        m_Section->m_Cont.LinkLocation = NULL;
-        m_Section->m_Cont.LinkLocation2 = NULL;
+        m_Section->m_Cont.LinkLocation = nullptr;
+        m_Section->m_Cont.LinkLocation2 = nullptr;
 
         if (Link)
         {
@@ -803,13 +803,13 @@ void CX86RecompilerOps::Compile_BranchLikely(BRANCH_COMPARE CompareType, bool Li
         {
             if (m_Section->m_Cont.FallThrough)
             {
-                if (m_Section->m_Jump.LinkLocation != NULL)
+                if (m_Section->m_Jump.LinkLocation != nullptr)
                 {
                     g_Notify->BreakPoint(__FILE__, __LINE__);
                 }
             }
 
-            if (m_Section->m_Jump.LinkLocation != NULL || m_Section->m_Jump.FallThrough)
+            if (m_Section->m_Jump.LinkLocation != nullptr || m_Section->m_Jump.FallThrough)
             {
                 LinkJump(m_Section->m_Jump);
 
@@ -824,7 +824,7 @@ void CX86RecompilerOps::Compile_BranchLikely(BRANCH_COMPARE CompareType, bool Li
             }
 
             LinkJump(m_Section->m_Cont);
-            CompileExit(m_CompilePC, m_CompilePC + 8, m_Section->m_Cont.RegSet, CExitInfo::Normal, true, NULL);
+            CompileExit(m_CompilePC, m_CompilePC + 8, m_Section->m_Cont.RegSet, CExitInfo::Normal, true, nullptr);
             return;
         }
         else
@@ -842,7 +842,7 @@ void CX86RecompilerOps::Compile_BranchLikely(BRANCH_COMPARE CompareType, bool Li
         {
             if (m_Section->m_Cont.FallThrough)
             {
-                if (m_Section->m_Jump.LinkLocation != NULL)
+                if (m_Section->m_Jump.LinkLocation != nullptr)
                 {
                     g_Notify->BreakPoint(__FILE__, __LINE__);
                 }
@@ -866,7 +866,7 @@ void CX86RecompilerOps::Compile_BranchLikely(BRANCH_COMPARE CompareType, bool Li
 
 void CX86RecompilerOps::BNE_Compare()
 {
-    uint8_t *Jump = NULL;
+    uint8_t *Jump = nullptr;
 
     if (IsKnown(m_Opcode.rs) && IsKnown(m_Opcode.rt))
     {
@@ -900,7 +900,7 @@ void CX86RecompilerOps::BNE_Compare()
 
                 if (m_Section->m_Jump.FallThrough)
                 {
-                    JneLabel8("continue", 0);
+                    JneLabel8("Continue", 0);
                     Jump = *g_RecompPos - 1;
                 }
                 else
@@ -977,7 +977,7 @@ void CX86RecompilerOps::BNE_Compare()
                 }
                 if (m_Section->m_Jump.FallThrough)
                 {
-                    JneLabel8("continue", 0);
+                    JneLabel8("Continue", 0);
                     Jump = *g_RecompPos - 1;
                 }
                 else
@@ -1070,7 +1070,7 @@ void CX86RecompilerOps::BNE_Compare()
             }
             if (m_Section->m_Jump.FallThrough)
             {
-                JneLabel8("continue", 0);
+                JneLabel8("Continue", 0);
                 Jump = *g_RecompPos - 1;
             }
             else
@@ -1137,7 +1137,7 @@ void CX86RecompilerOps::BNE_Compare()
             CompX86regToVariable(Reg, &_GPR[m_Opcode.rs].W[1], CRegName::GPR_Hi[m_Opcode.rs]);
             if (m_Section->m_Jump.FallThrough)
             {
-                JneLabel8("continue", 0);
+                JneLabel8("Continue", 0);
                 Jump = *g_RecompPos - 1;
             }
             else
@@ -1191,7 +1191,7 @@ void CX86RecompilerOps::BNE_Compare()
 
 void CX86RecompilerOps::BEQ_Compare()
 {
-    uint8_t *Jump = NULL;
+    uint8_t *Jump = nullptr;
 
     if (IsKnown(m_Opcode.rs) && IsKnown(m_Opcode.rt))
     {
@@ -1225,7 +1225,7 @@ void CX86RecompilerOps::BEQ_Compare()
                     );
                 if (m_Section->m_Cont.FallThrough)
                 {
-                    JneLabel8("continue", 0);
+                    JneLabel8("Continue", 0);
                     Jump = *g_RecompPos - 1;
                 }
                 else
@@ -1301,7 +1301,7 @@ void CX86RecompilerOps::BEQ_Compare()
                     CompConstToX86reg(GetMipsRegMapHi(MappedReg), GetMipsRegHi(ConstReg));
                 }
                 if (m_Section->m_Cont.FallThrough) {
-                    JneLabel8("continue", 0);
+                    JneLabel8("Continue", 0);
                     Jump = *g_RecompPos - 1;
                 }
                 else
@@ -1394,7 +1394,7 @@ void CX86RecompilerOps::BEQ_Compare()
             }
             if (m_Section->m_Cont.FallThrough)
             {
-                JneLabel8("continue", 0);
+                JneLabel8("Continue", 0);
                 Jump = *g_RecompPos - 1;
             }
             else
@@ -1451,7 +1451,7 @@ void CX86RecompilerOps::BEQ_Compare()
             CompX86regToVariable(Reg, &_GPR[m_Opcode.rt].W[1], CRegName::GPR_Hi[m_Opcode.rt]);
             if (m_Section->m_Cont.FallThrough)
             {
-                JneLabel8("continue", 0);
+                JneLabel8("Continue", 0);
                 Jump = *g_RecompPos - 1;
             }
             else
@@ -1576,7 +1576,7 @@ void CX86RecompilerOps::BGTZ_Compare()
     }
     else
     {
-        uint8_t *Jump = NULL;
+        uint8_t *Jump = nullptr;
 
         if (IsMapped(m_Opcode.rs))
         {
@@ -1590,12 +1590,12 @@ void CX86RecompilerOps::BGTZ_Compare()
         {
             JlLabel32(m_Section->m_Cont.BranchLabel.c_str(), 0);
             m_Section->m_Cont.LinkLocation = (uint32_t *)(*g_RecompPos - 4);
-            JgLabel8("continue", 0);
+            JgLabel8("Continue", 0);
             Jump = *g_RecompPos - 1;
         }
         else if (m_Section->m_Cont.FallThrough)
         {
-            JlLabel8("continue", 0);
+            JlLabel8("Continue", 0);
             Jump = *g_RecompPos - 1;
             JgLabel32(m_Section->m_Jump.BranchLabel.c_str(), 0);
             m_Section->m_Jump.LinkLocation = (uint32_t *)(*g_RecompPos - 4);
@@ -1709,7 +1709,7 @@ void CX86RecompilerOps::BLEZ_Compare()
         }
         else
         {
-            uint8_t *Jump = NULL;
+            uint8_t *Jump = nullptr;
 
             if (IsMapped(m_Opcode.rs))
             {
@@ -1773,7 +1773,7 @@ void CX86RecompilerOps::BLEZ_Compare()
         }
     }
     else {
-        uint8_t *Jump = NULL;
+        uint8_t *Jump = nullptr;
 
         if (!g_System->b32BitCore())
         {
@@ -2127,7 +2127,7 @@ void CX86RecompilerOps::COP1_BCT_Compare()
     }
 }
 
-/*************************  OpCode functions *************************/
+//  Opcode functions
 void CX86RecompilerOps::J()
 {
     if (m_NextInstruction == NORMAL)
@@ -2141,7 +2141,7 @@ void CX86RecompilerOps::J()
 
         m_Section->m_Jump.TargetPC = (m_CompilePC & 0xF0000000) + (m_Opcode.target << 2);;
         m_Section->m_Jump.JumpPC = m_CompilePC;
-        if (m_Section->m_JumpSection != NULL)
+        if (m_Section->m_JumpSection != nullptr)
         {
             m_Section->m_Jump.BranchLabel.Format("Section_%d", ((CCodeSection *)m_Section->m_JumpSection)->m_SectionID);
         }
@@ -2150,8 +2150,8 @@ void CX86RecompilerOps::J()
             m_Section->m_Jump.BranchLabel = "ExitBlock";
         }
         m_Section->m_Jump.FallThrough = true;
-        m_Section->m_Jump.LinkLocation = NULL;
-        m_Section->m_Jump.LinkLocation2 = NULL;
+        m_Section->m_Jump.LinkLocation = nullptr;
+        m_Section->m_Jump.LinkLocation2 = nullptr;
         m_NextInstruction = DO_DELAY_SLOT;
     }
     else if (m_NextInstruction == DELAY_SLOT_DONE)
@@ -2182,7 +2182,7 @@ void CX86RecompilerOps::JAL()
         }
         m_Section->m_Jump.TargetPC = (m_CompilePC & 0xF0000000) + (m_Opcode.target << 2);
         m_Section->m_Jump.JumpPC = m_CompilePC;
-        if (m_Section->m_JumpSection != NULL)
+        if (m_Section->m_JumpSection != nullptr)
         {
             m_Section->m_Jump.BranchLabel.Format("Section_%d", ((CCodeSection *)m_Section->m_JumpSection)->m_SectionID);
         }
@@ -2191,8 +2191,8 @@ void CX86RecompilerOps::JAL()
             m_Section->m_Jump.BranchLabel = "ExitBlock";
         }
         m_Section->m_Jump.FallThrough = true;
-        m_Section->m_Jump.LinkLocation = NULL;
-        m_Section->m_Jump.LinkLocation2 = NULL;
+        m_Section->m_Jump.LinkLocation = nullptr;
+        m_Section->m_Jump.LinkLocation2 = nullptr;
         m_NextInstruction = DO_DELAY_SLOT;
     }
     else if (m_NextInstruction == DELAY_SLOT_DONE)
@@ -2216,7 +2216,7 @@ void CX86RecompilerOps::JAL()
             bool bCheck = TargetPC <= m_CompilePC;
             UpdateCounters(m_RegWorkingSet, bCheck, true);
 
-            CompileExit((uint32_t)-1, (uint32_t)-1, m_RegWorkingSet, bCheck ? CExitInfo::Normal : CExitInfo::Normal_NoSysCheck, true, NULL);
+            CompileExit((uint32_t)-1, (uint32_t)-1, m_RegWorkingSet, bCheck ? CExitInfo::Normal : CExitInfo::Normal_NoSysCheck, true, nullptr);
         }
         m_NextInstruction = END_BLOCK;
     }
@@ -2349,7 +2349,7 @@ void CX86RecompilerOps::SLTIU()
     }
     else
     {
-        uint8_t * Jump = NULL;
+        uint8_t * Jump = nullptr;
 
         CompConstToVariable(((int16_t)m_Opcode.immediate >> 31), &_GPR[m_Opcode.rs].W[1], CRegName::GPR_Hi[m_Opcode.rs]);
         JneLabel8("CompareSet", 0);
@@ -2445,7 +2445,7 @@ void CX86RecompilerOps::SLTI()
     }
     else
     {
-        uint8_t * Jump[2] = { NULL, NULL };
+        uint8_t * Jump[2] = { nullptr, nullptr };
         CompConstToVariable(((int16_t)m_Opcode.immediate >> 31), &_GPR[m_Opcode.rs].W[1], CRegName::GPR_Hi[m_Opcode.rs]);
         JeLabel8("Low Compare", 0);
         Jump[0] = *g_RecompPos - 1;
@@ -3325,7 +3325,7 @@ void CX86RecompilerOps::LW_KnownAddress(x86Reg Reg, uint32_t VAddr)
                 }
             }
             break;
-        case 0x04500000: /* AI registers */
+        case 0x04500000: // AI registers
             switch (PAddr)
             {
             case 0x04500004:
@@ -3349,7 +3349,7 @@ void CX86RecompilerOps::LW_KnownAddress(x86Reg Reg, uint32_t VAddr)
                 }
                 else
                 {
-                    if (g_Plugins->Audio()->AiReadLength != NULL)
+                    if (g_Plugins->Audio()->AiReadLength != nullptr)
                     {
                         m_RegWorkingSet.BeforeCallDirect();
                         Call_Direct((void *)g_Plugins->Audio()->AiReadLength, "AiReadLength");
@@ -3442,7 +3442,7 @@ void CX86RecompilerOps::LW_KnownAddress(x86Reg Reg, uint32_t VAddr)
             }
             break;
         case 0x05000000:
-            //64DD Registers
+            // 64DD registers
             if (g_Settings->LoadBool(Setting_EnableDisk))
             {
                 switch (PAddr)
@@ -3491,13 +3491,13 @@ void CX86RecompilerOps::LW_KnownAddress(x86Reg Reg, uint32_t VAddr)
         default:
             if ((PAddr & 0xF0000000) == 0x10000000 && (PAddr - 0x10000000) < g_Rom->GetRomSize())
             {
-                // read from rom
+                // Read from ROM
                 sprintf(VarName, "RDRAM + %X", PAddr);
                 MoveVariableToX86reg(PAddr + g_MMU->Rdram(), VarName, Reg);
             }
-            else if (g_DDRom != NULL && ((PAddr & 0xFF000000) == 0x06000000 && (PAddr - 0x06000000) < g_DDRom->GetRomSize()))
+            else if (g_DDRom != nullptr && ((PAddr & 0xFF000000) == 0x06000000 && (PAddr - 0x06000000) < g_DDRom->GetRomSize()))
             {
-                // read from ddrom
+                // Read from DDROM (TODO: Is DDROM a disk image or the IPL?)
                 sprintf(VarName, "RDRAM + %X", PAddr);
                 MoveVariableToX86reg(PAddr + g_MMU->Rdram(), VarName, Reg);
             }
@@ -4137,7 +4137,7 @@ void CX86RecompilerOps::SW(bool bCheckLLbit)
             ShiftRightUnsignImmed(TempReg2, 12);
             MoveVariableDispToX86Reg(g_MMU->m_TLB_WriteMap, "MMU->TLB_WriteMap", TempReg2, TempReg2, 4);
             CompileWriteTLBMiss(TempReg1, TempReg2);
-            uint8_t * Jump = NULL;
+            uint8_t * Jump = nullptr;
             if (bCheckLLbit)
             {
                 CompConstToVariable(1, _LLBit, "_LLBit");
@@ -4949,7 +4949,7 @@ void CX86RecompilerOps::SD()
     }
 }
 
-/********************** R4300i OpCodes: Special **********************/
+// R4300i opcodes: Special
 void CX86RecompilerOps::SPECIAL_SLL()
 {
     if (m_Opcode.rd == 0)
@@ -5161,11 +5161,11 @@ void CX86RecompilerOps::SPECIAL_JR()
         }
 
         m_Section->m_Jump.FallThrough = false;
-        m_Section->m_Jump.LinkLocation = NULL;
-        m_Section->m_Jump.LinkLocation2 = NULL;
+        m_Section->m_Jump.LinkLocation = nullptr;
+        m_Section->m_Jump.LinkLocation2 = nullptr;
         m_Section->m_Cont.FallThrough = false;
-        m_Section->m_Cont.LinkLocation = NULL;
-        m_Section->m_Cont.LinkLocation2 = NULL;
+        m_Section->m_Cont.LinkLocation = nullptr;
+        m_Section->m_Cont.LinkLocation2 = nullptr;
 
         if (DelaySlotEffectsCompare(m_CompilePC, m_Opcode.rs, 0))
         {
@@ -5188,7 +5188,7 @@ void CX86RecompilerOps::SPECIAL_JR()
     {
         if (DelaySlotEffectsCompare(m_CompilePC, m_Opcode.rs, 0))
         {
-            CompileExit(m_CompilePC, (uint32_t)-1, m_RegWorkingSet, CExitInfo::Normal, true, NULL);
+            CompileExit(m_CompilePC, (uint32_t)-1, m_RegWorkingSet, CExitInfo::Normal, true, nullptr);
         }
         else
         {
@@ -5205,7 +5205,7 @@ void CX86RecompilerOps::SPECIAL_JR()
             {
                 MoveX86regToVariable(Map_TempReg(x86_Any, m_Opcode.rs, false), _PROGRAM_COUNTER, "PROGRAM_COUNTER");
             }
-            CompileExit((uint32_t)-1, (uint32_t)-1, m_RegWorkingSet, CExitInfo::Normal, true, NULL);
+            CompileExit((uint32_t)-1, (uint32_t)-1, m_RegWorkingSet, CExitInfo::Normal, true, nullptr);
             if (m_Section->m_JumpSection)
             {
                 m_Section->GenerateSectionLinkage();
@@ -5258,11 +5258,11 @@ void CX86RecompilerOps::SPECIAL_JALR()
         }
 
         m_Section->m_Jump.FallThrough = false;
-        m_Section->m_Jump.LinkLocation = NULL;
-        m_Section->m_Jump.LinkLocation2 = NULL;
+        m_Section->m_Jump.LinkLocation = nullptr;
+        m_Section->m_Jump.LinkLocation2 = nullptr;
         m_Section->m_Cont.FallThrough = false;
-        m_Section->m_Cont.LinkLocation = NULL;
-        m_Section->m_Cont.LinkLocation2 = NULL;
+        m_Section->m_Cont.LinkLocation = nullptr;
+        m_Section->m_Cont.LinkLocation2 = nullptr;
 
         m_NextInstruction = DO_DELAY_SLOT;
     }
@@ -5270,7 +5270,7 @@ void CX86RecompilerOps::SPECIAL_JALR()
     {
         if (DelaySlotEffectsCompare(m_CompilePC, m_Opcode.rs, 0))
         {
-            CompileExit(m_CompilePC, (uint32_t)-1, m_RegWorkingSet, CExitInfo::Normal, true, NULL);
+            CompileExit(m_CompilePC, (uint32_t)-1, m_RegWorkingSet, CExitInfo::Normal, true, nullptr);
         }
         else
         {
@@ -5287,7 +5287,7 @@ void CX86RecompilerOps::SPECIAL_JALR()
             {
                 MoveX86regToVariable(Map_TempReg(x86_Any, m_Opcode.rs, false), _PROGRAM_COUNTER, "PROGRAM_COUNTER");
             }
-            CompileExit((uint32_t)-1, (uint32_t)-1, m_RegWorkingSet, CExitInfo::Normal, true, NULL);
+            CompileExit((uint32_t)-1, (uint32_t)-1, m_RegWorkingSet, CExitInfo::Normal, true, nullptr);
             if (m_Section->m_JumpSection)
             {
                 m_Section->GenerateSectionLinkage();
@@ -5303,7 +5303,7 @@ void CX86RecompilerOps::SPECIAL_JALR()
 
 void CX86RecompilerOps::SPECIAL_SYSCALL()
 {
-    CompileExit(m_CompilePC, (uint32_t)-1, m_RegWorkingSet, CExitInfo::DoSysCall, true, NULL);
+    CompileExit(m_CompilePC, (uint32_t)-1, m_RegWorkingSet, CExitInfo::DoSysCall, true, nullptr);
     m_NextInstruction = END_BLOCK;
 }
 
@@ -5432,10 +5432,10 @@ void CX86RecompilerOps::SPECIAL_DSLLV()
     Jump[0] = *g_RecompPos - 1;
     ShiftLeftDouble(GetMipsRegMapHi(m_Opcode.rd), GetMipsRegMapLo(m_Opcode.rd));
     ShiftLeftSign(GetMipsRegMapLo(m_Opcode.rd));
-    JmpLabel8("continue", 0);
+    JmpLabel8("Continue", 0);
     Jump[1] = *g_RecompPos - 1;
 
-    //MORE32:
+    // MORE32:
     CPU_Message("");
     CPU_Message("      MORE32:");
     SetJump8(Jump[0], *g_RecompPos);
@@ -5444,7 +5444,7 @@ void CX86RecompilerOps::SPECIAL_DSLLV()
     AndConstToX86Reg(x86_ECX, 0x1F);
     ShiftLeftSign(GetMipsRegMapHi(m_Opcode.rd));
 
-    //continue:
+    // Continue:
     CPU_Message("");
     CPU_Message("      continue:");
     SetJump8(Jump[1], *g_RecompPos);
@@ -5517,10 +5517,10 @@ void CX86RecompilerOps::SPECIAL_DSRLV()
         Jump[0] = *g_RecompPos - 1;
         ShiftRightDouble(GetMipsRegMapLo(m_Opcode.rd), GetMipsRegMapHi(m_Opcode.rd));
         ShiftRightUnsign(GetMipsRegMapHi(m_Opcode.rd));
-        JmpLabel8("continue", 0);
+        JmpLabel8("Continue", 0);
         Jump[1] = *g_RecompPos - 1;
 
-        //MORE32:
+        // MORE32:
         CPU_Message("");
         CPU_Message("      MORE32:");
         SetJump8(Jump[0], *g_RecompPos);
@@ -5529,7 +5529,7 @@ void CX86RecompilerOps::SPECIAL_DSRLV()
         AndConstToX86Reg(x86_ECX, 0x1F);
         ShiftRightUnsign(GetMipsRegMapLo(m_Opcode.rd));
 
-        //continue:
+        // Continue:
         CPU_Message("");
         CPU_Message("      continue:");
         SetJump8(Jump[1], *g_RecompPos);
@@ -5559,10 +5559,10 @@ void CX86RecompilerOps::SPECIAL_DSRAV()
     Jump[0] = *g_RecompPos - 1;
     ShiftRightDouble(GetMipsRegMapLo(m_Opcode.rd), GetMipsRegMapHi(m_Opcode.rd));
     ShiftRightSign(GetMipsRegMapHi(m_Opcode.rd));
-    JmpLabel8("continue", 0);
+    JmpLabel8("Continue", 0);
     Jump[1] = *g_RecompPos - 1;
 
-    //MORE32:
+    // MORE32:
     CPU_Message("");
     CPU_Message("      MORE32:");
     SetJump8(Jump[0], *g_RecompPos);
@@ -5571,7 +5571,7 @@ void CX86RecompilerOps::SPECIAL_DSRAV()
     AndConstToX86Reg(x86_ECX, 0x1F);
     ShiftRightSign(GetMipsRegMapLo(m_Opcode.rd));
 
-    //continue:
+    // Continue:
     CPU_Message("");
     CPU_Message("      continue:");
     SetJump8(Jump[1], *g_RecompPos);
@@ -5588,7 +5588,7 @@ void CX86RecompilerOps::SPECIAL_MULT()
 
     MoveX86regToVariable(x86_EAX, &_RegLO->UW[0], "_RegLO->UW[0]");
     MoveX86regToVariable(x86_EDX, &_RegHI->UW[0], "_RegHI->UW[0]");
-    ShiftRightSignImmed(x86_EAX, 31);    /* paired */
+    ShiftRightSignImmed(x86_EAX, 31);    // Paired
     ShiftRightSignImmed(x86_EDX, 31);
     MoveX86regToVariable(x86_EAX, &_RegLO->UW[1], "_RegLO->UW[1]");
     MoveX86regToVariable(x86_EDX, &_RegHI->UW[1], "_RegHI->UW[1]");
@@ -5605,7 +5605,7 @@ void CX86RecompilerOps::SPECIAL_MULTU()
 
     MoveX86regToVariable(x86_EAX, &_RegLO->UW[0], "_RegLO->UW[0]");
     MoveX86regToVariable(x86_EDX, &_RegHI->UW[0], "_RegHI->UW[0]");
-    ShiftRightSignImmed(x86_EAX, 31);    /* paired */
+    ShiftRightSignImmed(x86_EAX, 31);    // Paired
     ShiftRightSignImmed(x86_EDX, 31);
     MoveX86regToVariable(x86_EAX, &_RegLO->UW[1], "_RegLO->UW[1]");
     MoveX86regToVariable(x86_EDX, &_RegHI->UW[1], "_RegHI->UW[1]");
@@ -5642,7 +5642,7 @@ void CX86RecompilerOps::SPECIAL_DIV()
     m_RegWorkingSet.SetX86Protected(x86_EDX, true);
     Map_TempReg(x86_EAX, m_Opcode.rs, false);
 
-    /* edx is the signed portion to eax */
+    // EDX is the signed portion to EAX
     m_RegWorkingSet.SetX86Protected(x86_EDX, false);
     Map_TempReg(x86_EDX, -1, false);
 
@@ -5660,7 +5660,7 @@ void CX86RecompilerOps::SPECIAL_DIV()
 
     MoveX86regToVariable(x86_EAX, &_RegLO->UW[0], "_RegLO->UW[0]");
     MoveX86regToVariable(x86_EDX, &_RegHI->UW[0], "_RegHI->UW[0]");
-    ShiftRightSignImmed(x86_EAX, 31);    /* paired */
+    ShiftRightSignImmed(x86_EAX, 31);    // Paired
     ShiftRightSignImmed(x86_EDX, 31);
     MoveX86regToVariable(x86_EAX, &_RegLO->UW[1], "_RegLO->UW[1]");
     MoveX86regToVariable(x86_EDX, &_RegHI->UW[1], "_RegHI->UW[1]");
@@ -5681,7 +5681,7 @@ void CX86RecompilerOps::SPECIAL_DIVU()
             MoveConstToVariable(0, &_RegHI->UW[1], "_RegHI->UW[1]");
             return;
         }
-        Jump[1] = NULL;
+        Jump[1] = nullptr;
     }
     else
     {
@@ -5724,14 +5724,14 @@ void CX86RecompilerOps::SPECIAL_DIVU()
     MoveX86regToVariable(x86_EAX, &_RegLO->UW[0], "_RegLO->UW[0]");
     MoveX86regToVariable(x86_EDX, &_RegHI->UW[0], "_RegHI->UW[0]");
 
-    /* wouldnt these be zero (???) */
+    // Wouldn't these be zero?
 
-    ShiftRightSignImmed(x86_EAX, 31);    /* paired */
+    ShiftRightSignImmed(x86_EAX, 31);    // Paired
     ShiftRightSignImmed(x86_EDX, 31);
     MoveX86regToVariable(x86_EAX, &_RegLO->UW[1], "_RegLO->UW[1]");
     MoveX86regToVariable(x86_EDX, &_RegHI->UW[1], "_RegHI->UW[1]");
 
-    if (Jump[1] != NULL)
+    if (Jump[1] != nullptr)
     {
         CPU_Message("");
         CPU_Message("      EndDivu:");
@@ -5793,7 +5793,7 @@ void CX86RecompilerOps::SPECIAL_DMULTU()
     Map_TempReg(x86_ECX, -1, false);
 
     MulX86reg(x86_EDX);
-    MoveX86RegToX86Reg(x86_EAX, x86_EBX); /* EDX:EAX -> ECX:EBX */
+    MoveX86RegToX86Reg(x86_EAX, x86_EBX); // EDX:EAX -> ECX:EBX
     MoveX86RegToX86Reg(x86_EDX, x86_ECX);
 
     /* Tmp[1].UDW = (uint64)_GPR[m_Opcode.rs].UW[0] * (uint64)_GPR[m_Opcode.rt].UW[1]; */
@@ -5803,7 +5803,7 @@ void CX86RecompilerOps::SPECIAL_DMULTU()
     MulX86reg(x86_EDX);
     Map_TempReg(x86_ESI, -1, false);
     Map_TempReg(x86_EDI, -1, false);
-    MoveX86RegToX86Reg(x86_EAX, x86_ESI); /* EDX:EAX -> EDI:ESI */
+    MoveX86RegToX86Reg(x86_EAX, x86_ESI); // EDX:EAX -> EDI:ESI
     MoveX86RegToX86Reg(x86_EDX, x86_EDI);
 
     /* Tmp[2].UDW = (uint64)_RegLO->UW[1] + (uint64)Tmp[0].UW[0] + (uint64)Tmp[1].UW[0]; */
@@ -5812,7 +5812,7 @@ void CX86RecompilerOps::SPECIAL_DMULTU()
     AddX86RegToX86Reg(x86_EAX, x86_EBX);
     AddConstToX86Reg(x86_EDX, 0);
     AddX86RegToX86Reg(x86_EAX, x86_ESI);
-    AddConstToX86Reg(x86_EDX, 0);            /* EDX:EAX */
+    AddConstToX86Reg(x86_EDX, 0);            // EDX:EAX
 
     /* _RegLO->UDW += ((uint64)Tmp[0].UW[0] + (uint64)Tmp[1].UW[0]) << 32; */
     /* [low+4] += ebx + esi */
@@ -7018,7 +7018,7 @@ void CX86RecompilerOps::SPECIAL_SLT()
     }
     else
     {
-        uint8_t *Jump[2] = { NULL, NULL };
+        uint8_t *Jump[2] = { nullptr, nullptr };
 
         x86Reg Reg = Map_TempReg(x86_Any, m_Opcode.rs, true);
         CompX86regToVariable(Reg, &_GPR[m_Opcode.rt].W[1], CRegName::GPR_Hi[m_Opcode.rt]);
@@ -7195,7 +7195,7 @@ void CX86RecompilerOps::SPECIAL_SLTU()
     {
         uint32_t KnownReg = IsKnown(m_Opcode.rt) ? m_Opcode.rt : m_Opcode.rs;
         uint32_t UnknownReg = IsKnown(m_Opcode.rt) ? m_Opcode.rs : m_Opcode.rt;
-        uint8_t *Jump[2] = { NULL, NULL };
+        uint8_t *Jump[2] = { nullptr, nullptr };
 
         ProtectGPR(KnownReg);
         if (g_System->b32BitCore())
@@ -7298,7 +7298,7 @@ void CX86RecompilerOps::SPECIAL_SLTU()
     }
     else
     {
-        uint8_t *Jump[2] = { NULL, NULL };
+        uint8_t *Jump[2] = { nullptr, nullptr };
 
         x86Reg Reg = Map_TempReg(x86_Any, m_Opcode.rs, true);
         CompX86regToVariable(Reg, &_GPR[m_Opcode.rt].W[1], CRegName::GPR_Hi[m_Opcode.rt]);
@@ -7837,12 +7837,12 @@ void CX86RecompilerOps::SPECIAL_DSRA32()
     }
 }
 
-/************************** COP0 functions **************************/
+// COP0 functions
 void CX86RecompilerOps::COP0_MF()
 {
     switch (m_Opcode.rd)
     {
-    case 9: //Count
+    case 9: // Count
         m_RegWorkingSet.SetBlockCycleCount(m_RegWorkingSet.GetBlockCycleCount() - g_System->CountPerOp());
         UpdateCounters(m_RegWorkingSet, false, true);
         m_RegWorkingSet.SetBlockCycleCount(m_RegWorkingSet.GetBlockCycleCount() + g_System->CountPerOp());
@@ -7867,19 +7867,19 @@ void CX86RecompilerOps::COP0_MT()
 
     switch (m_Opcode.rd)
     {
-    case 0: //Index
-    case 2: //EntryLo0
-    case 3: //EntryLo1
-    case 4: //Context
-    case 5: //PageMask
-    case 10: //Entry Hi
-    case 14: //EPC
-    case 16: //Config
-    case 18: //WatchLo
-    case 19: //WatchHi
-    case 28: //Tag lo
-    case 29: //Tag Hi
-    case 30: //ErrEPC
+    case 0: // Index
+    case 2: // EntryLo0
+    case 3: // EntryLo1
+    case 4: // Context
+    case 5: // PageMask
+    case 10: // Entry Hi
+    case 14: // EPC
+    case 16: // Config
+    case 18: // WatchLo
+    case 19: // WatchHi
+    case 28: // Tag Lo
+    case 29: // Tag Hi
+    case 30: // ErrEPC
         if (IsConst(m_Opcode.rt))
         {
             MoveConstToVariable(GetMipsRegLo(m_Opcode.rt), &_CP0[m_Opcode.rd], CRegName::Cop0[m_Opcode.rd]);
@@ -7892,12 +7892,12 @@ void CX86RecompilerOps::COP0_MT()
         {
             MoveX86regToVariable(Map_TempReg(x86_Any, m_Opcode.rt, false), &_CP0[m_Opcode.rd], CRegName::Cop0[m_Opcode.rd]);
         }
-        if (m_Opcode.rd == 4) //Context
+        if (m_Opcode.rd == 4) // Context
         {
             AndConstToVariable(0xFF800000, &_CP0[m_Opcode.rd], CRegName::Cop0[m_Opcode.rd]);
         }
         break;
-    case 11: //Compare
+    case 11: // Compare
         m_RegWorkingSet.SetBlockCycleCount(m_RegWorkingSet.GetBlockCycleCount() - g_System->CountPerOp());
         UpdateCounters(m_RegWorkingSet, false, true);
         m_RegWorkingSet.SetBlockCycleCount(m_RegWorkingSet.GetBlockCycleCount() + g_System->CountPerOp());
@@ -7935,7 +7935,7 @@ void CX86RecompilerOps::COP0_MT()
 #endif
         m_RegWorkingSet.AfterCallDirect();
         break;
-    case 9: //Count
+    case 9: // Count
         m_RegWorkingSet.SetBlockCycleCount(m_RegWorkingSet.GetBlockCycleCount() - g_System->CountPerOp());
         UpdateCounters(m_RegWorkingSet, false, true);
         m_RegWorkingSet.SetBlockCycleCount(m_RegWorkingSet.GetBlockCycleCount() + g_System->CountPerOp());
@@ -7966,7 +7966,7 @@ void CX86RecompilerOps::COP0_MT()
         Call_Direct(AddressOf(&CSystemTimer::UpdateCompareTimer), "CSystemTimer::UpdateCompareTimer");
         m_RegWorkingSet.AfterCallDirect();
         break;
-    case 12: //Status
+    case 12: // Status
     {
                  x86Reg OldStatusReg = Map_TempReg(x86_Any, -1, false);
                  MoveVariableToX86reg(&_CP0[m_Opcode.rd], CRegName::Cop0[m_Opcode.rd], OldStatusReg);
@@ -8009,7 +8009,7 @@ void CX86RecompilerOps::COP0_MT()
                  m_RegWorkingSet.AfterCallDirect();
     }
         break;
-    case 6: //Wired
+    case 6: // Wired
         m_RegWorkingSet.SetBlockCycleCount(m_RegWorkingSet.GetBlockCycleCount() - g_System->CountPerOp());
         UpdateCounters(m_RegWorkingSet, false, true);
         m_RegWorkingSet.SetBlockCycleCount(m_RegWorkingSet.GetBlockCycleCount() + g_System->CountPerOp());
@@ -8037,7 +8037,7 @@ void CX86RecompilerOps::COP0_MT()
             MoveX86regToVariable(Map_TempReg(x86_Any, m_Opcode.rt, false), &_CP0[m_Opcode.rd], CRegName::Cop0[m_Opcode.rd]);
         }
         break;
-    case 13: //cause
+    case 13: // Cause
         AndConstToVariable(0xFFFFCFF, &_CP0[m_Opcode.rd], CRegName::Cop0[m_Opcode.rd]);
         if (IsConst(m_Opcode.rt))
         {
@@ -8067,7 +8067,7 @@ void CX86RecompilerOps::COP0_MT()
     }
 }
 
-/************************** COP0 CO functions ***********************/
+// COP0 CO functions
 void CX86RecompilerOps::COP0_CO_TLBR(void)
 {
     if (!g_System->bUseTlb()) { return; }
@@ -8171,11 +8171,11 @@ void CX86RecompilerOps::COP0_CO_ERET(void)
     Call_Direct((void *)x86_compiler_COP0_CO_ERET, "x86_compiler_COP0_CO_ERET");
 
     UpdateCounters(m_RegWorkingSet, true, true);
-    CompileExit(m_CompilePC, (uint32_t)-1, m_RegWorkingSet, CExitInfo::Normal, true, NULL);
+    CompileExit(m_CompilePC, (uint32_t)-1, m_RegWorkingSet, CExitInfo::Normal, true, nullptr);
     m_NextInstruction = END_BLOCK;
 }
 
-/************************** FPU Options **************************/
+// FPU options
 void CX86RecompilerOps::ChangeDefaultRoundingModel()
 {
     switch ((_FPCR[31] & 3))
@@ -8187,7 +8187,7 @@ void CX86RecompilerOps::ChangeDefaultRoundingModel()
     }
 }
 
-/************************** COP1 functions **************************/
+// COP1 functions
 void CX86RecompilerOps::COP1_MF()
 {
     CompileCop1Test();
@@ -8346,7 +8346,7 @@ void CX86RecompilerOps::COP1_CT()
     m_RegWorkingSet.SetRoundingModel(CRegInfo::RoundUnknown);
 }
 
-/************************** COP1: S functions ************************/
+// COP1: S functions
 void CX86RecompilerOps::COP1_S_ADD()
 {
     uint32_t Reg1 = m_Opcode.ft == m_Opcode.fd ? m_Opcode.ft : m_Opcode.fs;
@@ -8693,7 +8693,7 @@ void CX86RecompilerOps::COP1_S_CMP()
     OrX86RegToVariable(&_FPCR[31], "_FPCR[31]", Reg);
 }
 
-/************************** COP1: D functions ************************/
+// COP1: D functions
 void CX86RecompilerOps::COP1_D_ADD()
 {
     uint32_t Reg1 = m_Opcode.ft == m_Opcode.fd ? m_Opcode.ft : m_Opcode.fs;
@@ -9066,7 +9066,7 @@ void CX86RecompilerOps::COP1_D_CMP()
     OrX86RegToVariable(&_FPCR[31], "_FPCR[31]", Reg);
 }
 
-/************************** COP1: W functions ************************/
+// COP1: W functions
 void CX86RecompilerOps::COP1_W_CVT_S()
 {
     CompileCop1Test();
@@ -9087,7 +9087,7 @@ void CX86RecompilerOps::COP1_W_CVT_D()
     ChangeFPURegFormat(m_Opcode.fd, CRegInfo::FPU_Dword, CRegInfo::FPU_Double, CRegInfo::RoundDefault);
 }
 
-/************************** COP1: L functions ************************/
+// COP1: L functions
 void CX86RecompilerOps::COP1_L_CVT_S()
 {
     CompileCop1Test();
@@ -9108,10 +9108,10 @@ void CX86RecompilerOps::COP1_L_CVT_D()
     ChangeFPURegFormat(m_Opcode.fd, CRegInfo::FPU_Qword, CRegInfo::FPU_Double, CRegInfo::RoundDefault);
 }
 
-/************************** Other functions **************************/
+// Other functions
 void CX86RecompilerOps::UnknownOpcode()
 {
-    CPU_Message("  %X Unhandled Opcode: %s", m_CompilePC, R4300iOpcodeName(m_Opcode.Hex, m_CompilePC));
+    CPU_Message("  %X Unhandled opcode: %s", m_CompilePC, R4300iOpcodeName(m_Opcode.Hex, m_CompilePC));
 
     m_RegWorkingSet.WriteBackRegisters();
     UpdateCounters(m_RegWorkingSet, false, true);
@@ -9259,7 +9259,7 @@ void CX86RecompilerOps::CompileExitCode()
         CPU_Message("      $Exit_%d", ExitIter->ID);
         SetJump32(ExitIter->JumpLoc, (uint32_t *)*g_RecompPos);
         m_NextInstruction = ExitIter->NextInstruction;
-        CompileExit((uint32_t)-1, ExitIter->TargetPC, ExitIter->ExitRegSet, ExitIter->reason, true, NULL);
+        CompileExit((uint32_t)-1, ExitIter->TargetPC, ExitIter->ExitRegSet, ExitIter->reason, true, nullptr);
     }
 }
 
@@ -9341,14 +9341,14 @@ void CX86RecompilerOps::SyncRegState(const CRegInfo & SyncTo)
         else if (MemStackReg == x86_Unknown)
         {
             UnMap_X86reg(TargetStackReg);
-            CPU_Message("    regcache: allocate %s as Memory Stack", x86_Name(TargetStackReg));
+            CPU_Message("    regcache: allocate %s as memory stack", x86_Name(TargetStackReg));
             m_RegWorkingSet.SetX86Mapped(TargetStackReg, CRegInfo::Stack_Mapped);
             MoveVariableToX86reg(&g_Recompiler->MemoryStackPos(), "MemoryStack", TargetStackReg);
         }
         else
         {
             UnMap_X86reg(TargetStackReg);
-            CPU_Message("    regcache: change allocation of Memory Stack from %s to %s", x86_Name(MemStackReg), x86_Name(TargetStackReg));
+            CPU_Message("    regcache: change allocation of memory stack from %s to %s", x86_Name(MemStackReg), x86_Name(TargetStackReg));
             m_RegWorkingSet.SetX86Mapped(TargetStackReg, CRegInfo::Stack_Mapped);
             m_RegWorkingSet.SetX86Mapped(MemStackReg, CRegInfo::NotMapped);
             MoveX86RegToX86Reg(MemStackReg, TargetStackReg);
@@ -9386,12 +9386,12 @@ void CX86RecompilerOps::SyncRegState(const CRegInfo & SyncTo)
             case CRegInfo::STATE_CONST_32_SIGN:
                 if (GetMipsRegLo(i) != SyncTo.GetMipsRegLo(i))
                 {
-                    CPU_Message("Value of const is different Reg %d (%s) Value: 0x%08X to 0x%08X", i, CRegName::GPR[i], GetMipsRegLo(i), SyncTo.GetMipsRegLo(i));
+                    CPU_Message("Value of constant is different register %d (%s) Value: 0x%08X to 0x%08X", i, CRegName::GPR[i], GetMipsRegLo(i), SyncTo.GetMipsRegLo(i));
                     g_Notify->BreakPoint(__FILE__, __LINE__);
                 }
                 continue;
             default:
-                CPU_Message("Unhandled Reg state %d\nin SyncRegState", GetMipsRegState(i));
+                CPU_Message("Unhandled register state %d\nin SyncRegState", GetMipsRegState(i));
                 g_Notify->BreakPoint(__FILE__, __LINE__);
             }
         }
@@ -9516,7 +9516,7 @@ void CX86RecompilerOps::SyncRegState(const CRegInfo & SyncTo)
                                                case CRegInfo::STATE_CONST_32_SIGN:
                                                    if (!g_System->b32BitCore() && GetMipsRegLo_S(i) < 0)
                                                    {
-                                                       CPU_Message("Sign Problems in SyncRegState\nSTATE_MAPPED_32_ZERO");
+                                                       CPU_Message("Sign problems in SyncRegState\nSTATE_MAPPED_32_ZERO");
                                                        CPU_Message("%s: %X", CRegName::GPR[i], GetMipsRegLo_S(i));
                                                        g_Notify->BreakPoint(__FILE__, __LINE__);
                                                    }
@@ -9552,11 +9552,11 @@ void CX86RecompilerOps::SetRegWorkingSet(const CRegInfo & RegInfo)
 
 bool CX86RecompilerOps::InheritParentInfo()
 {
-    if (m_Section->m_CompiledLocation == NULL)
+    if (m_Section->m_CompiledLocation == nullptr)
     {
         m_Section->m_CompiledLocation = *g_RecompPos;
         m_Section->DisplaySectionInformation();
-        m_Section->m_CompiledLocation = NULL;
+        m_Section->m_CompiledLocation = nullptr;
     }
     else
     {
@@ -9572,7 +9572,7 @@ bool CX86RecompilerOps::InheritParentInfo()
     if (m_Section->m_ParentSection.size() == 1)
     {
         CCodeSection * Parent = *(m_Section->m_ParentSection.begin());
-        if (Parent->m_CompiledLocation == NULL)
+        if (Parent->m_CompiledLocation == nullptr)
         {
             g_Notify->BreakPoint(__FILE__, __LINE__);
         }
@@ -9584,7 +9584,7 @@ bool CX86RecompilerOps::InheritParentInfo()
         return true;
     }
 
-    //Multiple Parents
+    // Multiple parents
     BLOCK_PARENT_LIST ParentList;
     CCodeSection::SECTION_LIST::iterator iter;
     for (iter = m_Section->m_ParentSection.begin(); iter != m_Section->m_ParentSection.end(); iter++)
@@ -9592,7 +9592,7 @@ bool CX86RecompilerOps::InheritParentInfo()
         CCodeSection * Parent = *iter;
         BLOCK_PARENT BlockParent;
 
-        if (Parent->m_CompiledLocation == NULL) { continue; }
+        if (Parent->m_CompiledLocation == nullptr) { continue; }
         if (Parent->m_JumpSection != Parent->m_ContinueSection)
         {
             BlockParent.Parent = Parent;
@@ -9622,7 +9622,7 @@ bool CX86RecompilerOps::InheritParentInfo()
         CCodeSection * Parent = *iter;
         BLOCK_PARENT BlockParent;
 
-        if (Parent->m_CompiledLocation != NULL) { continue; }
+        if (Parent->m_CompiledLocation != nullptr) { continue; }
         if (Parent->m_JumpSection != Parent->m_ContinueSection)
         {
             BlockParent.Parent = Parent;
@@ -9657,7 +9657,7 @@ bool CX86RecompilerOps::InheritParentInfo()
         FirstParent = 0;
     }
 
-    //Link First Parent to start
+    // Link first parent to start
     CCodeSection * Parent = ParentList[FirstParent].Parent;
     CJumpInfo * JumpInfo = ParentList[FirstParent].JumpInfo;
 
@@ -9691,10 +9691,10 @@ bool CX86RecompilerOps::InheritParentInfo()
     }
     JumpInfo->FallThrough = false;
 
-    //Fix up initial state
+    // Fix up initial state
     UnMap_AllFPRs();
 
-    //determine loop reg usage
+    // Determine loop registry usage
     if (m_Section->m_InLoop && ParentList.size() > 1)
     {
         if (!SetupRegisterForLoop(m_Section->m_BlockInfo, m_Section->m_RegEnter)) { return false; }
@@ -9708,7 +9708,7 @@ bool CX86RecompilerOps::InheritParentInfo()
 
         if (i == (size_t)FirstParent) { continue; }
         Parent = ParentList[i].Parent;
-        if (Parent->m_CompiledLocation == NULL)
+        if (Parent->m_CompiledLocation == nullptr)
         {
             continue;
         }
@@ -9716,7 +9716,7 @@ bool CX86RecompilerOps::InheritParentInfo()
 
         if (m_RegWorkingSet.GetRoundingModel() != RegSet->GetRoundingModel()) { m_RegWorkingSet.SetRoundingModel(CRegInfo::RoundUnknown); }
 
-        //Find Parent MapRegState
+        // Find parent MapRegState
         MemoryStackPos = x86_Unknown;
         for (i2 = 0; i2 < sizeof(x86_Registers) / sizeof(x86_Registers[0]); i2++)
         {
@@ -9728,7 +9728,7 @@ bool CX86RecompilerOps::InheritParentInfo()
         }
         if (MemoryStackPos == x86_Unknown)
         {
-            // if the memory stack position is not mapped then unmap it
+            // If the memory stack position is not mapped then unmap it
             x86Reg MemStackReg = Get_MemoryStack();
             if (MemStackReg != x86_Unknown)
             {
@@ -9770,7 +9770,7 @@ bool CX86RecompilerOps::InheritParentInfo()
                     }
                     break;
                 default:
-                    CPU_Message("Unknown CPU State(%d) in InheritParentInfo", GetMipsRegState(i2));
+                    CPU_Message("Unknown CPU state(%d) in InheritParentInfo", GetMipsRegState(i2));
                     g_Notify->BreakPoint(__FILE__, __LINE__);
                 }
             }
@@ -9813,7 +9813,7 @@ bool CX86RecompilerOps::InheritParentInfo()
                         }
                         break;
                     default:
-                        CPU_Message("Unknown CPU State(%d) in InheritParentInfo", RegSet->GetMipsRegState(i2));
+                        CPU_Message("Unknown CPU state(%d) in InheritParentInfo", RegSet->GetMipsRegState(i2));
                         g_Notify->BreakPoint(__FILE__, __LINE__);
                         break;
                     }
@@ -9837,7 +9837,7 @@ bool CX86RecompilerOps::InheritParentInfo()
     }
     m_Section->m_RegEnter = m_RegWorkingSet;
 
-    //Sync registers for different blocks
+    // Sync registers for different blocks
     stdstr_f Label("Section_%d", m_Section->m_SectionID);
     int CurrentParent = FirstParent;
     bool NeedSync = false;
@@ -9906,7 +9906,7 @@ bool CX86RecompilerOps::InheritParentInfo()
                 }
                 break;
             default:
-                WriteTrace(TraceRecompiler, TraceError, "Unhandled Reg state %d\nin InheritParentInfo", GetMipsRegState(i2));
+                WriteTrace(TraceRecompiler, TraceError, "Unhandled register state %d\nin InheritParentInfo", GetMipsRegState(i2));
                 g_Notify->BreakPoint(__FILE__, __LINE__);
             }
         }
@@ -9915,20 +9915,20 @@ bool CX86RecompilerOps::InheritParentInfo()
         JumpInfo = ParentList[CurrentParent].JumpInfo;
         JmpLabel32(Label.c_str(), 0);
         JumpInfo->LinkLocation = (uint32_t *)(*g_RecompPos - 4);
-        JumpInfo->LinkLocation2 = NULL;
+        JumpInfo->LinkLocation2 = nullptr;
 
         CurrentParent = i;
         Parent = ParentList[CurrentParent].Parent;
         JumpInfo = ParentList[CurrentParent].JumpInfo;
         CPU_Message("   Section_%d (from %d):", m_Section->m_SectionID, Parent->m_SectionID);
-        if (JumpInfo->LinkLocation != NULL)
+        if (JumpInfo->LinkLocation != nullptr)
         {
             SetJump32(JumpInfo->LinkLocation, (uint32_t *)*g_RecompPos);
-            JumpInfo->LinkLocation = NULL;
-            if (JumpInfo->LinkLocation2 != NULL)
+            JumpInfo->LinkLocation = nullptr;
+            if (JumpInfo->LinkLocation2 != nullptr)
             {
                 SetJump32(JumpInfo->LinkLocation2, (uint32_t *)*g_RecompPos);
-                JumpInfo->LinkLocation2 = NULL;
+                JumpInfo->LinkLocation2 = nullptr;
             }
         }
 
@@ -9943,7 +9943,7 @@ bool CX86RecompilerOps::InheritParentInfo()
         {
             UpdateCounters(m_RegWorkingSet, false, true);
         }
-        SyncRegState(m_Section->m_RegEnter);         //Sync
+        SyncRegState(m_Section->m_RegEnter);         // Sync
         m_Section->m_RegEnter = m_RegWorkingSet;
     }
 
@@ -9961,7 +9961,7 @@ bool CX86RecompilerOps::InheritParentInfo()
 
 void CX86RecompilerOps::LinkJump(CJumpInfo & JumpInfo, uint32_t SectionID, uint32_t FromSectionID)
 {
-    if (JumpInfo.LinkLocation != NULL)
+    if (JumpInfo.LinkLocation != nullptr)
     {
         if (SectionID != -1)
         {
@@ -9975,11 +9975,11 @@ void CX86RecompilerOps::LinkJump(CJumpInfo & JumpInfo, uint32_t SectionID, uint3
             }
         }
         SetJump32(JumpInfo.LinkLocation, (uint32_t *)*g_RecompPos);
-        JumpInfo.LinkLocation = NULL;
-        if (JumpInfo.LinkLocation2 != NULL)
+        JumpInfo.LinkLocation = nullptr;
+        if (JumpInfo.LinkLocation2 != nullptr)
         {
             SetJump32(JumpInfo.LinkLocation2, (uint32_t *)*g_RecompPos);
-            JumpInfo.LinkLocation2 = NULL;
+            JumpInfo.LinkLocation2 = nullptr;
         }
     }
 }
@@ -10046,7 +10046,7 @@ void CX86RecompilerOps::UpdateSyncCPU(CRegInfo & RegSet, uint32_t Cycles)
         return;
     }
 
-    WriteX86Comment("Updating Sync CPU");
+    WriteX86Comment("Updating sync CPU");
     RegSet.BeforeCallDirect();
     PushImm32(stdstr_f("%d", Cycles).c_str(), Cycles);
     PushImm32("g_SyncSystem", (uint32_t)g_SyncSystem);
@@ -10066,8 +10066,8 @@ void CX86RecompilerOps::UpdateCounters(CRegInfo & RegSet, bool CheckTimer, bool 
     if (RegSet.GetBlockCycleCount() != 0)
     {
         UpdateSyncCPU(RegSet, RegSet.GetBlockCycleCount());
-        WriteX86Comment("Update Counter");
-        SubConstFromVariable(RegSet.GetBlockCycleCount(), g_NextTimer, "g_NextTimer"); // updates compare flag
+        WriteX86Comment("Update counter");
+        SubConstFromVariable(RegSet.GetBlockCycleCount(), g_NextTimer, "g_NextTimer"); // Updates compare flag
         if (ClearValues)
         {
             RegSet.SetBlockCycleCount(0);
@@ -10231,7 +10231,7 @@ void CX86RecompilerOps::OverflowDelaySlot(bool TestTimer)
 
 void CX86RecompilerOps::CompileExit(uint32_t JumpPC, uint32_t TargetPC, CRegInfo &ExitRegSet, CExitInfo::EXIT_REASON reason)
 {
-    CompileExit(JumpPC, TargetPC, ExitRegSet, reason, true, NULL);
+    CompileExit(JumpPC, TargetPC, ExitRegSet, reason, true, nullptr);
 }
 
 void CX86RecompilerOps::CompileExit(uint32_t JumpPC, uint32_t TargetPC, CRegInfo &ExitRegSet, CExitInfo::EXIT_REASON reason, bool CompileNow, void(*x86Jmp)(const char * Label, uint32_t Value))
@@ -10240,7 +10240,7 @@ void CX86RecompilerOps::CompileExit(uint32_t JumpPC, uint32_t TargetPC, CRegInfo
     {
         char String[100];
         sprintf(String, "Exit_%d", m_ExitInfo.size());
-        if (x86Jmp == NULL)
+        if (x86Jmp == nullptr)
         {
             g_Notify->BreakPoint(__FILE__, __LINE__);
             return;
@@ -10314,7 +10314,7 @@ void CX86RecompilerOps::CompileExit(uint32_t JumpPC, uint32_t TargetPC, CRegInfo
                 //                uint32_t pAddr = TargetPC & 0x1FFFFFFF;
                 //
                 //                MoveVariableToX86reg((uint8_t *)RDRAM + pAddr,"RDRAM + pAddr",x86_EAX);
-                //                Jump2 = NULL;
+                //                Jump2 = nullptr;
                 //            } else {
                 //                MoveConstToX86reg((TargetPC >> 12),x86_ECX);
                 //                MoveConstToX86reg(TargetPC,x86_EBX);
@@ -10336,7 +10336,7 @@ void CX86RecompilerOps::CompileExit(uint32_t JumpPC, uint32_t TargetPC, CRegInfo
                 //            JmpDirectReg(x86_ECX);
                 //            CPU_Message("      NoCode:");
                 //            *((uint8_t *)(Jump))=(uint8_t)(*g_RecompPos - Jump - 1);
-                //            if (Jump2 != NULL) {
+                //            if (Jump2 != nullptr) {
                 //                CPU_Message("      NoTlbEntry:");
                 //                *((uint8_t *)(Jump2))=(uint8_t)(*g_RecompPos - Jump2 - 1);
                 //            }
@@ -10356,7 +10356,7 @@ void CX86RecompilerOps::CompileExit(uint32_t JumpPC, uint32_t TargetPC, CRegInfo
             }
             else if (LookUpMode() == FuncFind_PhysicalLookup)
             {
-                uint8_t * Jump2 = NULL;
+                uint8_t * Jump2 = nullptr;
                 if (TargetPC >= 0x80000000 && TargetPC < 0x90000000)
                 {
                     uint32_t pAddr = TargetPC & 0x1FFFFFFF;
@@ -10384,7 +10384,7 @@ void CX86RecompilerOps::CompileExit(uint32_t JumpPC, uint32_t TargetPC, CRegInfo
                     JmpDirectReg(x86_EAX);
                     CPU_Message("      NullPointer:");
                     *((uint8_t *)(Jump)) = (uint8_t)(*g_RecompPos - Jump - 1);
-                    if (Jump2 != NULL)
+                    if (Jump2 != nullptr)
                     {
                         CPU_Message("      NoTlbEntry:");
                         *((uint8_t *)(Jump2)) = (uint8_t)(*g_RecompPos - Jump2 - 1);
@@ -10487,7 +10487,7 @@ void CX86RecompilerOps::CompileExit(uint32_t JumpPC, uint32_t TargetPC, CRegInfo
         ExitCodeBlock();
         break;
     default:
-        WriteTrace(TraceRecompiler, TraceError, "how did you want to exit on reason (%d) ???", reason);
+        WriteTrace(TraceRecompiler, TraceError, "How did you want to exit on reason (%d) ???", reason);
         g_Notify->BreakPoint(__FILE__, __LINE__);
     }
 }
@@ -10591,7 +10591,7 @@ void CX86RecompilerOps::SB_Const(uint8_t Value, uint32_t VAddr)
     default:
         if (ShowUnhandledMemory())
         {
-            g_Notify->DisplayError(stdstr_f("%s\ntrying to store %02X in %08X?", __FUNCTION__, Value, VAddr).c_str());
+            g_Notify->DisplayError(stdstr_f("%s\nTrying to store %02X in %08X?", __FUNCTION__, Value, VAddr).c_str());
         }
     }
 }
@@ -10642,7 +10642,7 @@ void CX86RecompilerOps::SB_Register(x86Reg Reg, uint32_t VAddr)
     default:
         if (ShowUnhandledMemory())
         {
-            g_Notify->DisplayError(stdstr_f("%s\ntrying to store in %08X?", __FUNCTION__, VAddr).c_str());
+            g_Notify->DisplayError(stdstr_f("%s\nTrying to store in %08X?", __FUNCTION__, VAddr).c_str());
         }
     }
 }
@@ -10691,7 +10691,7 @@ void CX86RecompilerOps::SH_Const(uint16_t Value, uint32_t VAddr)
     default:
         if (ShowUnhandledMemory())
         {
-            g_Notify->DisplayError(stdstr_f("%s\ntrying to store %04X in %08X?", __FUNCTION__, Value, VAddr).c_str());
+            g_Notify->DisplayError(stdstr_f("%s\nTrying to store %04X in %08X?", __FUNCTION__, Value, VAddr).c_str());
         }
     }
 }
@@ -10742,7 +10742,7 @@ void CX86RecompilerOps::SH_Register(x86Reg Reg, uint32_t VAddr)
     default:
         if (ShowUnhandledMemory())
         {
-            g_Notify->DisplayError(stdstr_f("%s\ntrying to store in %08X?", __FUNCTION__, PAddr).c_str());
+            g_Notify->DisplayError(stdstr_f("%s\nTrying to store in %08X?", __FUNCTION__, PAddr).c_str());
         }
     }
 }
@@ -10811,7 +10811,7 @@ void CX86RecompilerOps::SW_Const(uint32_t Value, uint32_t VAddr)
         default:
             if (ShowUnhandledMemory())
             {
-                g_Notify->DisplayError(stdstr_f("%s\ntrying to store %08X in %08X?", __FUNCTION__, Value, VAddr).c_str());
+                g_Notify->DisplayError(stdstr_f("%s\nTrying to store %08X in %08X?", __FUNCTION__, Value, VAddr).c_str());
             }
         }
         break;
@@ -10864,7 +10864,7 @@ void CX86RecompilerOps::SW_Const(uint32_t Value, uint32_t VAddr)
         default:
             if (ShowUnhandledMemory())
             {
-                g_Notify->DisplayError(stdstr_f("%s\ntrying to store %08X in %08X?", __FUNCTION__, Value, VAddr).c_str());
+                g_Notify->DisplayError(stdstr_f("%s\nTrying to store %08X in %08X?", __FUNCTION__, Value, VAddr).c_str());
             }
         }
         break;
@@ -10888,7 +10888,7 @@ void CX86RecompilerOps::SW_Const(uint32_t Value, uint32_t VAddr)
         default:
             if (ShowUnhandledMemory())
             {
-                g_Notify->DisplayError(stdstr_f("%s\ntrying to store %08X in %08X?", __FUNCTION__, Value, VAddr).c_str());
+                g_Notify->DisplayError(stdstr_f("%s\nTrying to store %08X in %08X?", __FUNCTION__, Value, VAddr).c_str());
             }
         }
         break;
@@ -11006,7 +11006,7 @@ void CX86RecompilerOps::SW_Const(uint32_t Value, uint32_t VAddr)
         default:
             if (ShowUnhandledMemory())
             {
-                g_Notify->DisplayError(stdstr_f("%s\ntrying to store %08X in %08X?", __FUNCTION__, Value, VAddr).c_str());
+                g_Notify->DisplayError(stdstr_f("%s\nTrying to store %08X in %08X?", __FUNCTION__, Value, VAddr).c_str());
             }
         }
         break;
@@ -11014,7 +11014,7 @@ void CX86RecompilerOps::SW_Const(uint32_t Value, uint32_t VAddr)
         switch (PAddr)
         {
         case 0x04400000:
-            if (g_Plugins->Gfx()->ViStatusChanged != NULL)
+            if (g_Plugins->Gfx()->ViStatusChanged != nullptr)
             {
                 CompConstToVariable(Value, &g_Reg->VI_STATUS_REG, "VI_STATUS_REG");
                 JeLabel8("Continue", 0);
@@ -11030,7 +11030,7 @@ void CX86RecompilerOps::SW_Const(uint32_t Value, uint32_t VAddr)
             break;
         case 0x04400004: MoveConstToVariable((Value & 0xFFFFFF), &g_Reg->VI_ORIGIN_REG, "VI_ORIGIN_REG"); break;
         case 0x04400008:
-            if (g_Plugins->Gfx()->ViWidthChanged != NULL)
+            if (g_Plugins->Gfx()->ViWidthChanged != nullptr)
             {
                 CompConstToVariable(Value, &g_Reg->VI_WIDTH_REG, "VI_WIDTH_REG");
                 JeLabel8("Continue", 0);
@@ -11070,11 +11070,11 @@ void CX86RecompilerOps::SW_Const(uint32_t Value, uint32_t VAddr)
         default:
             if (ShowUnhandledMemory())
             {
-                g_Notify->DisplayError(stdstr_f("%s\ntrying to store %08X in %08X?", __FUNCTION__, Value, VAddr).c_str());
+                g_Notify->DisplayError(stdstr_f("%s\nTrying to store %08X in %08X?", __FUNCTION__, Value, VAddr).c_str());
             }
         }
         break;
-    case 0x04500000: /* AI registers */
+    case 0x04500000: // AI registers
         switch (PAddr)
         {
         case 0x04500000: MoveConstToVariable(Value, &g_Reg->AI_DRAM_ADDR_REG, "AI_DRAM_ADDR_REG"); break;
@@ -11095,7 +11095,7 @@ void CX86RecompilerOps::SW_Const(uint32_t Value, uint32_t VAddr)
             break;
         case 0x04500008: MoveConstToVariable((Value & 1), &g_Reg->AI_CONTROL_REG, "AI_CONTROL_REG"); break;
         case 0x0450000C:
-            /* Clear Interrupt */;
+            // Clear interrupt
             AndConstToVariable((uint32_t)~MI_INTR_AI, &g_Reg->MI_INTR_REG, "MI_INTR_REG");
             AndConstToVariable((uint32_t)~MI_INTR_AI, &g_Reg->m_AudioIntrReg, "m_AudioIntrReg");
             m_RegWorkingSet.BeforeCallDirect();
@@ -11119,7 +11119,7 @@ void CX86RecompilerOps::SW_Const(uint32_t Value, uint32_t VAddr)
             MoveConstToVariable(Value, PAddr + g_MMU->Rdram(), VarName);
             if (ShowUnhandledMemory())
             {
-                g_Notify->DisplayError(stdstr_f("%s\ntrying to store %08X in %08X?", __FUNCTION__, Value, VAddr).c_str());
+                g_Notify->DisplayError(stdstr_f("%s\nTrying to store %08X in %08X?", __FUNCTION__, Value, VAddr).c_str());
             }
         }
         break;
@@ -11184,7 +11184,7 @@ void CX86RecompilerOps::SW_Const(uint32_t Value, uint32_t VAddr)
         default:
             if (ShowUnhandledMemory())
             {
-                g_Notify->DisplayError(stdstr_f("%s\ntrying to store %08X in %08X?", __FUNCTION__, Value, VAddr).c_str());
+                g_Notify->DisplayError(stdstr_f("%s\nTrying to store %08X in %08X?", __FUNCTION__, Value, VAddr).c_str());
             }
         }
         break;
@@ -11198,7 +11198,7 @@ void CX86RecompilerOps::SW_Const(uint32_t Value, uint32_t VAddr)
         default:
             if (ShowUnhandledMemory())
             {
-                g_Notify->DisplayError(stdstr_f("%s\ntrying to store %08X in %08X?", __FUNCTION__, Value, VAddr).c_str());
+                g_Notify->DisplayError(stdstr_f("%s\nTrying to store %08X in %08X?", __FUNCTION__, Value, VAddr).c_str());
             }
         }
         break;
@@ -11255,12 +11255,12 @@ void CX86RecompilerOps::SW_Const(uint32_t Value, uint32_t VAddr)
         default:
             if (ShowUnhandledMemory())
             {
-                g_Notify->DisplayError(stdstr_f("%s\ntrying to store %08X in %08X?", __FUNCTION__, Value, VAddr).c_str());
+                g_Notify->DisplayError(stdstr_f("%s\nTrying to store %08X in %08X?", __FUNCTION__, Value, VAddr).c_str());
             }
         }
         break;
     case 0x05000000:
-        //64DD Registers
+        // 64DD registers
         if (g_Settings->LoadBool(Setting_EnableDisk))
         {
             switch (PAddr)
@@ -11273,7 +11273,7 @@ void CX86RecompilerOps::SW_Const(uint32_t Value, uint32_t VAddr)
             default:
                 if (ShowUnhandledMemory())
                 {
-                    g_Notify->DisplayError(stdstr_f("%s\ntrying to store %08X in %08X?", __FUNCTION__, Value, VAddr).c_str());
+                    g_Notify->DisplayError(stdstr_f("%s\nTrying to store %08X in %08X?", __FUNCTION__, Value, VAddr).c_str());
                 }
             }
             break;
@@ -11301,7 +11301,7 @@ void CX86RecompilerOps::SW_Const(uint32_t Value, uint32_t VAddr)
     default:
         if (ShowUnhandledMemory())
         {
-            g_Notify->DisplayError(stdstr_f("%s\ntrying to store %08X in %08X?", __FUNCTION__, Value, VAddr).c_str());
+            g_Notify->DisplayError(stdstr_f("%s\nTrying to store %08X in %08X?", __FUNCTION__, Value, VAddr).c_str());
         }
         m_RegWorkingSet.SetBlockCycleCount(m_RegWorkingSet.GetBlockCycleCount() - g_System->CountPerOp());
         UpdateCounters(m_RegWorkingSet, false, true);
@@ -11418,10 +11418,10 @@ void CX86RecompilerOps::SW_Register(x86Reg Reg, uint32_t VAddr)
             }
             else
             {
-                CPU_Message("    Should be moving %s in to %08X ?!?", x86_Name(Reg), VAddr);
+                CPU_Message("    should be moving %s in to %08X ?", x86_Name(Reg), VAddr);
                 if (ShowUnhandledMemory())
                 {
-                    g_Notify->DisplayError(stdstr_f("%s\ntrying to store in %08X?", __FUNCTION__, VAddr).c_str());
+                    g_Notify->DisplayError(stdstr_f("%s\nTrying to store in %08X?", __FUNCTION__, VAddr).c_str());
                 }
             }
         }
@@ -11463,17 +11463,17 @@ void CX86RecompilerOps::SW_Register(x86Reg Reg, uint32_t VAddr)
             m_RegWorkingSet.AfterCallDirect();
             break;
         default:
-            CPU_Message("    Should be moving %s in to %08X ?!?", x86_Name(Reg), VAddr);
+            CPU_Message("    should be moving %s in to %08X ?", x86_Name(Reg), VAddr);
             if (ShowUnhandledMemory())
             {
-                g_Notify->DisplayError(stdstr_f("%s\ntrying to store in %08X?", __FUNCTION__, VAddr).c_str());
+                g_Notify->DisplayError(stdstr_f("%s\nTrying to store in %08X?", __FUNCTION__, VAddr).c_str());
             }
         }
         break;
     case 0x04400000:
         switch (PAddr) {
         case 0x04400000:
-            if (g_Plugins->Gfx()->ViStatusChanged != NULL)
+            if (g_Plugins->Gfx()->ViStatusChanged != nullptr)
             {
                 uint8_t * Jump;
                 CompX86regToVariable(Reg, &g_Reg->VI_STATUS_REG, "VI_STATUS_REG");
@@ -11493,7 +11493,7 @@ void CX86RecompilerOps::SW_Register(x86Reg Reg, uint32_t VAddr)
             AndConstToVariable(0xFFFFFF, &g_Reg->VI_ORIGIN_REG, "VI_ORIGIN_REG");
             break;
         case 0x04400008:
-            if (g_Plugins->Gfx()->ViWidthChanged != NULL)
+            if (g_Plugins->Gfx()->ViWidthChanged != nullptr)
             {
                 uint8_t * Jump;
                 CompX86regToVariable(Reg, &g_Reg->VI_WIDTH_REG, "VI_WIDTH_REG");
@@ -11532,14 +11532,14 @@ void CX86RecompilerOps::SW_Register(x86Reg Reg, uint32_t VAddr)
         case 0x04400030: MoveX86regToVariable(Reg, &g_Reg->VI_X_SCALE_REG, "VI_X_SCALE_REG"); break;
         case 0x04400034: MoveX86regToVariable(Reg, &g_Reg->VI_Y_SCALE_REG, "VI_Y_SCALE_REG"); break;
         default:
-            CPU_Message("    Should be moving %s in to %08X ?!?", x86_Name(Reg), VAddr);
+            CPU_Message("    should be moving %s in to %08X ?", x86_Name(Reg), VAddr);
             if (ShowUnhandledMemory())
             {
-                g_Notify->DisplayError(stdstr_f("%s\ntrying to store in %08X?", __FUNCTION__, VAddr).c_str());
+                g_Notify->DisplayError(stdstr_f("%s\nTrying to store in %08X?", __FUNCTION__, VAddr).c_str());
             }
         }
         break;
-    case 0x04500000: /* AI registers */
+    case 0x04500000: // AI registers
         switch (PAddr) {
         case 0x04500000: MoveX86regToVariable(Reg, &g_Reg->AI_DRAM_ADDR_REG, "AI_DRAM_ADDR_REG"); break;
         case 0x04500004:
@@ -11569,7 +11569,7 @@ void CX86RecompilerOps::SW_Register(x86Reg Reg, uint32_t VAddr)
             MoveX86regToVariable(Reg, &g_Reg->AI_CONTROL_REG, "AI_CONTROL_REG");
             AndConstToVariable(1, &g_Reg->AI_CONTROL_REG, "AI_CONTROL_REG");
         case 0x0450000C:
-            /* Clear Interrupt */;
+            // Clear interrupt
             AndConstToVariable((uint32_t)~MI_INTR_AI, &g_Reg->MI_INTR_REG, "MI_INTR_REG");
             AndConstToVariable((uint32_t)~MI_INTR_AI, &g_Reg->m_AudioIntrReg, "m_AudioIntrReg");
             m_RegWorkingSet.BeforeCallDirect();
@@ -11593,7 +11593,7 @@ void CX86RecompilerOps::SW_Register(x86Reg Reg, uint32_t VAddr)
             MoveX86regToVariable(Reg, PAddr + g_MMU->Rdram(), VarName);
             if (ShowUnhandledMemory())
             {
-                g_Notify->DisplayError(stdstr_f("%s\ntrying to store in %08X?", __FUNCTION__, VAddr).c_str());
+                g_Notify->DisplayError(stdstr_f("%s\nTrying to store in %08X?", __FUNCTION__, VAddr).c_str());
             }
         }
         break;
@@ -11642,7 +11642,7 @@ void CX86RecompilerOps::SW_Register(x86Reg Reg, uint32_t VAddr)
         case 0x04600010:
             if (ShowUnhandledMemory())
             {
-                g_Notify->DisplayError(stdstr_f("%s\ntrying to store in %08X?", __FUNCTION__, VAddr).c_str());
+                g_Notify->DisplayError(stdstr_f("%s\nTrying to store in %08X?", __FUNCTION__, VAddr).c_str());
             }
             AndConstToVariable((uint32_t)~MI_INTR_PI, &g_Reg->MI_INTR_REG, "MI_INTR_REG");
             m_RegWorkingSet.BeforeCallDirect();
@@ -11689,10 +11689,10 @@ void CX86RecompilerOps::SW_Register(x86Reg Reg, uint32_t VAddr)
             AndConstToVariable(0xFF, &g_Reg->PI_BSD_DOM2_RLS_REG, "PI_BSD_DOM2_RLS_REG");
             break;
         default:
-            CPU_Message("    Should be moving %s in to %08X ?!?", x86_Name(Reg), VAddr);
+            CPU_Message("    should be moving %s in to %08X ?", x86_Name(Reg), VAddr);
             if (ShowUnhandledMemory())
             {
-                g_Notify->DisplayError(stdstr_f("%s\ntrying to store in %08X?", __FUNCTION__, VAddr).c_str());
+                g_Notify->DisplayError(stdstr_f("%s\nTrying to store in %08X?", __FUNCTION__, VAddr).c_str());
             }
         }
         break;
@@ -11706,7 +11706,7 @@ void CX86RecompilerOps::SW_Register(x86Reg Reg, uint32_t VAddr)
         default:
             if (ShowUnhandledMemory())
             {
-                g_Notify->DisplayError(stdstr_f("%s\ntrying to store in %08X?", __FUNCTION__, VAddr).c_str());
+                g_Notify->DisplayError(stdstr_f("%s\nTrying to store in %08X?", __FUNCTION__, VAddr).c_str());
             }
         }
         break;
@@ -11757,12 +11757,12 @@ void CX86RecompilerOps::SW_Register(x86Reg Reg, uint32_t VAddr)
         default:
             if (ShowUnhandledMemory())
             {
-                g_Notify->DisplayError(stdstr_f("%s\ntrying to store in %08X?", __FUNCTION__, VAddr).c_str());
+                g_Notify->DisplayError(stdstr_f("%s\nTrying to store in %08X?", __FUNCTION__, VAddr).c_str());
             }
         }
         break;
     case 0x05000000:
-        //64DD Registers
+        // 64DD registers
         if (g_Settings->LoadBool(Setting_EnableDisk))
         {
             switch (PAddr)
@@ -11770,7 +11770,7 @@ void CX86RecompilerOps::SW_Register(x86Reg Reg, uint32_t VAddr)
             case 0x05000500: MoveX86regToVariable(Reg, &g_Reg->ASIC_DATA, "ASIC_DATA"); break;
             case 0x05000508:
             {
-                //ASIC_CMD
+                // ASIC_CMD
                 MoveX86regToVariable(Reg, &g_Reg->ASIC_CMD, "ASIC_CMD");
                 m_RegWorkingSet.BeforeCallDirect();
                 Call_Direct(AddressOf(&DiskCommand), "DiskCommand");
@@ -11779,7 +11779,7 @@ void CX86RecompilerOps::SW_Register(x86Reg Reg, uint32_t VAddr)
             }
             case 0x05000510:
             {
-                //ASIC_BM_CTL
+                // ASIC_BM_CTL
                 MoveX86regToVariable(Reg, &g_Reg->ASIC_BM_CTL, "ASIC_BM_CTL");
                 m_RegWorkingSet.BeforeCallDirect();
                 Call_Direct(AddressOf(&DiskBMControl), "DiskBMControl");
@@ -11804,10 +11804,10 @@ void CX86RecompilerOps::SW_Register(x86Reg Reg, uint32_t VAddr)
         MoveX86regToVariable(Reg, PAddr + g_MMU->Rdram(), VarName);
         break;
     default:
-        CPU_Message("    Should be moving %s in to %08X ?!?", x86_Name(Reg), VAddr);
+        CPU_Message("    should be moving %s in to %08X ?", x86_Name(Reg), VAddr);
         if (ShowUnhandledMemory())
         {
-            g_Notify->DisplayError(stdstr_f("%s\ntrying to store in %08X?", __FUNCTION__, VAddr).c_str());
+            g_Notify->DisplayError(stdstr_f("%s\nTrying to store in %08X?", __FUNCTION__, VAddr).c_str());
         }
     }
 }

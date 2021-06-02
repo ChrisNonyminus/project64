@@ -4,12 +4,12 @@
 class CRSP_Plugin : public CPlugin
 {
     typedef struct {
-        /* Menu */
-        /* Items should have an ID between 5001 and 5100 */
+        // Menu
+        // Items should have an ID between 5001 and 5100
         void * hRSPMenu;
         void(CALL *ProcessMenuItem) (int32_t ID);
 
-        /* Break Points */
+        // Breakpoints
         int32_t UseBPoints;
         char BPPanelName[20];
         void(CALL *Add_BPoint)      (void);
@@ -21,7 +21,7 @@ class CRSP_Plugin : public CPlugin
         void(CALL *RemoveBpoint)    (void * hList, int32_t index);
         void(CALL *RemoveAllBpoint) (void);
 
-        /* RSP command Window */
+        // RSP command window
         void(CALL *Enter_RSP_Commands_Window)(void);
     } RSPDEBUG_INFO;
 
@@ -49,8 +49,8 @@ public:
     void ProcessMenuItem(int32_t id);
 
 private:
-    CRSP_Plugin(const CRSP_Plugin&);			// Disable copy constructor
-    CRSP_Plugin& operator=(const CRSP_Plugin&);	// Disable assignment
+    CRSP_Plugin(const CRSP_Plugin&);
+    CRSP_Plugin& operator=(const CRSP_Plugin&);
 
     PLUGIN_TYPE type() { return PLUGIN_TYPE_RSP; }
     virtual int32_t GetDefaultSettingStartRange() const { return FirstRSPDefaultSet; }

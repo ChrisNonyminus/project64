@@ -102,7 +102,7 @@ LRESULT    CDumpMemory::OnClicked(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl
         GetDlgItemText(IDC_FILENAME, FileName, sizeof(FileName));
         if (wcslen(FileName) == 0)
         {
-            g_Notify->DisplayWarning("Please Choose target file");
+            g_Notify->DisplayWarning("Please choose target file");
             ::SetFocus(GetDlgItem(IDC_FILENAME));
             return false;
         }
@@ -110,7 +110,7 @@ LRESULT    CDumpMemory::OnClicked(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl
         {
             DumpPC = StartPC;
         }
-        //disable buttons
+        // Disable buttons
         ::EnableWindow(GetDlgItem(IDC_E_START_ADDR), FALSE);
         ::EnableWindow(GetDlgItem(IDC_E_END_ADDR), FALSE);
         ::EnableWindow(GetDlgItem(IDC_E_ALT_PC), FALSE);
@@ -123,7 +123,7 @@ LRESULT    CDumpMemory::OnClicked(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl
         g_BaseSystem->ExternalEvent(SysEvent_PauseCPU_DumpMemory);
         if (!DumpMemory(FileName, Format, StartPC, EndPC, DumpPC))
         {
-            //enable buttons
+            // Enable buttons
             g_BaseSystem->ExternalEvent(SysEvent_ResumeCPU_DumpMemory);
             return false;
         }
@@ -158,7 +158,7 @@ bool CDumpMemory::DumpMemory(LPCTSTR FileName, DumpFormat Format, DWORD StartPC,
             const char* command = R4300iOpcodeName(opcode.Hex, DumpPC);
 
             char* cmdName = strtok((char*)command, "\t");
-            char* cmdArgs = strtok(NULL, "\t");
+            char* cmdArgs = strtok(nullptr, "\t");
             cmdArgs = cmdArgs ? cmdArgs : "";
 
             LogFile.LogF("%X: %-15s%s\r\n", DumpPC, cmdName, cmdArgs);
@@ -180,26 +180,24 @@ bool CDumpMemory::DumpMemory(LPCTSTR FileName, DumpFormat Format, DWORD StartPC,
         }
 
         uint32_t dumpLen = EndPC - StartPC;
-        uint8_t* dumpBuf = (uint8_t*)malloc(dumpLen);
+        std::unique_ptr<uint8_t[]> dumpBuf = std::make_unique<uint8_t[]>(dumpLen);
         uint32_t dumpIdx = 0;
 
         for (uint32_t pc = StartPC; pc < EndPC; pc++, dumpIdx++)
         {
-            bool bReadable = m_Debugger->DebugLoad_VAddr(pc, dumpBuf[dumpIdx]);
+            bool bReadable = m_Debugger->DebugLoad_VAddr(pc, dumpBuf.get()[dumpIdx]);
 
             if (!bReadable)
             {
                 g_Notify->DisplayError(stdstr_f("Address error\n%s", strFile.c_str()).c_str());
                 dumpFile.Close();
-                free(dumpBuf);
                 return false;
             }
         }
 
         dumpFile.SeekToBegin();
-        dumpFile.Write(dumpBuf, dumpLen);
+        dumpFile.Write(dumpBuf.get(), dumpLen);
         dumpFile.Close();
-        free(dumpBuf);
         return true;
     }
 

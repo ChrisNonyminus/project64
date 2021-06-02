@@ -1,9 +1,10 @@
 // Project64 - A Nintendo 64 emulator
-// http://www.pj64-emu.com/
+// https://www.pj64-emu.com/
 // Copyright(C) 2001-2021 Project64
 // Copyright(C) 2003-2009 Sergey 'Gonetz' Lipski
 // Copyright(C) 2002 Dave2001
 // GNU/GPLv2 licensed: https://gnu.org/licenses/gpl-2.0.html
+
 #include <Project64-video/Renderer/Renderer.h>
 #include <Project64-video/Gfx_1.3.h>
 
@@ -27,9 +28,10 @@
 #include <Common/Util.h>
 
 /*
- * `GetSystemSetting` and `FindSystemSettingId` from Project64 debugger
- * used only in g_Notify->DisplayError when OpenGL extension loading fails on WGL
- */
+`GetSystemSetting` and `FindSystemSettingId` from Project64 debugger
+used only in g_Notify->DisplayError when OpenGL extension loading fails on WGL
+*/
+
 #include <Settings/Settings.h>
 
 int screen_width, screen_height;
@@ -72,14 +74,15 @@ static inline void opt_glCopyTexImage2D(GLenum target,
 #define glCopyTexImage2D opt_glCopyTexImage2D
 
 #ifdef _WIN32
+
 /*
- * Some post-1.1 OpenGL functions can fail to be loaded through GL extensions
- * when running primitive OpenGL contexts on Microsoft Windows, specifically.
- *
- * As of the Project64 Glide64 version, Glitch64 now assigns these GL
- * functions to dummy functions to prevent access violations, while also
- * displaying error information showing the missing OpenGL support.
- */
+Some post-1.1 OpenGL functions can fail to be loaded through OpenGL extensions
+when running primitive OpenGL contexts on Microsoft Windows, specifically.
+
+As of the Project64 Glide64 version, Glitch64 now assigns these OpenGL
+functions to dummy functions to prevent access violations, while also
+displaying error information showing the missing OpenGL support.
+*/
 
 PFNGLACTIVETEXTUREARBPROC glActiveTextureARB;
 PFNGLBLENDFUNCSEPARATEEXTPROC glBlendFuncSeparateEXT;
@@ -106,17 +109,17 @@ PFNWGLGETEXTENSIONSSTRINGARBPROC wglGetExtensionsStringARB;
 const char * APIENTRY dummy_wglGetExtensionsString(HDC)
 {
     g_Notify->DisplayError("wglGetExtensionsString");
-    return NULL;
+    return nullptr;
 }
 
 PFNGLBINDFRAMEBUFFEREXTPROC glBindFramebufferEXT;
 PFNGLFRAMEBUFFERTEXTURE2DEXTPROC glFramebufferTexture2DEXT;
 PFNGLGENFRAMEBUFFERSEXTPROC glGenFramebuffersEXT;
-PFNGLBINDRENDERBUFFEREXTPROC glBindRenderbufferEXT = NULL;
-PFNGLDELETERENDERBUFFERSEXTPROC glDeleteRenderbuffersEXT = NULL;
-PFNGLGENRENDERBUFFERSEXTPROC glGenRenderbuffersEXT = NULL;
-PFNGLRENDERBUFFERSTORAGEEXTPROC glRenderbufferStorageEXT = NULL;
-PFNGLFRAMEBUFFERRENDERBUFFEREXTPROC glFramebufferRenderbufferEXT = NULL;
+PFNGLBINDRENDERBUFFEREXTPROC glBindRenderbufferEXT = nullptr;
+PFNGLDELETERENDERBUFFERSEXTPROC glDeleteRenderbuffersEXT = nullptr;
+PFNGLGENRENDERBUFFERSEXTPROC glGenRenderbuffersEXT = nullptr;
+PFNGLRENDERBUFFERSTORAGEEXTPROC glRenderbufferStorageEXT = nullptr;
+PFNGLFRAMEBUFFERRENDERBUFFEREXTPROC glFramebufferRenderbufferEXT = nullptr;
 PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC glCheckFramebufferStatusEXT;
 PFNGLDELETEFRAMEBUFFERSEXTPROC glDeleteFramebuffersEXT;
 void APIENTRY dummy_glGenRenderbuffers(GLsizei/*n*/, GLuint* /*renderbuffers*/)
@@ -184,7 +187,7 @@ void APIENTRY dummy_glSecondaryColor3f(GLfloat/*red*/, GLfloat/*green*/, GLfloat
 GLuint APIENTRY dummy_glCreateShader(GLenum/*type*/)
 { /* GLX render opcode ?, req. OpenGL 2.0 (1.2 w/ ARB_shader_objects) */
     g_Notify->DisplayError("glCreateShader");
-    return ((GLuint)(NULL));
+    return ((GLuint)(nullptr));
 }
 void APIENTRY dummy_glShaderSource(GLuint, GLsizei, const GLchar **, GLint *)
 { /* GLX render opcode ?, req. OpenGL 2.0 (1.2 w/ ARB_shader_objects) */
@@ -197,7 +200,7 @@ void APIENTRY dummy_glCompileShader(GLuint/*shader*/)
 GLuint APIENTRY dummy_glCreateProgram(void)
 { /* GLX render opcode ?, req. OpenGL 2.0 (1.2 w/ ARB_shader_objects) */
     g_Notify->DisplayError("glCreateProgram");
-    return ((GLuint)(NULL));
+    return ((GLuint)(nullptr));
 }
 void APIENTRY dummy_glAttachObject(GLhandleARB, GLhandleARB)
 { /* GLX render opcode ?, req. OpenGL 2.0 (1.2 w/ ARB_shader_objects) */
@@ -245,7 +248,7 @@ void APIENTRY dummy_glGetObjectParameteriv(GLhandleARB, GLenum, GLint *)
     g_Notify->DisplayError("glGetObjectParameteriv");
 }
 
-// FXT1,DXT1,DXT5 support - Hiroshi Morii <koolsmoky(at)users.sourceforge.net>
+// FXT1,DXT1,DXT5 support - Hiroshi Morii
 // NOTE: Glide64 + GlideHQ use the following formats
 // GL_COMPRESSED_RGB_S3TC_DXT1_EXT
 // GL_COMPRESSED_RGBA_S3TC_DXT5_EXT
@@ -279,10 +282,10 @@ int render_to_texture = 0;
 int texture_unit;
 int use_fbo;
 int buffer_cleared;
-// ZIGGY
-// to allocate a new static texture name, take the value (free_texture++)
+// Comment by Ziggy
+// To allocate a new static texture name, take the value (free_texture++)
 int free_texture;
-int default_texture; // the infamous "32*1024*1024" is now configurable
+int default_texture; // The infamous "32*1024*1024" is now configurable
 int current_texture;
 int depth_texture, color_texture;
 int glsl_support = 1;
@@ -292,9 +295,9 @@ int lfb_color_fmt;
 float invtex[2];
 
 #ifdef _WIN32
-static HDC hDC = NULL;
-static HGLRC hGLRC = NULL;
-static HWND hToolBar = NULL;
+static HDC hDC = nullptr;
+static HGLRC hGLRC = nullptr;
+static HWND hToolBar = nullptr;
 #endif // _WIN32
 
 static int savedWidtho, savedHeighto;
@@ -315,7 +318,7 @@ struct texbuf_t {
     uint32_t start, end;
     int fmt;
 };
-#define NB_TEXBUFS 128 // MUST be a power of two
+#define NB_TEXBUFS 128 // Must be a power of two
 static texbuf_t texbufs[NB_TEXBUFS];
 static int texbuf_i;
 
@@ -371,7 +374,7 @@ void gfxColorMask(bool rgb, bool a)
 
 int isExtensionSupported(const char *extension)
 {
-    const GLubyte *extensions = NULL;
+    const GLubyte *extensions = nullptr;
     const GLubyte *start;
     GLubyte *where, *terminator;
 
@@ -402,7 +405,7 @@ int isExtensionSupported(const char *extension)
 #ifdef _WIN32
 int isWglExtensionSupported(const char *extension)
 {
-    const GLubyte *extensions = NULL;
+    const GLubyte *extensions = nullptr;
     const GLubyte *start;
     GLubyte *where, *terminator;
 
@@ -437,9 +440,9 @@ bool gfxSstWinOpen(gfxColorFormat_t color_format, gfxOriginLocation_t origin_loc
 {
     static int show_warning = 1;
 
-    // ZIGGY
-    // allocate static texture names
-    // the initial value should be big enough to support the maximal resolution
+    // Comment by Ziggy
+    // Allocate static texture names
+    // The initial value should be big enough to support the maximal resolution
     free_texture = 32 * 2048 * 2048;
     default_texture = free_texture++;
     color_texture = free_texture++;
@@ -459,7 +462,7 @@ bool gfxSstWinOpen(gfxColorFormat_t color_format, gfxOriginLocation_t origin_loc
 
     int pfm;
 #else
-    fputs("ERROR:  No GLX yet to start GL on [Free]BSD, Linux etc.\n", stderr);
+    fputs("ERROR: No GLX yet to start GL on [Free]BSD, Linux etc.\n", stderr);
 #endif // _WIN32
 
     WriteTrace(TraceGlitch, TraceDebug, "color_format: %d, origin_location: %d, nColBuffers: %d, nAuxBuffers: %d", color_format, origin_location, nColBuffers, nAuxBuffers);
@@ -467,22 +470,22 @@ bool gfxSstWinOpen(gfxColorFormat_t color_format, gfxOriginLocation_t origin_loc
 #ifdef _WIN32
     TMU_SIZE = ((g_settings->wrpVRAM() * 1024 * 1024) - g_width * g_height * 4 * 3) / 2;
 
-    // save screen resolution for hwfbe, after resolution enumeration
+    // Save screen resolution for hwfbe (hardware framebuffer emulation?), after resolution enumeration
     screen_width = g_width;
     screen_height = g_height;
 
-    if ((HWND)gfx.hWnd != NULL)
+    if ((HWND)gfx.hWnd != nullptr)
     {
         hDC = GetDC((HWND)gfx.hWnd);
     }
-    if (hDC == NULL)
+    if (hDC == nullptr)
     {
         WriteTrace(TraceGlitch, TraceWarning, "GetDC on main window failed");
         return false;
     }
 
     if ((pfm = ChoosePixelFormat(hDC, &pfd)) == 0) {
-        //printf("disabling auxiliary buffers\n");
+        //printf("Disabling auxiliary buffers\n");
         pfd.cAuxBuffers = 0;
         pfm = ChoosePixelFormat(hDC, &pfd);
     }
@@ -506,7 +509,7 @@ bool gfxSstWinOpen(gfxColorFormat_t color_format, gfxOriginLocation_t origin_loc
 
     HGLRC CurrenthGLRC = wglGetCurrentContext();
 
-    if (CurrenthGLRC == NULL || CurrenthGLRC == hGLRC)
+    if (CurrenthGLRC == nullptr || CurrenthGLRC == hGLRC)
     {
         if (!wglMakeCurrent(hDC, hGLRC))
         {
@@ -517,9 +520,9 @@ bool gfxSstWinOpen(gfxColorFormat_t color_format, gfxOriginLocation_t origin_loc
     }
 #endif // _WIN32
     lfb_color_fmt = color_format;
-    if (origin_location != GFX_ORIGIN_UPPER_LEFT) WriteTrace(TraceGlitch, TraceWarning, "origin must be in upper left corner");
-    if (nColBuffers != 2) WriteTrace(TraceGlitch, TraceWarning, "number of color buffer is not 2");
-    if (nAuxBuffers != 1) WriteTrace(TraceGlitch, TraceWarning, "number of auxiliary buffer is not 1");
+    if (origin_location != GFX_ORIGIN_UPPER_LEFT) WriteTrace(TraceGlitch, TraceWarning, "Origin must be in upper left corner");
+    if (nColBuffers != 2) WriteTrace(TraceGlitch, TraceWarning, "Number of color buffer is not 2");
+    if (nAuxBuffers != 1) WriteTrace(TraceGlitch, TraceWarning, "Number of auxiliary buffer is not 1");
 
     if (isExtensionSupported("GL_ARB_texture_env_combine") == 0 &&
         isExtensionSupported("GL_EXT_texture_env_combine") == 0 &&
@@ -535,9 +538,9 @@ bool gfxSstWinOpen(gfxColorFormat_t color_format, gfxOriginLocation_t origin_loc
     glActiveTextureARB = (PFNGLACTIVETEXTUREARBPROC)wglGetProcAddress("glActiveTextureARB");
     glMultiTexCoord2fARB = (PFNGLMULTITEXCOORD2FARBPROC)wglGetProcAddress("glMultiTexCoord2fARB");
 
-    if (glActiveTextureARB == NULL)
+    if (glActiveTextureARB == nullptr)
         glActiveTextureARB = (PFNGLACTIVETEXTUREARBPROC)dummy_glActiveTexture;
-    if (glMultiTexCoord2fARB == NULL)
+    if (glMultiTexCoord2fARB == nullptr)
         glMultiTexCoord2fARB = (PFNGLMULTITEXCOORD2FARBPROC)dummy_glMultiTexCoord2f;
 #endif // _WIN32
 
@@ -548,7 +551,7 @@ bool gfxSstWinOpen(gfxColorFormat_t color_format, gfxOriginLocation_t origin_loc
     nbAuxBuffers = 0;
     glGetIntegerv(GL_AUX_BUFFERS, &nbAuxBuffers);
     if (nbAuxBuffers > 0)
-        printf("Congratulations, you have %d auxilliary buffers, we'll use them wisely !\n", nbAuxBuffers);
+        printf("Congratulations, you have %d auxiliary buffers, we'll use them wisely!\n", nbAuxBuffers);
 
     if (isExtensionSupported("GL_EXT_blend_func_separate") == 0)
         blend_func_separate_support = 0;
@@ -558,7 +561,7 @@ bool gfxSstWinOpen(gfxColorFormat_t color_format, gfxOriginLocation_t origin_loc
     if (isExtensionSupported("GL_EXT_packed_pixels") == 0)
         packed_pixels_support = 0;
     else {
-        printf("packed pixels extension used\n");
+        printf("Packed pixels extension used\n");
         packed_pixels_support = 1;
     }
 
@@ -571,7 +574,7 @@ bool gfxSstWinOpen(gfxColorFormat_t color_format, gfxOriginLocation_t origin_loc
 
 #ifdef _WIN32
     glBlendFuncSeparateEXT = (PFNGLBLENDFUNCSEPARATEEXTPROC)wglGetProcAddress("glBlendFuncSeparateEXT");
-    if (glBlendFuncSeparateEXT == NULL)
+    if (glBlendFuncSeparateEXT == nullptr)
         glBlendFuncSeparateEXT = (PFNGLBLENDFUNCSEPARATEEXTPROC)dummy_glBlendFuncSeparate;
 #endif // _WIN32
 
@@ -582,13 +585,13 @@ bool gfxSstWinOpen(gfxColorFormat_t color_format, gfxOriginLocation_t origin_loc
 
 #ifdef _WIN32
     glFogCoordfEXT = (PFNGLFOGCOORDFPROC)wglGetProcAddress("glFogCoordfEXT");
-    if (glFogCoordfEXT == NULL)
+    if (glFogCoordfEXT == nullptr)
         glFogCoordfEXT = (PFNGLFOGCOORDFPROC)dummy_glFogCoordf;
 #endif // _WIN32
 
 #ifdef _WIN32
     wglGetExtensionsStringARB = (PFNWGLGETEXTENSIONSSTRINGARBPROC)wglGetProcAddress("wglGetExtensionsStringARB");
-    if (wglGetExtensionsStringARB == NULL)
+    if (wglGetExtensionsStringARB == nullptr)
         wglGetExtensionsStringARB = (PFNWGLGETEXTENSIONSSTRINGARBPROC)dummy_wglGetExtensionsString;
 #endif // _WIN32
 
@@ -599,15 +602,15 @@ bool gfxSstWinOpen(gfxColorFormat_t color_format, gfxOriginLocation_t origin_loc
     glCheckFramebufferStatusEXT = (PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC)wglGetProcAddress("glCheckFramebufferStatusEXT");
     glDeleteFramebuffersEXT = (PFNGLDELETEFRAMEBUFFERSEXTPROC)wglGetProcAddress("glDeleteFramebuffersEXT");
 
-    if (glBindFramebufferEXT == NULL)
+    if (glBindFramebufferEXT == nullptr)
         glBindFramebufferEXT = (PFNGLBINDFRAMEBUFFEREXTPROC)dummy_glBindFramebuffer;
-    if (glFramebufferTexture2DEXT == NULL)
+    if (glFramebufferTexture2DEXT == nullptr)
         glFramebufferTexture2DEXT = (PFNGLFRAMEBUFFERTEXTURE2DEXTPROC)dummy_glFramebufferTexture2D;
-    if (glGenFramebuffersEXT == NULL)
+    if (glGenFramebuffersEXT == nullptr)
         glGenFramebuffersEXT = (PFNGLGENFRAMEBUFFERSEXTPROC)dummy_glGenFramebuffers;
-    if (glCheckFramebufferStatusEXT == NULL)
+    if (glCheckFramebufferStatusEXT == nullptr)
         glCheckFramebufferStatusEXT = (PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC)dummy_glCheckFramebufferStatus;
-    if (glDeleteFramebuffersEXT == NULL)
+    if (glDeleteFramebuffersEXT == nullptr)
         glDeleteFramebuffersEXT = (PFNGLDELETEFRAMEBUFFERSEXTPROC)dummy_glDeleteFramebuffers;
 
     glBindRenderbufferEXT = (PFNGLBINDRENDERBUFFEREXTPROC)wglGetProcAddress("glBindRenderbufferEXT");
@@ -616,15 +619,15 @@ bool gfxSstWinOpen(gfxColorFormat_t color_format, gfxOriginLocation_t origin_loc
     glRenderbufferStorageEXT = (PFNGLRENDERBUFFERSTORAGEEXTPROC)wglGetProcAddress("glRenderbufferStorageEXT");
     glFramebufferRenderbufferEXT = (PFNGLFRAMEBUFFERRENDERBUFFEREXTPROC)wglGetProcAddress("glFramebufferRenderbufferEXT");
 
-    if (glBindRenderbufferEXT == NULL)
+    if (glBindRenderbufferEXT == nullptr)
         glBindRenderbufferEXT = (PFNGLBINDRENDERBUFFEREXTPROC)dummy_glBindRenderbuffer;
-    if (glDeleteRenderbuffersEXT == NULL)
+    if (glDeleteRenderbuffersEXT == nullptr)
         glDeleteRenderbuffersEXT = (PFNGLDELETERENDERBUFFERSEXTPROC)dummy_glDeleteRenderbuffers;
-    if (glGenRenderbuffersEXT == NULL)
+    if (glGenRenderbuffersEXT == nullptr)
         glGenRenderbuffersEXT = (PFNGLGENRENDERBUFFERSEXTPROC)dummy_glGenRenderbuffers;
-    if (glRenderbufferStorageEXT == NULL)
+    if (glRenderbufferStorageEXT == nullptr)
         glRenderbufferStorageEXT = (PFNGLRENDERBUFFERSTORAGEEXTPROC)dummy_glRenderbufferStorage;
-    if (glFramebufferRenderbufferEXT == NULL)
+    if (glFramebufferRenderbufferEXT == nullptr)
         glFramebufferRenderbufferEXT = (PFNGLFRAMEBUFFERRENDERBUFFEREXTPROC)dummy_glFramebufferRenderbuffer;
 #endif // _WIN32
 
@@ -666,40 +669,40 @@ bool gfxSstWinOpen(gfxColorFormat_t color_format, gfxOriginLocation_t origin_loc
 #ifdef _WIN32
     glCompressedTexImage2DARB = (PFNGLCOMPRESSEDTEXIMAGE2DPROC)wglGetProcAddress("glCompressedTexImage2DARB");
 
-    if (glCreateShaderObjectARB == NULL)
+    if (glCreateShaderObjectARB == nullptr)
         glCreateShaderObjectARB = (PFNGLCREATESHADEROBJECTARBPROC)dummy_glCreateShader;
-    if (glShaderSourceARB == NULL)
+    if (glShaderSourceARB == nullptr)
         glShaderSourceARB = (PFNGLSHADERSOURCEARBPROC)dummy_glShaderSource;
-    if (glCompileShaderARB == NULL)
+    if (glCompileShaderARB == nullptr)
         glCompileShaderARB = (PFNGLCOMPILESHADERARBPROC)dummy_glCompileShader;
-    if (glCreateProgramObjectARB == NULL)
+    if (glCreateProgramObjectARB == nullptr)
         glCreateProgramObjectARB = (PFNGLCREATEPROGRAMOBJECTARBPROC)dummy_glCreateProgram;
-    if (glAttachObjectARB == NULL)
+    if (glAttachObjectARB == nullptr)
         glAttachObjectARB = (PFNGLATTACHOBJECTARBPROC)dummy_glAttachObject;
-    if (glLinkProgramARB == NULL)
+    if (glLinkProgramARB == nullptr)
         glLinkProgramARB = (PFNGLLINKPROGRAMARBPROC)dummy_glLinkProgram;
-    if (glUseProgramObjectARB == NULL)
+    if (glUseProgramObjectARB == nullptr)
         glUseProgramObjectARB = (PFNGLUSEPROGRAMOBJECTARBPROC)dummy_glUseProgram;
-    if (glGetUniformLocationARB == NULL)
+    if (glGetUniformLocationARB == nullptr)
         glGetUniformLocationARB = (PFNGLGETUNIFORMLOCATIONARBPROC)dummy_glGetUniformLocation;
-    if (glUniform1iARB == NULL)
+    if (glUniform1iARB == nullptr)
         glUniform1iARB = (PFNGLUNIFORM1IARBPROC)dummy_glUniform1i;
-    if (glUniform4iARB == NULL)
+    if (glUniform4iARB == nullptr)
         glUniform4iARB = (PFNGLUNIFORM4IARBPROC)dummy_glUniform4i;
-    if (glUniform4fARB == NULL)
+    if (glUniform4fARB == nullptr)
         glUniform4fARB = (PFNGLUNIFORM4FARBPROC)dummy_glUniform4f;
-    if (glUniform1fARB == NULL)
+    if (glUniform1fARB == nullptr)
         glUniform1fARB = (PFNGLUNIFORM1FARBPROC)dummy_glUniform1f;
-    if (glDeleteObjectARB == NULL)
+    if (glDeleteObjectARB == nullptr)
         glDeleteObjectARB = (PFNGLDELETEOBJECTARBPROC)dummy_glDeleteObject;
-    if (glGetInfoLogARB == NULL)
+    if (glGetInfoLogARB == nullptr)
         glGetInfoLogARB = (PFNGLGETINFOLOGARBPROC)dummy_glGetInfoLog;
-    if (glGetObjectParameterivARB == NULL)
+    if (glGetObjectParameterivARB == nullptr)
         glGetObjectParameterivARB = (PFNGLGETOBJECTPARAMETERIVARBPROC)dummy_glGetObjectParameteriv;
 
-    if (glSecondaryColor3f == NULL)
+    if (glSecondaryColor3f == nullptr)
         glSecondaryColor3f = (PFNGLSECONDARYCOLOR3FPROC)dummy_glSecondaryColor3f;
-    if (glCompressedTexImage2DARB == NULL)
+    if (glCompressedTexImage2DARB == nullptr)
         glCompressedTexImage2DARB = (PFNGLCOMPRESSEDTEXIMAGE2DPROC)dummy_glCompressedTexImage2D;
 #endif
 
@@ -717,7 +720,7 @@ bool gfxSstWinOpen(gfxColorFormat_t color_format, gfxOriginLocation_t origin_loc
     //   void do_benchmarks();
     //   do_benchmarks();
 
-    // VP try to resolve z precision issues
+    // VP try to resolve Z precision issues
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glTranslatef(0, 0, 1 - zscale);
@@ -739,7 +742,7 @@ bool gfxSstWinOpen(gfxColorFormat_t color_format, gfxOriginLocation_t origin_loc
     }
 
     if (!use_fbo && nbAuxBuffers == 0) {
-        // create the framebuffer saving texture
+        // Create the framebuffer saving texture
         int w = g_width, h = g_height;
         glBindTexture(GL_TEXTURE_2D, color_texture);
         if (!npot_support) {
@@ -759,7 +762,7 @@ bool gfxSstWinOpen(gfxColorFormat_t color_format, gfxOriginLocation_t origin_loc
     init_textures();
     init_combiner();
 
-    // Aniso filter check
+    // Anisotropic filter check
     if (g_settings->wrpAnisotropic())
     {
         glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &largest_supported_anisotropy);
@@ -769,7 +772,7 @@ bool gfxSstWinOpen(gfxColorFormat_t color_format, gfxOriginLocation_t origin_loc
     // Hmm, perhaps the internal format need to be specified explicitly...
     {
         GLint ifmt;
-        glTexImage2D(GL_PROXY_TEXTURE_2D, 0, GL_RGBA, 16, 16, 0, GL_BGRA, GL_UNSIGNED_SHORT_1_5_5_5_REV, NULL);
+        glTexImage2D(GL_PROXY_TEXTURE_2D, 0, GL_RGBA, 16, 16, 0, GL_BGRA, GL_UNSIGNED_SHORT_1_5_5_5_REV, nullptr);
         glGetTexLevelParameteriv(GL_PROXY_TEXTURE_2D, 0, GL_TEXTURE_INTERNAL_FORMAT, &ifmt);
         if (ifmt != GL_RGB5_A1) {
             WriteTrace(TraceGlitch, TraceWarning, "ATI SUCKS %x\n", ifmt);
@@ -799,8 +802,8 @@ bool gfxSstWinClose()
 
     free_combiners();
 #ifndef WIN32
-    try // I don't know why, but opengl can be killed before this function call when emulator is closed (Gonetz).
-        // ZIGGY : I found the problem : it is a function pointer, when the extension isn't supported , it is then zero, so just need to check the pointer prior to do the call.
+    try // I don't know why, but OpenGL can be killed before this function call when emulator is closed (Gonetz).
+        // Comment by Ziggy: I found the problem: it is a function pointer, when the extension isn't supported, it is then zero, so just need to check the pointer prior to do the call.
     {
         if (use_fbo && glBindFramebufferEXT)
             glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
@@ -824,23 +827,22 @@ bool gfxSstWinClose()
 
     free_textures();
 #ifndef WIN32
-    // ZIGGY for some reasons, Pj64 doesn't like remove_tex on exit
+    // (Comment by Ziggy) For some reasons, Project64 doesn't like remove_tex on exit
     remove_tex(0, 0xfffffff);
 #endif
 
-    //*/
 #ifdef _WIN32
     if (hGLRC)
     {
-        wglMakeCurrent(hDC, NULL);
+        wglMakeCurrent(hDC, nullptr);
         wglDeleteContext(hGLRC);
-        hGLRC = NULL;
+        hGLRC = nullptr;
     }
     ExitFullScreen();
 #else
     //SDL_QuitSubSystem(SDL_INIT_VIDEO);
     //sleep(2);
-    //m_pScreen = NULL;
+    //m_pScreen = nullptr;
 #endif
     return true;
 }
@@ -851,9 +853,9 @@ void gfxTextureBufferExt(gfxChipID_t tmu, uint32_t startAddress, gfxLOD_t lodmin
     static int fbs_init = 0;
 
     WriteTrace(TraceGlitch, TraceDebug, "tmu: %d startAddress: %d lodmin: %d lodmax: %d aspect: %d fmt: %d evenOdd: %d", tmu, startAddress, lodmin, lodmax, aspect, fmt, evenOdd);
-    if (lodmin != lodmax) WriteTrace(TraceGlitch, TraceWarning, "gfxTextureBufferExt : loading more than one LOD");
+    if (lodmin != lodmax) WriteTrace(TraceGlitch, TraceWarning, "gfxTextureBufferExt: Loading more than one LOD");
     if (!use_fbo) {
-        if (!render_to_texture) { //initialization
+        if (!render_to_texture) { // Initialization
             return;
         }
 
@@ -874,7 +876,7 @@ void gfxTextureBufferExt(gfxChipID_t tmu, uint32_t startAddress, gfxLOD_t lodmin
             updateTexture();
 #ifdef SAVE_CBUFFER
         //printf("saving %dx%d\n", pBufferWidth, pBufferHeight);
-        // save color buffer
+        // Save color buffer
         if (nbAuxBuffers > 0) {
             glDrawBuffer(GL_AUX0);
             current_buffer = GL_AUX0;
@@ -892,7 +894,7 @@ void gfxTextureBufferExt(gfxChipID_t tmu, uint32_t startAddress, gfxLOD_t lodmin
             glReadBuffer(GL_BACK);
             glActiveTextureARB(texture_unit);
             glBindTexture(GL_TEXTURE_2D, color_texture);
-            // save incrementally the framebuffer
+            // Save incrementally the framebuffer
             if (save_w) {
                 if (tw > save_w && th > save_h) {
                     glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, save_h,
@@ -945,8 +947,8 @@ void gfxTextureBufferExt(gfxChipID_t tmu, uint32_t startAddress, gfxLOD_t lodmin
         widtho = g_width / 2;
         heighto = g_height / 2;
 
-        // this could be improved, but might be enough as long as the set of
-        // texture buffer addresses stay small
+        // This could be improved, but might be enough as long as the set of
+        // texture buffer addresses stays small
         for (i = (texbuf_i - 1)&(NB_TEXBUFS - 1); i != texbuf_i; i = (i - 1)&(NB_TEXBUFS - 1))
             if (texbufs[i].start == pBufferAddress)
                 break;
@@ -957,8 +959,8 @@ void gfxTextureBufferExt(gfxChipID_t tmu, uint32_t startAddress, gfxLOD_t lodmin
             texbuf_i = (texbuf_i + 1)&(NB_TEXBUFS - 1);
         //printf("texbuf %x fmt %x\n", pBufferAddress, fmt);
 
-        // ZIGGY it speeds things up to not delete the buffers
-        // a better thing would be to delete them *sometimes*
+        // (Comment by Ziggy) It speeds things up to not delete the buffers
+        // A better thing would be to delete them *sometimes*
         //   remove_tex(pBufferAddress+1, pBufferAddress + size);
         add_tex(pBufferAddress);
 
@@ -974,7 +976,7 @@ void gfxTextureBufferExt(gfxChipID_t tmu, uint32_t startAddress, gfxLOD_t lodmin
         grDisplayGLError("gfxTextureBufferExt :: A");
     }
     else {
-        if (!render_to_texture) //initialization
+        if (!render_to_texture) // Initialization
         {
             if (!fbs_init)
             {
@@ -982,7 +984,7 @@ void gfxTextureBufferExt(gfxChipID_t tmu, uint32_t startAddress, gfxLOD_t lodmin
                 fbs_init = 1;
                 nb_fb = 0;
             }
-            return; //no need to allocate FBO if render buffer is not texture buffer
+            return; // No need to allocate FBO if render buffer is not texture buffer
         }
 
         render_to_texture = 2;
@@ -1009,7 +1011,7 @@ void gfxTextureBufferExt(gfxChipID_t tmu, uint32_t startAddress, gfxLOD_t lodmin
         {
             if (fbs[i].address == pBufferAddress)
             {
-                if (fbs[i].width == g_width && fbs[i].height == g_height) //select already allocated FBO
+                if (fbs[i].width == g_width && fbs[i].height == g_height) // Select already allocated FBO
                 {
                     glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
                     glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbs[i].fbid);
@@ -1021,7 +1023,7 @@ void gfxTextureBufferExt(gfxChipID_t tmu, uint32_t startAddress, gfxLOD_t lodmin
                     if (fbs[i].buff_clear)
                     {
                         glDepthMask(1);
-                        glClear(GL_DEPTH_BUFFER_BIT); //clear z-buffer only. we may need content, stored in the frame buffer
+                        glClear(GL_DEPTH_BUFFER_BIT); // Clear Z-buffer only. We may need content, stored in the framebuffer
                         fbs[i].buff_clear = 0;
                     }
                     CHECK_FRAMEBUFFER_STATUS();
@@ -1029,7 +1031,7 @@ void gfxTextureBufferExt(gfxChipID_t tmu, uint32_t startAddress, gfxLOD_t lodmin
                     grDisplayGLError("gfxTextureBufferExt :: C");
                     return;
                 }
-                else //create new FBO at the same address, delete old one
+                else // Create new FBO at the same address, delete old one
                 {
                     glDeleteFramebuffersEXT(1, &(fbs[i].fbid));
                     glDeleteRenderbuffersEXT(1, &(fbs[i].zbid));
@@ -1042,7 +1044,7 @@ void gfxTextureBufferExt(gfxChipID_t tmu, uint32_t startAddress, gfxLOD_t lodmin
         }
 
         remove_tex(pBufferAddress, pBufferAddress + g_width*g_height * 2/*grTexFormatSize(fmt)*/);
-        //create new FBO
+        // Create new FBO
         glGenFramebuffersEXT(1, &(fbs[nb_fb].fbid));
         glGenRenderbuffersEXT(1, &(fbs[nb_fb].zbid));
         glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, fbs[nb_fb].zbid);
@@ -1055,7 +1057,7 @@ void gfxTextureBufferExt(gfxChipID_t tmu, uint32_t startAddress, gfxLOD_t lodmin
         add_tex(fbs[nb_fb].texid);
         glBindTexture(GL_TEXTURE_2D, fbs[nb_fb].texid);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, g_width, g_height, 0,
-            GL_RGB, GL_UNSIGNED_BYTE, NULL);
+            GL_RGB, GL_UNSIGNED_BYTE, nullptr);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
@@ -1245,20 +1247,20 @@ void updateTexture()
         WriteTrace(TraceGlitch, TraceDebug, "pBufferAddress: %x", pBufferAddress);
         //printf("update texture %x\n", pBufferAddress);
 
-        // nothing changed, don't update the texture
+        // Nothing changed, don't update the texture
         if (!buffer_cleared) {
-            WriteTrace(TraceGlitch, TraceDebug, "update cancelled");
+            WriteTrace(TraceGlitch, TraceDebug, "Update cancelled");
             return;
         }
 
         glPushAttrib(GL_ALL_ATTRIB_BITS);
 
-        // save result of render to texture into actual texture
+        // Save result of render to texture into actual texture
         glReadBuffer(current_buffer);
         glActiveTextureARB(texture_unit);
-        // ZIGGY
-        // deleting the texture before resampling it increases speed on certain old
-        // nvidia cards (geforce 2 for example), unfortunatly it slows down a lot
+        // Comment by Ziggy
+        // Deleting the texture before resampling it increases speed on certain old
+        // Nvidia cards (GeForce 2 for example), unfortunately it slows down a lot
         // on newer cards.
         //glDeleteTextures( 1, &pBufferAddress );
         glBindTexture(GL_TEXTURE_2D, pBufferAddress);
@@ -1274,7 +1276,7 @@ void updateTexture()
 void gfxRenderBuffer(gfxBuffer_t buffer)
 {
 #ifdef _WIN32
-    static HANDLE region = NULL;
+    static HANDLE region = nullptr;
     //int realWidth = pBufferWidth, realHeight = pBufferHeight;
 #endif // _WIN32
     WriteTrace(TraceGlitch, TraceDebug, "buffer: %d", buffer);
@@ -1287,7 +1289,7 @@ void gfxRenderBuffer(gfxBuffer_t buffer)
         {
             updateTexture();
 
-            // VP z fix
+            // VP Z fix
             glMatrixMode(GL_MODELVIEW);
             glLoadIdentity();
             glTranslatef(0, 0, 1 - zscale);
@@ -1311,7 +1313,7 @@ void gfxRenderBuffer(gfxBuffer_t buffer)
 
 #ifdef SAVE_CBUFFER
             if (!use_fbo && render_to_texture == 2) {
-                // restore color buffer
+                // Restore color buffer
                 if (nbAuxBuffers > 0) {
                     glDrawBuffer(GL_BACK);
                     current_buffer = GL_BACK;
@@ -1352,7 +1354,7 @@ void gfxRenderBuffer(gfxBuffer_t buffer)
         }
         glDrawBuffer(GL_BACK);
         break;
-    case 6: // RENDER TO TEXTURE
+    case 6: // Render to texture
         if (!render_to_texture)
         {
             savedWidth = g_width;
@@ -1376,7 +1378,7 @@ void gfxRenderBuffer(gfxBuffer_t buffer)
                     0.0f, 0.0f, 0.0f, 1.0f };
                 glMatrixMode(GL_MODELVIEW);
                 glLoadMatrixf(m);
-                // VP z fix
+                // VP Z fix
                 glTranslatef(0, 0, 1 - zscale);
                 glScalef(1, 1 * 1, zscale);
                 inverted_culling = 1;
@@ -1386,14 +1388,14 @@ void gfxRenderBuffer(gfxBuffer_t buffer)
         render_to_texture = 1;
         break;
     default:
-        WriteTrace(TraceGlitch, TraceWarning, "gfxRenderBuffer : unknown buffer : %x", buffer);
+        WriteTrace(TraceGlitch, TraceWarning, "gfxRenderBuffer: Unknown buffer : %x", buffer);
     }
     grDisplayGLError("gfxRenderBuffer");
 }
 
 void gfxAuxBufferExt(gfxBuffer_t buffer)
 {
-    WriteTrace(TraceGlitch, TraceDebug, "buffer: %d", buffer);
+    WriteTrace(TraceGlitch, TraceDebug, "Buffer: %d", buffer);
 
     if (buffer == GFX_BUFFER_AUXBUFFER)
     {
@@ -1434,7 +1436,7 @@ void gfxBufferClear(gfxColor_t color, gfxAlpha_t alpha, uint32_t depth)
             alpha / 255.0f);
         break;
     default:
-        WriteTrace(TraceGlitch, TraceWarning, "gfxBufferClear: unknown color format : %x", lfb_color_fmt);
+        WriteTrace(TraceGlitch, TraceWarning, "gfxBufferClear: Unknown color format : %x", lfb_color_fmt);
     }
 
     if (w_buffer_mode)
@@ -1443,7 +1445,7 @@ void gfxBufferClear(gfxColor_t color, gfxAlpha_t alpha, uint32_t depth)
         glClearDepth(depth / 65535.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // ZIGGY TODO check that color mask is on
+    // (Comment by Ziggy) TODO: Check that color mask is on
     buffer_cleared = 1;
 
     grDisplayGLError("gfxBufferClear");
@@ -1455,7 +1457,7 @@ void gfxBufferSwap(uint32_t swap_interval)
     WriteTrace(TraceGlitch, TraceDebug, "swap_interval: %d", swap_interval);
     //printf("swap\n");
     if (render_to_texture) {
-        WriteTrace(TraceGlitch, TraceWarning, "swap while render_to_texture\n");
+        WriteTrace(TraceGlitch, TraceWarning, "Swap while render_to_texture\n");
         return;
     }
 
@@ -1469,13 +1471,13 @@ void gfxBufferSwap(uint32_t swap_interval)
     // VP debugging
 }
 
-// frame buffer
+// Framebuffer
 bool gfxLfbLock(gfxLock_t type, gfxBuffer_t buffer, gfxLfbWriteMode_t writeMode, gfxOriginLocation_t origin, bool pixelPipeline, gfxLfbInfo_t *info)
 {
-    WriteTrace(TraceGlitch, TraceDebug, "type: %d buffer: %d writeMode: %d origin: %d pixelPipeline: %d", type, buffer, writeMode, origin, pixelPipeline);
+    WriteTrace(TraceGlitch, TraceDebug, "Type: %d buffer: %d writeMode: %d origin: %d pixelPipeline: %d", type, buffer, writeMode, origin, pixelPipeline);
     if (type == GFX_LFB_WRITE_ONLY)
     {
-        WriteTrace(TraceGlitch, TraceWarning, "gfxLfbLock : write only");
+        WriteTrace(TraceGlitch, TraceWarning, "gfxLfbLock: Write only");
     }
     else
     {
@@ -1491,7 +1493,7 @@ bool gfxLfbLock(gfxLock_t type, gfxBuffer_t buffer, gfxLfbWriteMode_t writeMode,
             glReadBuffer(GL_BACK);
             break;
         default:
-            WriteTrace(TraceGlitch, TraceWarning, "gfxLfbLock : unknown buffer : %x", buffer);
+            WriteTrace(TraceGlitch, TraceWarning, "gfxLfbLock: Unknown buffer : %x", buffer);
         }
 
         if (buffer != GFX_BUFFER_AUXBUFFER)
@@ -1542,10 +1544,10 @@ bool gfxLfbLock(gfxLock_t type, gfxBuffer_t buffer, gfxLfbWriteMode_t writeMode,
 
 bool gfxLfbUnlock(gfxLock_t type, gfxBuffer_t buffer)
 {
-    WriteTrace(TraceGlitch, TraceDebug, "type: %d, buffer: %d", type, buffer);
+    WriteTrace(TraceGlitch, TraceDebug, "Type: %d, buffer: %d", type, buffer);
     if (type == GFX_LFB_WRITE_ONLY)
     {
-        WriteTrace(TraceGlitch, TraceWarning, "gfxLfbUnlock : write only");
+        WriteTrace(TraceGlitch, TraceWarning, "gfxLfbUnlock: Write only");
     }
     return true;
 }
@@ -1570,7 +1572,7 @@ bool gfxLfbReadRegion(gfxBuffer_t src_buffer, uint32_t src_x, uint32_t src_y, ui
         glReadBuffer(current_buffer);
         break;*/
     default:
-        WriteTrace(TraceGlitch, TraceWarning, "grReadRegion : unknown buffer : %x", src_buffer);
+        WriteTrace(TraceGlitch, TraceWarning, "grReadRegion: Unknown buffer : %x", src_buffer);
     }
 
     if (src_buffer != GFX_BUFFER_AUXBUFFER)
@@ -1635,7 +1637,7 @@ bool gfxLfbWriteRegion(gfxBuffer_t dst_buffer, uint32_t dst_x, uint32_t dst_y, g
         glDrawBuffer(current_buffer);
         break;
     default:
-        WriteTrace(TraceGlitch, TraceWarning, "gfxLfbWriteRegion : unknown buffer : %x", dst_buffer);
+        WriteTrace(TraceGlitch, TraceWarning, "gfxLfbWriteRegion: Unknown buffer : %x", dst_buffer);
     }
 
     if (dst_buffer != GFX_BUFFER_AUXBUFFER)
@@ -1688,7 +1690,7 @@ bool gfxLfbWriteRegion(gfxBuffer_t dst_buffer, uint32_t dst_x, uint32_t dst_y, g
             }
             break;
         default:
-            WriteTrace(TraceGlitch, TraceWarning, "gfxLfbWriteRegion : unknown format : %d", src_format);
+            WriteTrace(TraceGlitch, TraceWarning, "gfxLfbWriteRegion: Unknown format : %d", src_format);
         }
 
         glBindTexture(GL_TEXTURE_2D, default_texture);
@@ -1709,7 +1711,7 @@ bool gfxLfbWriteRegion(gfxBuffer_t dst_buffer, uint32_t dst_x, uint32_t dst_y, g
         float *buf = (float*)malloc(src_width*(src_height + (g_viewport_offset)) * sizeof(float));
 
         if (src_format != GFX_LFBWRITEMODE_ZA16)
-            WriteTrace(TraceGlitch, TraceWarning, "unknown depth buffer write format:%x", src_format);
+            WriteTrace(TraceGlitch, TraceWarning, "Unknown depth buffer write format:%x", src_format);
 
         if (dst_x || dst_y)
             WriteTrace(TraceGlitch, TraceWarning, "dst_x:%d, dst_y:%d\n", dst_x, dst_y);
@@ -1740,16 +1742,16 @@ bool gfxLfbWriteRegion(gfxBuffer_t dst_buffer, uint32_t dst_x, uint32_t dst_y, g
     return true;
 }
 
-/* wrapper-specific glide extensions */
+// Wrapper-specific Glide extensions
 #ifdef _WIN32
 static void CorrectGamma(LPVOID apGammaRamp)
 {
-    HDC hdc = GetDC(NULL);
-    if (hdc != NULL)
+    HDC hdc = GetDC(nullptr);
+    if (hdc != nullptr)
     {
 		if (to_fullscreen)
 			SetDeviceGammaRamp(hdc, apGammaRamp);
-        ReleaseDC(NULL, hdc);
+        ReleaseDC(nullptr, hdc);
     }
 }
 #else
@@ -1757,9 +1759,9 @@ static void CorrectGamma(const uint16_t aGammaRamp[3][256])
 {
     int res;
 
-    /* res = SDL_SetGammaRamp(aGammaRamp[0], aGammaRamp[1], aGammaRamp[2]); */
+    // res = SDL_SetGammaRamp(aGammaRamp[0], aGammaRamp[1], aGammaRamp[2]);
     res = -1;
-    fputs("ERROR:  Replacement for SDL_SetGammaRamp unimplemented.\n", stderr);
+    fputs("Error: Replacement for SDL_SetGammaRamp unimplemented.\n", stderr);
     WriteTrace(TraceGlitch, TraceDebug, "SDL_SetGammaRamp returned %d\r\n", res);
 }
 #endif
@@ -1782,15 +1784,15 @@ void gfxGetGammaTableExt(uint32_t /*nentries*/, uint32_t *red, uint32_t *green, 
     WriteTrace(TraceGlitch, TraceDebug, "-");
     uint16_t aGammaRamp[3][256];
 #ifdef _WIN32
-    HDC hdc = GetDC(NULL);
-    if (hdc == NULL)
+    HDC hdc = GetDC(nullptr);
+    if (hdc == nullptr)
         return;
     if (GetDeviceGammaRamp(hdc, aGammaRamp) == TRUE)
     {
-        ReleaseDC(NULL, hdc);
+        ReleaseDC(nullptr, hdc);
 #else
-    fputs("ERROR:  Replacement for SDL_GetGammaRamp unimplemented.\n", stderr);
-    /* if (SDL_GetGammaRamp(aGammaRamp[0], aGammaRamp[1], aGammaRamp[2]) != -1) */
+    fputs("Error:  Replacement for SDL_GetGammaRamp unimplemented.\n", stderr);
+    // if (SDL_GetGammaRamp(aGammaRamp[0], aGammaRamp[1], aGammaRamp[2]) != -1)
     {
 #endif
         for (int i = 0; i < 256; i++)
@@ -1817,15 +1819,15 @@ void gfxGammaCorrectionRGB(float gammaR, float gammaG, float gammaB)
 }
 
 static const char * GL_errors[7 + 1] = {
-    "GL_NO_ERROR", /* "There is no current error." */
-    "GL_INVALID_ENUM", /* "Invalid parameter." */
-    "GL_INVALID_VALUE", /* "Invalid enum parameter value." */
-    "GL_INVALID_OPERATION", /* "Illegal call." */
+    "GL_NO_ERROR", // "There is no current error."
+    "GL_INVALID_ENUM", // "Invalid parameter."
+    "GL_INVALID_VALUE", // "Invalid enum parameter value."
+    "GL_INVALID_OPERATION", // "Illegal call."
     "GL_STACK_OVERFLOW",
     "GL_STACK_UNDERFLOW",
-    "GL_OUT_OF_MEMORY", /* "Unable to allocate memory." */
+    "GL_OUT_OF_MEMORY", // "Unable to allocate memory."
 
-    "GL_UNKNOWN_ERROR" /* ??? */
+    "GL_UNKNOWN_ERROR"
 };
 
 #ifndef _DEBUG
@@ -1847,24 +1849,22 @@ int grDisplayGLError(const char* message)
         error_index = failure = 0;
     else
         error_index =
-        (status < GL_INVALID_ENUM) /* to avoid underflow when subtracting */
-        ? (7) /* our own, made-up "GL_UNKNOWN_ERROR" error */
+        (status < GL_INVALID_ENUM) // To avoid underflow when subtracting
+        ? (7) // Our own, made-up "GL_UNKNOWN_ERROR" error
         : (status - GL_INVALID_ENUM) + 1;
 
     if (error_index > 7)
         error_index = 7;
 
 #if !0
-    /*
-     * In most cases, we don't want to spam the screen to repeatedly say that
-     * there were no OpenGL errors yet, though sometimes one may need verbosity.
-     */
+    // In most cases, we don't want to spam the screen to repeatedly say that
+    // there were no OpenGL errors yet, though sometimes one may need verbosity.
     if (failure == 0)
         return (failure);
 #endif
 
 #ifdef _WIN32
-    MessageBoxA(NULL, message, GL_errors[error_index], MB_ICONERROR);
+    MessageBoxA(nullptr, message, GL_errors[error_index], MB_ICONERROR);
 #else
     fprintf(stderr, "%s\n%s\n\n", GL_errors[error_index], message);
 #endif
@@ -1876,43 +1876,43 @@ void CHECK_FRAMEBUFFER_STATUS()
 {
     GLenum status;
     status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
-    WriteTrace(TraceGlitch, TraceDebug, "status: %X", status);
+    WriteTrace(TraceGlitch, TraceDebug, "Status: %X", status);
     switch (status) {
     case GL_FRAMEBUFFER_COMPLETE_EXT:
-        /*WriteTrace(TraceGlitch, TraceWarning, "framebuffer complete!\n");*/
+        //WriteTrace(TraceGlitch, TraceWarning, "framebuffer complete!\n");
         break;
     case GL_FRAMEBUFFER_UNSUPPORTED_EXT:
-        WriteTrace(TraceGlitch, TraceWarning, "framebuffer GL_FRAMEBUFFER_UNSUPPORTED_EXT\n");
-        /* you gotta choose different formats */
-        /*assert(0);*/
+        WriteTrace(TraceGlitch, TraceWarning, "Framebuffer GL_FRAMEBUFFER_UNSUPPORTED_EXT\n");
+        // You have to choose different formats
+        //assert(0);
         break;
     case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT:
-        WriteTrace(TraceGlitch, TraceWarning, "framebuffer INCOMPLETE_ATTACHMENT\n");
+        WriteTrace(TraceGlitch, TraceWarning, "Framebuffer INCOMPLETE_ATTACHMENT\n");
         break;
     case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT:
-        WriteTrace(TraceGlitch, TraceWarning, "framebuffer FRAMEBUFFER_MISSING_ATTACHMENT\n");
+        WriteTrace(TraceGlitch, TraceWarning, "Framebuffer FRAMEBUFFER_MISSING_ATTACHMENT\n");
         break;
     case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT:
-        WriteTrace(TraceGlitch, TraceWarning, "framebuffer FRAMEBUFFER_DIMENSIONS\n");
+        WriteTrace(TraceGlitch, TraceWarning, "Framebuffer FRAMEBUFFER_DIMENSIONS\n");
         break;
-        /*case GL_FRAMEBUFFER_INCOMPLETE_DUPLICATE_ATTACHMENT_EXT:
-          WriteTrace(TraceGlitch, TraceWarning, "framebuffer INCOMPLETE_DUPLICATE_ATTACHMENT\n");
-          break;*/
+        //case GL_FRAMEBUFFER_INCOMPLETE_DUPLICATE_ATTACHMENT_EXT:
+        //  WriteTrace(TraceGlitch, TraceWarning, "Framebuffer INCOMPLETE_DUPLICATE_ATTACHMENT\n");
+        //  break;
     case GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT:
-        WriteTrace(TraceGlitch, TraceWarning, "framebuffer INCOMPLETE_FORMATS\n");
+        WriteTrace(TraceGlitch, TraceWarning, "Framebuffer INCOMPLETE_FORMATS\n");
         break;
     case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT:
-        WriteTrace(TraceGlitch, TraceWarning, "framebuffer INCOMPLETE_DRAW_BUFFER\n");
+        WriteTrace(TraceGlitch, TraceWarning, "Framebuffer INCOMPLETE_DRAW_BUFFER\n");
         break;
     case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT:
-        WriteTrace(TraceGlitch, TraceWarning, "framebuffer INCOMPLETE_READ_BUFFER\n");
+        WriteTrace(TraceGlitch, TraceWarning, "Framebuffer INCOMPLETE_READ_BUFFER\n");
         break;
     case GL_FRAMEBUFFER_BINDING_EXT:
-        WriteTrace(TraceGlitch, TraceWarning, "framebuffer BINDING_EXT\n");
+        WriteTrace(TraceGlitch, TraceWarning, "Framebuffer BINDING_EXT\n");
         break;
     default:
         break;
-        /* programming error; will fail on all hardware */
-        /*assert(0);*/
+        // Programming error; will fail on all hardware
+        //assert(0);
     }
 }

@@ -333,7 +333,9 @@
 #define IDC_ENABLE_ENHANCEMENTS         1146
 #define IDC_USA                         1147
 #define IDC_R14_EDIT                    1147
+#define IDC_SHOW_STATUS_BAR             1147
 #define IDC_R15_EDIT                    1148
+#define IDC_EXIT_FULLSCREEN_ON_LOSE_FOCUS 1148
 #define IDC_SHELL_INT_TEXT              1149
 #define IDC_COUNTFACT                   1151
 #define IDC_MEMORY_SIZE_TEXT            1153
@@ -699,7 +701,6 @@
 #define IDC_STATUSBAR                   1572
 #define IDC_CMB_JUMP                    1573
 #define IDC_COPYTABREGISTERS_BTN        1574
-#define IDC_MEMORY_SIZE_NOTE            1574
 #define IDC_F0_LBL                      1575
 #define IDC_GAME_DIR                    1575
 #define IDC_F1_LBL                      1576

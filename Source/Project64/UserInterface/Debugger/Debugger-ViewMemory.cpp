@@ -10,20 +10,20 @@
 
 CDebugMemoryView::jump_item_t CDebugMemoryView::JumpItems[] = {
     { 0x80000000, 0x00000000, 0x0800000, "RDRAM" },
-    { 0xA3F00000, 0x03F00000, 0x0000028, "RDRAM Registers" },
+    { 0xA3F00000, 0x03F00000, 0x0000028, "RDRAM registers" },
     { 0xA4000000, 0x04000000, 0x0001000, "SP DMEM" },
     { 0xA4001000, 0x04001000, 0x0001000, "SP IMEM" },
-    { 0xA4040000, 0x04040000, 0x0000020, "SP Registers" },
-    { 0xA4080000, 0x04080000, 0x0000004, "SP PC Register" },
-    { 0xA4100000, 0x04100000, 0x0000020, "DP Control Registers" },
-    { 0xA4300000, 0x04300000, 0x0000010, "MI Registers" },
-    { 0xA4400000, 0x04400000, 0x0000038, "VI Registers" },
-    { 0xA4500000, 0x04500000, 0x0000018, "AI Registers" },
-    { 0xA4600000, 0x04600000, 0x0000034, "PI Registers" },
-    { 0xA4700000, 0x04700000, 0x0000020, "RI Registers" },
-    { 0xA4800000, 0x04800000, 0x0000010, "SI Registers" },
-    { 0xA5000500, 0x05000500, 0x000004C, "DD Registers" },
-    { 0xA8000000, 0x08000000, 0x1000000, "Cartridge Save Data" },
+    { 0xA4040000, 0x04040000, 0x0000020, "SP registers" },
+    { 0xA4080000, 0x04080000, 0x0000004, "SP PC register" },
+    { 0xA4100000, 0x04100000, 0x0000020, "DP control registers" },
+    { 0xA4300000, 0x04300000, 0x0000010, "MI registers" },
+    { 0xA4400000, 0x04400000, 0x0000038, "VI registers" },
+    { 0xA4500000, 0x04500000, 0x0000018, "AI registers" },
+    { 0xA4600000, 0x04600000, 0x0000034, "PI registers" },
+    { 0xA4700000, 0x04700000, 0x0000020, "RI registers" },
+    { 0xA4800000, 0x04800000, 0x0000010, "SI registers" },
+    { 0xA5000500, 0x05000500, 0x000004C, "DD registers" },
+    { 0xA8000000, 0x08000000, 0x1000000, "Cartridge save data" },
     { 0xB0000000, 0x10000000, 0xFC00000, "Cartridge ROM" },
     { 0xBFC00000, 0x1FC00000, 0x00007C0, "PIF ROM" },
     { 0xBFC007C0, 0x1FC007C0, 0x0000040, "PIF RAM" },
@@ -34,7 +34,7 @@ CDebugMemoryView::CDebugMemoryView(CDebuggerUI * debugger) :
     CDebugDialog<CDebugMemoryView>(debugger),
     CDialogResize<CDebugMemoryView>(),
     CToolTipDialog<CDebugMemoryView>(),
-    m_Breakpoints(NULL),
+    m_Breakpoints(nullptr),
     m_WriteTargetColorStride(0),
     m_ReadTargetColorStride(0),
     m_SymbolColorStride(0),
@@ -54,7 +54,7 @@ CDebugMemoryView::~CDebugMemoryView()
 
 void CDebugMemoryView::ShowAddress(uint32_t address, bool bVirtual)
 {
-    if (m_hWnd == NULL)
+    if (m_hWnd == nullptr)
     {
         return;
     }
@@ -268,7 +268,7 @@ void CDebugMemoryView::SetupJumpMenu(bool bVirtual)
     {
         jump_item_t* item = &JumpItems[i];
 
-        if (item->caption == NULL)
+        if (item->caption == nullptr)
         {
             break;
         }
@@ -283,7 +283,7 @@ int CDebugMemoryView::GetJumpItemIndex(uint32_t address, bool bVirtual)
 {
     for (int nItem = 0;; nItem++)
     {
-        if (JumpItems[nItem].caption == NULL)
+        if (JumpItems[nItem].caption == nullptr)
         {
             break;
         }
@@ -567,11 +567,11 @@ LRESULT CDebugMemoryView::OnHxCtrlKeyPressed(LPNMHDR lpNMHDR)
         m_Breakpoints->ClearMemLocks();
         break;
     case 'F':
-        // todo put selection in the textbox
+        // TODO: put selection in the textbox
         m_Debugger->OpenMemorySearch();
         break;
     case 'S':
-        // todo set start and end addrs to selection
+        // TODO: set start and end address to selection
         m_Debugger->OpenMemoryDump();
         break;
     case 'T':
@@ -606,7 +606,7 @@ LRESULT CDebugMemoryView::OnHxCtrlKeyPressed(LPNMHDR lpNMHDR)
 
 LRESULT CDebugMemoryView::OnHxSetNibble(LPNMHDR lpNMHDR)
 {
-    if (g_MMU == NULL)
+    if (g_MMU == nullptr)
     {
         return FALSE;
     }
@@ -645,7 +645,7 @@ LRESULT CDebugMemoryView::OnHxSetByte(LPNMHDR lpNMHDR)
 {
     NMHXSETBYTE* nmsb = reinterpret_cast<NMHXSETBYTE*>(lpNMHDR);
 
-    if (g_MMU == NULL)
+    if (g_MMU == nullptr)
     {
         return FALSE;
     }
@@ -706,7 +706,7 @@ LRESULT CDebugMemoryView::OnHxSelectionChanged(LPNMHDR /*lpNMHDR*/)
 
     uint32_t romAddr, offset;
     DMALOGENTRY* entry = m_Debugger->DMALog()->GetEntryByRamAddress(startAddress, &romAddr, &offset);
-    m_StatusBar.SetText(MEMSB_DMAINFO, entry != NULL ? L"Have DMA" : L"");
+    m_StatusBar.SetText(MEMSB_DMAINFO, entry != nullptr ? L"Have DMA" : L"");
 
     return FALSE;
 }
@@ -773,7 +773,7 @@ LRESULT CDebugMemoryView::OnHxGetByteInfo(LPNMHDR lpNMHDR)
         newByte->bkColor = BKCOLOR_DEFAULT;
         newByte->color = COLOR_DEFAULT;
 
-        if (m_bVirtualMemory && (g_MMU == NULL || !g_MMU->TranslateVaddr(address, paddress)))
+        if (m_bVirtualMemory && (g_MMU == nullptr || !g_MMU->TranslateVaddr(address, paddress)))
         {
             newByte->bValid = false;
             continue;
@@ -786,8 +786,8 @@ LRESULT CDebugMemoryView::OnHxGetByteInfo(LPNMHDR lpNMHDR)
             continue;
         }
 
-        // always use virtual addresses for breakpoint & symbol info
-        // todo should be the other way around
+        // Always use virtual addresses for breakpoint and symbol info
+        // TODO: should be the other way around
         uint32_t vaddress = m_bVirtualMemory ? address : address + 0x80000000;
 
         CSymbol symbol;
@@ -843,7 +843,7 @@ LRESULT CDebugMemoryView::OnHxGetByteInfo(LPNMHDR lpNMHDR)
             newByte->bkColor = m_SymbolColorPhase ? BKCOLOR_SYMBOL0 : BKCOLOR_SYMBOL1;
         }
 
-        if (g_Rom != NULL && paddress >= 0x10000000 && paddress < 0x10000000 + g_Rom->GetRomSize())
+        if (g_Rom != nullptr && paddress >= 0x10000000 && paddress < 0x10000000 + g_Rom->GetRomSize())
         {
             newByte->color = COLOR_READONLY;
         }
@@ -889,7 +889,7 @@ LRESULT CDebugMemoryView::OnHxRightClick(LPNMHDR lpNMHDR)
 
     m_ContextMenuAddress = nmrc->address;
 
-    HMENU hMenu = LoadMenu(GetModuleHandle(NULL), MAKEINTRESOURCE(IDR_MEM_BP_POPUP));
+    HMENU hMenu = LoadMenu(GetModuleHandle(nullptr), MAKEINTRESOURCE(IDR_MEM_BP_POPUP));
     HMENU hPopupMenu = GetSubMenu(hMenu, 0);
 
     bool bHaveLock = m_Breakpoints->MemLockExists(m_ContextMenuAddress, 1);
@@ -912,7 +912,7 @@ LRESULT CDebugMemoryView::OnHxRightClick(LPNMHDR lpNMHDR)
 
     POINT mouse;
     GetCursorPos(&mouse);
-    TrackPopupMenu(hPopupMenu, TPM_LEFTALIGN, mouse.x, mouse.y, 0, m_hWnd, NULL);
+    TrackPopupMenu(hPopupMenu, TPM_LEFTALIGN, mouse.x, mouse.y, 0, m_hWnd, nullptr);
     DestroyMenu(hMenu);
     return FALSE;
 }
@@ -938,7 +938,7 @@ LRESULT CDebugMemoryView::OnHxHotAddrChanged(LPNMHDR /*lpNMHDR*/)
 
 LRESULT CDebugMemoryView::OnHxBaseAddrChanged(LPNMHDR /*lpNMHDR*/)
 {
-    // address was updated from the control
+    // Address was updated from the control
     uint32_t address = m_HexEditCtrl.GetBaseAddress();
     m_bIgnoreAddressInput = true;
     m_MemAddr.SetValue(address, DisplayMode::ZeroExtend);
@@ -960,7 +960,7 @@ LRESULT CDebugMemoryView::OnHxPaste(LPNMHDR lpNMHDR)
 {
     NMHXPASTE *nmp = reinterpret_cast<NMHXPASTE*>(lpNMHDR);
 
-    if (g_MMU == NULL)
+    if (g_MMU == nullptr)
     {
         return FALSE;
     }
@@ -972,21 +972,18 @@ LRESULT CDebugMemoryView::OnHxPaste(LPNMHDR lpNMHDR)
 
     if (nmp->column == HX_COL_HEXDATA)
     {
-        char* data = NULL;
-        // todo move this function to some utility class
-        int length = CMemoryScanner::ParseHexString(NULL, text);
+        // TODO: move this function to some utility class
+        int length = CMemoryScanner::ParseHexString(nullptr, text);
 
         if (length != 0)
         {
-            data = (char*)malloc(length);
-            CMemoryScanner::ParseHexString(data, text);
+            std::unique_ptr<char[]> data = std::make_unique<char[]>(length);
+            CMemoryScanner::ParseHexString(data.get(), text);
 
             for (int i = 0; i < length; i++)
             {
-                SetByte(nmp->address + i, data[i]);
+                SetByte(nmp->address + i, data.get()[i]);
             }
-
-            free(data);
         }
 
         retDataLength = length;
@@ -1143,7 +1140,7 @@ void CDebugMemoryView::CloseTab(int nItem)
     {
         if (nItem == m_TabCtrl.GetItemCount() - 1)
         {
-            // last tab
+            // Last tab
             m_TabCtrl.SetCurSel(nItem - 1);
         }
         else if (nItem == nSelItem)
@@ -1187,12 +1184,12 @@ LRESULT CDebugMemoryView::OnStatusBarClick(LPNMHDR lpNMHDR)
         uint32_t romAddress, blockOffset;
         DMALOGENTRY* entry = m_Debugger->DMALog()->GetEntryByRamAddress(startAddress, &romAddress, &blockOffset);
 
-        if (entry == NULL)
+        if (entry == nullptr)
         {
             return FALSE;
         }
 
-        stdstr strDmaTitle = stdstr_f("DMA Information for 0x%08X", startAddress);
+        stdstr strDmaTitle = stdstr_f("DMA information for 0x%08X", startAddress);
         stdstr strDmaInfo = stdstr_f("Block:\nROM 0x%08X -> RAM 0x%08X ( 0x%X bytes )\n\nROM address of byte:\n0x%08X ( 0x%08X + 0x%08X )",
             entry->romAddr, entry->ramAddr, entry->length, romAddress, entry->romAddr, blockOffset);
         MessageBox(strDmaInfo.ToUTF16().c_str(), strDmaTitle.ToUTF16().c_str(), MB_OK);

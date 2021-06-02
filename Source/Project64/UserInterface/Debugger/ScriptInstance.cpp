@@ -37,7 +37,7 @@ CScriptInstance* CScriptInstance::FetchInstance(duk_context* ctx)
             return Cache[i];
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 CScriptInstance::CScriptInstance(CDebuggerUI* debugger)
@@ -46,11 +46,11 @@ CScriptInstance::CScriptInstance(CDebuggerUI* debugger)
     m_Ctx = duk_create_heap_default();
     m_ScriptSystem = m_Debugger->ScriptSystem();
     m_NextListenerId = 0;
-    m_hIOCompletionPort = CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, 0, 0);
+    m_hIOCompletionPort = CreateIoCompletionPort(INVALID_HANDLE_VALUE, nullptr, 0, 0);
     CacheInstance(this);
     m_hKernel = LoadLibraryA("Kernel32.dll");
-    m_CancelIoEx = NULL;
-    if (m_hKernel != NULL)
+    m_CancelIoEx = nullptr;
+    if (m_hKernel != nullptr)
     {
         m_CancelIoEx = (Dynamic_CancelIoEx)GetProcAddress(m_hKernel, "CancelIoEx");
     }
@@ -63,8 +63,8 @@ CScriptInstance::~CScriptInstance()
 
     TerminateThread(m_hThread, 0);
     CloseHandle(m_hThread);
-    m_CancelIoEx = NULL;
-    if (m_hKernel != NULL)
+    m_CancelIoEx = nullptr;
+    if (m_hKernel != nullptr)
     {
         FreeLibrary(m_hKernel);
     }
@@ -73,7 +73,7 @@ CScriptInstance::~CScriptInstance()
 void CScriptInstance::Start(char* path)
 {
     m_TempPath = path;
-    CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)StartThread, this, 0, NULL);
+    CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)StartThread, this, 0, nullptr);
 }
 
 void CScriptInstance::ForceStop()
@@ -105,7 +105,7 @@ void CScriptInstance::SetState(INSTANCE_STATE state)
 
 void CScriptInstance::StateChanged()
 {
-    // todo mutex might be needed here
+    // TODO: mutex might be needed here
 
     m_Debugger->Debug_RefreshScriptsWindow();
     //m_ScriptSystem->DeleteStoppedInstances();
@@ -136,7 +136,7 @@ void CScriptInstance::StartScriptProc()
 
     if (apiresult != 0)
     {
-        MessageBox(NULL, stdstr(duk_safe_to_string(ctx, -1)).ToUTF16().c_str(), L"API Script Error", MB_OK | MB_ICONERROR);
+        MessageBox(nullptr, stdstr(duk_safe_to_string(ctx, -1)).ToUTF16().c_str(), L"API Script Error", MB_OK | MB_ICONERROR);
         return;
     }
 
@@ -144,12 +144,12 @@ void CScriptInstance::StartScriptProc()
     {
         stdstr fullPath = stdstr_f("Scripts/%s", m_TempPath);
         duk_int_t scriptresult = duk_peval_file(ctx, fullPath.c_str());
-        m_TempPath = NULL;
+        m_TempPath = nullptr;
 
         if (scriptresult != 0)
         {
             const char* errorText = duk_safe_to_string(ctx, -1);
-            //MessageBox(NULL, duk_safe_to_string(ctx, -1), "Script error", MB_OK | MB_ICONWARNING);
+            //MessageBox(nullptr, duk_safe_to_string(ctx, -1), "Script error", MB_OK | MB_ICONWARNING);
             m_Debugger->Debug_LogScriptsWindow(errorText);
             m_Debugger->Debug_LogScriptsWindow("\r\n");
             SetState(STATE_STOPPED);
@@ -179,7 +179,7 @@ void CScriptInstance::StartEventLoop()
 {
     SetState(STATE_RUNNING);
 
-    // Todo interrupt with an apc when an event is removed and event count is 0
+    // TODO: interrupt with an APC when an event is removed and event count is 0
     while (HaveEvents())
     {
         IOLISTENER* lpListener;
@@ -219,7 +219,7 @@ CScriptInstance::WaitForEvent(IOLISTENER** lpListener)
 
     if (!status)
     {
-        *lpListener = NULL;
+        *lpListener = nullptr;
         DWORD errorCode = GetLastError();
         if (errorCode == STATUS_USER_APC)
         {
@@ -300,7 +300,7 @@ void CScriptInstance::CloseAllAsyncFiles()
 
 void CScriptInstance::RemoveAsyncFile(HANDLE fd)
 {
-    // Stop tracking an fd and remove all of its listeners
+    // Stop tracking an FD and remove all of its listeners
     for (uint32_t i = 0; i < m_AsyncFiles.size(); i++)
     {
         IOFD iofd = m_AsyncFiles[i];
@@ -317,7 +317,7 @@ void CScriptInstance::RemoveAsyncFile(HANDLE fd)
 
 HANDLE CScriptInstance::CreateSocket()
 {
-    HANDLE fd = (HANDLE)WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
+    HANDLE fd = (HANDLE)WSASocket(AF_INET, SOCK_STREAM, 0, nullptr, 0, WSA_FLAG_OVERLAPPED);
     AddAsyncFile(fd, true);
     return fd;
 }
@@ -344,21 +344,22 @@ void CScriptInstance::RemoveListenerByIndex(UINT index)
 {
     IOLISTENER* lpListener = m_Listeners[index];
 
-    if (lpListener->data != NULL)
+    if (lpListener->data != nullptr)
     {
         free(lpListener->data);
     }
 
     // Original call to CancelIoEx:
     //CancelIoEx(lpListener->fd, (LPOVERLAPPED)lpListener);
-    if (m_CancelIoEx != NULL)
+    if (m_CancelIoEx != nullptr)
     {
         m_CancelIoEx(lpListener->fd, (LPOVERLAPPED)lpListener);
     }
     else
     {
+		// TODO: Remove/fix?
         // This isn't a good replacement and the script aspects of the debugger shouldn't
-        // be used in WindowsXP
+        // be used in Windows XP
         CancelIo(lpListener->fd);
     }
 
@@ -367,7 +368,7 @@ void CScriptInstance::RemoveListenerByIndex(UINT index)
     m_Listeners.erase(m_Listeners.begin() + index);
 }
 
-// Free listener & its buffer, remove from list
+// Free listener and its buffer, remove from list
 void CScriptInstance::RemoveListener(IOLISTENER* lpListener)
 {
     for (UINT i = 0; i < m_Listeners.size(); i++)
@@ -395,7 +396,7 @@ void CScriptInstance::InvokeListenerCallback(IOLISTENER* lpListener)
 {
     CGuard guard(m_CS);
 
-    if (lpListener->callback == NULL)
+    if (lpListener->callback == nullptr)
     {
         return;
     }
@@ -415,19 +416,19 @@ void CScriptInstance::InvokeListenerCallback(IOLISTENER* lpListener)
         }
         else
         {
-            // handle must have closed, safe to untrack fd and remove all associated listeners
+            // Handle must have closed, safe to untrack FD and remove all associated listeners
             RemoveAsyncFile(lpListener->fd);
 
-            // pass null to callback
+            // Pass null to callback
             duk_push_null(m_Ctx);
         }
         break;
     case EVENT_WRITE:
         nargs = 1;
-        duk_push_uint(m_Ctx, lpListener->dataLen); // num bytes written
+        duk_push_uint(m_Ctx, lpListener->dataLen); // Number of bytes written
         break;
     case EVENT_ACCEPT:
-        // pass client socket fd to callback
+        // Pass client socket FD to callback
         nargs = 1;
         duk_push_uint(m_Ctx, (UINT)lpListener->childFd);
         break;
@@ -441,7 +442,7 @@ void CScriptInstance::InvokeListenerCallback(IOLISTENER* lpListener)
     if (status != DUK_EXEC_SUCCESS)
     {
         const char* msg = duk_safe_to_string(m_Ctx, -1);
-        MessageBox(NULL, stdstr(msg).ToUTF16().c_str(), L"Script error", MB_OK | MB_ICONWARNING);
+        MessageBox(nullptr, stdstr(msg).ToUTF16().c_str(), L"Script error", MB_OK | MB_ICONWARNING);
     }
 
     duk_pop(m_Ctx);
@@ -451,11 +452,11 @@ const char* CScriptInstance::Eval(const char* jsCode)
 {
     CGuard guard(m_CS);
     int result = duk_peval_string(m_Ctx, jsCode);
-    const char* msg = NULL;
+    const char* msg = nullptr;
 
     if (result != 0)
     {
-        MessageBox(NULL, stdstr(msg).ToUTF16().c_str(), L"Script error", MB_OK | MB_ICONWARNING);
+        MessageBox(nullptr, stdstr(msg).ToUTF16().c_str(), L"Script error", MB_OK | MB_ICONWARNING);
     }
     else
     {
@@ -470,7 +471,7 @@ bool CScriptInstance::AddFile(const char* path, const char* mode, int* fd)
 {
     FILE* fp = fopen(path, mode);
 
-    if (fp == NULL)
+    if (fp == nullptr)
     {
         return false;
     }
@@ -524,7 +525,7 @@ FILE* CScriptInstance::GetFilePointer(int fd)
             return filefd->fp;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 const char* CScriptInstance::EvalFile(const char* jsPath)
@@ -533,7 +534,7 @@ const char* CScriptInstance::EvalFile(const char* jsPath)
     const char* msg = duk_safe_to_string(m_Ctx, -1);
     if (result != 0)
     {
-        MessageBox(NULL, stdstr(msg).ToUTF16().c_str(), stdstr(jsPath).ToUTF16().c_str(), MB_OK | MB_ICONWARNING);
+        MessageBox(nullptr, stdstr(msg).ToUTF16().c_str(), stdstr(jsPath).ToUTF16().c_str(), MB_OK | MB_ICONWARNING);
     }
     duk_pop(m_Ctx);
     return msg;
@@ -578,14 +579,12 @@ void CScriptInstance::Invoke2(void* heapptr, uint32_t param, uint32_t param2)
 
 void CScriptInstance::QueueAPC(PAPCFUNC userProc, ULONG_PTR param)
 {
-    if (m_hThread != NULL)
+    if (m_hThread != nullptr)
     {
-        MessageBox(NULL, L"apc queued", L"", MB_OK);
+        MessageBox(nullptr, L"APC queued", L"", MB_OK);
         QueueUserAPC(userProc, m_hThread, param);
     }
 }
-
-/****************************/
 
 duk_ret_t CScriptInstance::js_ioSockConnect(duk_context* ctx)
 {
@@ -612,7 +611,7 @@ duk_ret_t CScriptInstance::js_ioSockConnect(duk_context* ctx)
     ::bind((SOCKET)fd, (SOCKADDR*)&clientAddr, sizeof(SOCKADDR));
 
     IOLISTENER* lpListener = _this->AddListener(fd, EVENT_CONNECT, callback);
-    ConnectEx((SOCKET)fd, (SOCKADDR*)&serverAddr, sizeof(SOCKADDR), NULL, 0, NULL, (LPOVERLAPPED)lpListener);
+    ConnectEx((SOCKET)fd, (SOCKADDR*)&serverAddr, sizeof(SOCKADDR), nullptr, 0, nullptr, (LPOVERLAPPED)lpListener);
 
     duk_pop_n(ctx, 4);
     return 1;
@@ -668,7 +667,7 @@ duk_ret_t CScriptInstance::js_ioSockAccept(duk_context* ctx)
     HANDLE fd = (HANDLE)duk_get_uint(ctx, 0);
     void* jsCallback = duk_get_heapptr(ctx, 1);
 
-    void* data = malloc(sizeof(SOCKADDR) * 4); // issue?
+    void* data = malloc(sizeof(SOCKADDR) * 4); // Issue?
 
     IOLISTENER* lpListener = _this->AddListener(fd, EVENT_ACCEPT, jsCallback, data, 0);
 
@@ -678,11 +677,11 @@ duk_ret_t CScriptInstance::js_ioSockAccept(duk_context* ctx)
     int ok = AcceptEx(
         (SOCKET)fd,
         (SOCKET)lpListener->childFd,
-        lpListener->data, // local and remote SOCKADDR
+        lpListener->data, // Local and remote SOCKADDR
         0,
         sizeof(SOCKADDR_IN) + 16,
         sizeof(SOCKADDR_IN) + 16,
-        NULL,
+        nullptr,
         (LPOVERLAPPED)lpListener
     );
 
@@ -706,14 +705,14 @@ duk_ret_t CScriptInstance::js_ioRead(duk_context* ctx)
     size_t bufferSize = duk_get_uint(ctx, 1);
     void* jsCallback = duk_get_heapptr(ctx, 2);
 
-    void* data = malloc(bufferSize); // freed after event is fired
+    void* data = malloc(bufferSize); // Freed after event is fired
 
     IOLISTENER* lpListener = _this->AddListener(fd, EVENT_READ, jsCallback, data, bufferSize);
-    BOOL status = ReadFile(fd, lpListener->data, lpListener->dataLen, NULL, (LPOVERLAPPED)lpListener);
+    BOOL status = ReadFile(fd, lpListener->data, lpListener->dataLen, nullptr, (LPOVERLAPPED)lpListener);
 
     if (status == false && GetLastError() != ERROR_IO_PENDING)
     {
-        MessageBox(NULL, L"readex error", L"", MB_OK);
+        MessageBox(nullptr, L"readex error", L"", MB_OK);
     }
 
     duk_pop_n(ctx, 3);
@@ -729,12 +728,12 @@ duk_ret_t CScriptInstance::js_ioWrite(duk_context* ctx)
     void* jsData = duk_to_buffer(ctx, 1, &dataLen);
     void* jsCallback = duk_get_heapptr(ctx, 2);
 
-    char* data = (char*)malloc(dataLen + 1); // freed after event is fired
+    char* data = (char*)malloc(dataLen + 1); // Freed after event is fired
     memcpy(data, jsData, dataLen);
     data[dataLen] = '\0';
 
     IOLISTENER* lpListener = _this->AddListener(fd, EVENT_WRITE, jsCallback, data, dataLen);
-    WriteFile(fd, lpListener->data, lpListener->dataLen, NULL, (LPOVERLAPPED)lpListener);
+    WriteFile(fd, lpListener->data, lpListener->dataLen, nullptr, (LPOVERLAPPED)lpListener);
 
     duk_pop_n(ctx, 3);
     return 1;
@@ -766,7 +765,7 @@ duk_ret_t CScriptInstance::js_AddCallback(duk_context* ctx)
     int callbackId = -1;
 
     CScriptHook* hook = _this->m_ScriptSystem->GetHook(hookId);
-    if (hook != NULL)
+    if (hook != nullptr)
     {
         callbackId = hook->Add(_this, heapptr, param, param2, param3, param4, bOnce);
     }
@@ -986,12 +985,12 @@ duk_ret_t CScriptInstance::js_GetROMInt(duk_context* ctx)
 
     duk_pop_n(ctx, 3);
 
-    if (g_Rom == NULL)
+    if (g_Rom == nullptr)
     {
         goto return_err;
     }
 
-    uint8_t* rom = g_Rom->GetRomAddress(); // little endian
+    uint8_t* rom = g_Rom->GetRomAddress(); // Little endian
     uint32_t romSize = g_Rom->GetRomSize();
 
     if (address > romSize)
@@ -1055,12 +1054,12 @@ duk_ret_t CScriptInstance::js_GetROMFloat(duk_context* ctx)
 
     duk_pop_n(ctx, argc);
 
-    if (g_Rom == NULL)
+    if (g_Rom == nullptr)
     {
         goto return_err;
     }
 
-    uint8_t* rom = g_Rom->GetRomAddress(); // little endian
+    uint8_t* rom = g_Rom->GetRomAddress(); // Little endian
     uint32_t romSize = g_Rom->GetRomSize();
 
     if (address > romSize)
@@ -1100,7 +1099,7 @@ duk_ret_t CScriptInstance::js_GetRDRAMInt(duk_context* ctx)
 
     duk_pop_n(ctx, 3);
 
-    if (g_MMU == NULL)
+    if (g_MMU == nullptr)
     {
         goto return_err;
     }
@@ -1168,7 +1167,7 @@ duk_ret_t CScriptInstance::js_SetRDRAMInt(duk_context* ctx)
 
     duk_pop_n(ctx, 3);
 
-    if (g_MMU == NULL)
+    if (g_MMU == nullptr)
     {
         goto return_err;
     }
@@ -1221,7 +1220,7 @@ duk_ret_t CScriptInstance::js_GetRDRAMFloat(duk_context* ctx)
 
     duk_pop_n(ctx, argc);
 
-    if (g_MMU == NULL)
+    if (g_MMU == nullptr)
     {
         goto return_err;
     }
@@ -1274,7 +1273,7 @@ duk_ret_t CScriptInstance::js_SetRDRAMFloat(duk_context* ctx)
 
     duk_pop_n(ctx, argc);
 
-    if (g_MMU == NULL)
+    if (g_MMU == nullptr)
     {
         goto return_err;
     }
@@ -1316,7 +1315,7 @@ duk_ret_t CScriptInstance::js_GetRDRAMBlock(duk_context* ctx)
 
     duk_pop_n(ctx, 2);
 
-    if (g_MMU == NULL)
+    if (g_MMU == nullptr)
     {
         duk_push_boolean(ctx, false);
         return 1;
@@ -1344,14 +1343,14 @@ duk_ret_t CScriptInstance::js_MsgBox(duk_context* ctx)
         caption = duk_to_string(ctx, 1);
     }
 
-    MessageBox(NULL, stdstr(msg).ToUTF16().c_str(), stdstr(caption).ToUTF16().c_str(), MB_OK);
+    MessageBox(nullptr, stdstr(msg).ToUTF16().c_str(), stdstr(caption).ToUTF16().c_str(), MB_OK);
 
     duk_pop_n(ctx, argc);
     duk_push_boolean(ctx, 1);
     return 1;
 }
 
-// Return zero-terminated string from ram
+// Return zero-terminated string from RAM
 duk_ret_t CScriptInstance::js_GetRDRAMString(duk_context* ctx)
 {
     CScriptInstance* _this = FetchInstance(ctx);
@@ -1373,8 +1372,8 @@ duk_ret_t CScriptInstance::js_GetRDRAMString(duk_context* ctx)
     uint8_t test = 0xFF;
     int len = 0;
 
-    // determine length of string
-    while (len < maxLen && _this->m_Debugger->DebugLoad_VAddr(address + len, test) && test != 0) // todo protect from ram overrun
+    // Determine length of string
+    while (len < maxLen && _this->m_Debugger->DebugLoad_VAddr(address + len, test) && test != 0) // TODO: protect from RAM overrun
     {
         if ((address & 0xFFFFFF) + len >= g_MMU->RdramSize())
         {
@@ -1394,11 +1393,11 @@ duk_ret_t CScriptInstance::js_GetRDRAMString(duk_context* ctx)
 
     duk_pop_n(ctx, nargs);
     duk_push_string(ctx, (char*)str);
-    free(str); // duk creates internal copy
+    free(str); // Duk creates internal copy
     return 1;
 }
 
-// Return zero-terminated string from rom
+// Return zero-terminated string from ROM
 duk_ret_t CScriptInstance::js_GetROMString(duk_context* ctx)
 {
     // (address[, maxLen])
@@ -1444,11 +1443,11 @@ duk_ret_t CScriptInstance::js_GetROMString(duk_context* ctx)
 
     duk_pop(ctx);
     duk_push_string(ctx, str);
-    free(str); // duk creates internal copy
+    free(str); // Duk creates internal copy
     return 1;
 }
 
-// Return zero-terminated string from rom
+// Return zero-terminated string from ROM
 duk_ret_t CScriptInstance::js_GetROMBlock(duk_context* ctx)
 {
     uint32_t address = duk_get_uint(ctx, 0);
@@ -1607,7 +1606,7 @@ duk_ret_t CScriptInstance::js_FSWrite(duk_context* ctx)
 
     FILE* fp = _this->GetFilePointer(fd);
 
-    if (fp == NULL)
+    if (fp == nullptr)
     {
         goto end;
     }
@@ -1619,7 +1618,7 @@ duk_ret_t CScriptInstance::js_FSWrite(duk_context* ctx)
     
     if (duk_is_string(ctx, 1))
     {
-        // string
+        // String
         const char* str = duk_get_string(ctx, 1);
         length = strlen(str);
 
@@ -1627,10 +1626,10 @@ duk_ret_t CScriptInstance::js_FSWrite(duk_context* ctx)
     }
     else
     {
-        // buffer
+        // Buffer
         buffer = (const char*)duk_get_buffer_data(ctx, 1, &length);
         
-        if (buffer == NULL)
+        if (buffer == nullptr)
         {
             goto end;
         }
@@ -1695,7 +1694,7 @@ duk_ret_t CScriptInstance::js_FSRead(duk_context* ctx)
 
     FILE* fp = _this->GetFilePointer(fd);
 
-    if (fp == NULL)
+    if (fp == nullptr)
     {
         goto end;
     }
@@ -1753,7 +1752,7 @@ duk_ret_t CScriptInstance::js_FSFStat(duk_context* ctx)
         { "atimeMs",  (duk_double_t)statbuf.st_atime * 1000 },
         { "mtimeMs",  (duk_double_t)statbuf.st_mtime * 1000 },
         { "ctimeMs",  (duk_double_t)statbuf.st_ctime * 1000 },
-        { NULL, 0 }
+        { nullptr, 0 }
     };
     
     duk_put_number_list(ctx, obj_idx, props);
@@ -1799,7 +1798,7 @@ duk_ret_t CScriptInstance::js_FSStat(duk_context* ctx)
         { "atimeMs",  (duk_double_t)statbuf.st_atime * 1000 },
         { "mtimeMs",  (duk_double_t)statbuf.st_mtime * 1000 },
         { "ctimeMs",  (duk_double_t)statbuf.st_ctime * 1000 },
-        { NULL, 0 }
+        { nullptr, 0 }
     };
 
     duk_put_number_list(ctx, obj_idx, props);
@@ -1820,7 +1819,7 @@ duk_ret_t CScriptInstance::js_FSMkDir(duk_context* ctx)
 
     duk_pop_n(ctx, nargs);
 
-    if (CreateDirectoryA(path, NULL))
+    if (CreateDirectoryA(path, nullptr))
     {
         duk_push_true(ctx);
     }
@@ -1930,12 +1929,10 @@ duk_ret_t CScriptInstance::js_FSReadDir(duk_context* ctx)
     return 1;
 }
 
-////////////
-
 static BOOL ConnectEx(SOCKET s, const SOCKADDR* name, int namelen, PVOID lpSendBuffer,
     DWORD dwSendDataLength, LPDWORD lpdwBytesSent, LPOVERLAPPED lpOverlapped)
 {
-    LPFN_CONNECTEX ConnectExPtr = NULL;
+    LPFN_CONNECTEX ConnectExPtr = nullptr;
     DWORD nBytes;
     GUID guid = WSAID_CONNECTEX;
     int fetched = WSAIoctl(
@@ -1946,11 +1943,11 @@ static BOOL ConnectEx(SOCKET s, const SOCKADDR* name, int namelen, PVOID lpSendB
         &ConnectExPtr,
         sizeof(LPFN_CONNECTEX),
         &nBytes,
-        NULL,
-        NULL
+        nullptr,
+        nullptr
     );
 
-    if (fetched == 0 && ConnectExPtr != NULL)
+    if (fetched == 0 && ConnectExPtr != nullptr)
     {
         ConnectExPtr(s, name, namelen, lpSendBuffer, dwSendDataLength, lpdwBytesSent, lpOverlapped);
     }

@@ -16,9 +16,9 @@ public:
     bool SetupRegisterForLoop();
 
 private:
-    LoopAnalysis();                               // Disable default constructor
-    LoopAnalysis(const LoopAnalysis&);            // Disable copy constructor
-    LoopAnalysis& operator=(const LoopAnalysis&); // Disable assignment
+    LoopAnalysis();
+    LoopAnalysis(const LoopAnalysis&);
+    LoopAnalysis& operator=(const LoopAnalysis&);
 
     bool SetupEnterSection(CCodeSection * Section, bool & bChanged, bool & bSkipedSection);
     bool CheckLoopRegisterUsage(CCodeSection * Section);
@@ -26,7 +26,7 @@ private:
     void SetJumpRegSet(CCodeSection * Section, const CRegInfo &Reg);
     void SetContinueRegSet(CCodeSection * Section, const CRegInfo &Reg);
 
-    /********************** R4300i OpCodes: Special **********************/
+    // R4300i opcodes: Special
     void SPECIAL_SLL();
     void SPECIAL_SRL();
     void SPECIAL_SRA();

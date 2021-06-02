@@ -1,9 +1,10 @@
 // Project64 - A Nintendo 64 emulator
-// http://www.pj64-emu.com/
+// https://www.pj64-emu.com/
 // Copyright(C) 2001-2021 Project64
 // Copyright(C) 2003-2009 Sergey 'Gonetz' Lipski
 // Copyright(C) 2002 Dave2001
 // GNU/GPLv2 licensed: https://gnu.org/licenses/gpl-2.0.html
+
 #ifdef _WIN32
 #include <windows.h>
 #else // _WIN32
@@ -15,7 +16,7 @@
 #include <Project64-video/Renderer/Renderer.h>
 
 int TMU_SIZE = 8 * 2048 * 2048;
-static unsigned char* texture = NULL;
+static unsigned char* texture = nullptr;
 
 int packed_pixels_support = -1;
 int ati_sucks = -1;
@@ -40,7 +41,7 @@ typedef struct _texlist
 } texlist;
 
 static int nbTex = 0;
-static texlist *list = NULL;
+static texlist *list = nullptr;
 
 #ifdef _WIN32
 extern PFNGLDELETERENDERBUFFERSEXTPROC glDeleteRenderbuffersEXT;
@@ -53,7 +54,7 @@ void remove_tex(unsigned int idmin, unsigned int idmax)
     int n = 0;
     texlist *aux = list;
     int sz = nbTex;
-    if (aux == NULL) return;
+    if (aux == nullptr) return;
     t = (unsigned int*)malloc(sz * sizeof(int));
     while (aux && aux->id >= idmin && aux->id < idmax)
     {
@@ -65,7 +66,7 @@ void remove_tex(unsigned int idmin, unsigned int idmax)
         list = aux;
         nbTex--;
     }
-    while (aux != NULL && aux->next != NULL)
+    while (aux != nullptr && aux->next != nullptr)
     {
         if (aux->next->id >= idmin && aux->next->id < idmax)
         {
@@ -89,7 +90,7 @@ void add_tex(unsigned int id)
     texlist *aux = list;
     texlist *aux2;
     //printf("ADDTEX nbtex is now %d (%06x)\n", nbTex, id);
-    if (list == NULL || id < list->id)
+    if (list == nullptr || id < list->id)
     {
         nbTex++;
         list = (texlist*)malloc(sizeof(texlist));
@@ -97,9 +98,9 @@ void add_tex(unsigned int id)
         list->id = id;
         return;
     }
-    while (aux->next != NULL && aux->next->id < id) aux = aux->next;
-    // ZIGGY added this test so that add_tex now accept re-adding an existing texture
-    if (aux->next != NULL && aux->next->id == id) return;
+    while (aux->next != nullptr && aux->next->id < id) aux = aux->next;
+    // (Comment by Ziggy) Added this test so that add_tex now accepts re-adding an existing texture
+    if (aux->next != nullptr && aux->next->id == id) return;
     nbTex++;
     aux2 = aux->next;
     aux->next = (texlist*)malloc(sizeof(texlist));
@@ -110,7 +111,7 @@ void add_tex(unsigned int id)
 void init_textures()
 {
     tex0_width = tex0_height = tex1_width = tex1_height = 2;
-    // ZIGGY because remove_tex isn't called (Pj64 doesn't like it), it's better
+    // TODO: (Comment by Ziggy) Because remove_tex isn't called (Project64 doesn't like it), it's better
     // to leave these so that they'll be reused (otherwise we have a memory leak)
     // 	list = NULL;
     // 	nbTex = 0;
@@ -121,12 +122,12 @@ void init_textures()
 void free_textures()
 {
 #ifndef WIN32
-    // ZIGGY for some reasons, Pj64 doesn't like remove_tex on exit
+    // (Comment by Ziggy) For some reasons, Project64 doesn't like remove_tex on exit
     remove_tex(0x00000000, 0xFFFFFFFF);
 #endif
-    if (texture != NULL) {
+    if (texture != nullptr) {
         free(texture);
-        texture = NULL;
+        texture = nullptr;
     }
 }
 
@@ -146,7 +147,7 @@ uint32_t gfxTexTextureMemRequired(uint32_t evenOdd, gfxTexInfo *info)
 {
     WriteTrace(TraceGlitch, TraceDebug, "evenOdd = %d", evenOdd);
     int width, height;
-    if (info->largeLodLog2 != info->smallLodLog2) WriteTrace(TraceGlitch, TraceWarning, "gfxTexTextureMemRequired : loading more than one LOD");
+    if (info->largeLodLog2 != info->smallLodLog2) WriteTrace(TraceGlitch, TraceWarning, "gfxTexTextureMemRequired: Loading more than one LOD");
 
     if (info->aspectRatioLog2 < 0)
     {
@@ -184,7 +185,7 @@ uint32_t gfxTexTextureMemRequired(uint32_t evenOdd, gfxTexInfo *info)
     case GFX_TEXFMT_ARGB_CMP_FXT1:
         return ((((width + 0x7)&~0x7)*((height + 0x3)&~0x3)) >> 1);
     default:
-        WriteTrace(TraceGlitch, TraceWarning, "gfxTexTextureMemRequired : unknown texture format: %x", info->format);
+        WriteTrace(TraceGlitch, TraceWarning, "gfxTexTextureMemRequired: Unknown texture format: %x", info->format);
     }
     return 0;
 }
@@ -193,7 +194,7 @@ uint32_t gfxTexCalcMemRequired(gfxLOD_t lodmin, gfxLOD_t lodmax, gfxAspectRatio_
 {
     WriteTrace(TraceGlitch, TraceDebug, "lodmin = %d, lodmax: %d aspect: %d fmt: %d", lodmin, lodmax, aspect, fmt);
     int width, height;
-    if (lodmax != lodmin) WriteTrace(TraceGlitch, TraceWarning, "gfxTexCalcMemRequired : loading more than one LOD");
+    if (lodmax != lodmin) WriteTrace(TraceGlitch, TraceWarning, "gfxTexCalcMemRequired: Loading more than one LOD");
 
     if (aspect < 0)
     {
@@ -231,7 +232,7 @@ uint32_t gfxTexCalcMemRequired(gfxLOD_t lodmin, gfxLOD_t lodmax, gfxAspectRatio_
     case GFX_TEXFMT_ARGB_CMP_FXT1:
         return ((((width + 0x7)&~0x7)*((height + 0x3)&~0x3)) >> 1);
     default:
-        WriteTrace(TraceGlitch, TraceWarning, "gfxTexTextureMemRequired : unknown texture format: %x", fmt);
+        WriteTrace(TraceGlitch, TraceWarning, "gfxTexTextureMemRequired: Unknown texture format: %x", fmt);
     }
     return 0;
 }
@@ -275,7 +276,7 @@ int grTexFormatSize(int fmt)
         factor = 8;
         break;
     default:
-        WriteTrace(TraceGlitch, TraceWarning, "grTexFormatSize : unknown texture format: %x", fmt);
+        WriteTrace(TraceGlitch, TraceWarning, "grTexFormatSize: Unknown texture format: %x", fmt);
     }
     return factor;
 }
@@ -338,7 +339,7 @@ int grTexFormat2GLPackedFmt(int fmt, int * gltexfmt, int * glpixfmt, int * glpac
         // HACKALERT: 3Dfx Glide uses GFX_TEXFMT_ARGB_CMP_DXT1 for both opaque DXT1 and DXT1 with 1bit alpha.
         // GlideHQ compiled with GLIDE64_DXTN option enabled, uses opaqe DXT1 only.
         factor = 8; // HACKALERT: factor holds block bytes
-        *gltexfmt = GL_COMPRESSED_RGB_S3TC_DXT1_EXT; // these variables aren't used
+        *gltexfmt = GL_COMPRESSED_RGB_S3TC_DXT1_EXT; // These variables aren't used
         *glpixfmt = GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
         *glpackfmt = GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
         break;
@@ -358,10 +359,10 @@ int grTexFormat2GLPackedFmt(int fmt, int * gltexfmt, int * glpixfmt, int * glpac
         factor = 8;
         *gltexfmt = GL_COMPRESSED_RGBA_FXT1_3DFX;
         *glpixfmt = GL_COMPRESSED_RGBA_FXT1_3DFX;
-        *glpackfmt = GL_COMPRESSED_RGBA_FXT1_3DFX; // XXX: what should we do about GL_COMPRESSED_RGB_FXT1_3DFX?
+        *glpackfmt = GL_COMPRESSED_RGBA_FXT1_3DFX; // What should we do about GL_COMPRESSED_RGB_FXT1_3DFX?
         break;
       default:
-        WriteTrace(TraceGlitch, TraceWarning, "grTexFormat2GLPackedFmt : unknown texture format: %x", fmt);
+        WriteTrace(TraceGlitch, TraceWarning, "grTexFormat2GLPackedFmt: Unknown texture format: %x", fmt);
       }
       return factor;
     */
@@ -374,7 +375,7 @@ void gfxTexDownloadMipMap(gfxChipID_t tmu, uint32_t startAddress, gfxMipMapLevel
     int factor;
     int glformat = 0;
     int gltexfmt, glpixfmt, glpackfmt;
-    if (info->largeLodLog2 != info->smallLodLog2) WriteTrace(TraceGlitch, TraceWarning, "gfxTexDownloadMipMap : loading more than one LOD");
+    if (info->largeLodLog2 != info->smallLodLog2) WriteTrace(TraceGlitch, TraceWarning, "gfxTexDownloadMipMap: Loading more than one LOD");
 
     if (info->aspectRatioLog2 < 0)
     {
@@ -437,7 +438,7 @@ void gfxTexDownloadMipMap(gfxChipID_t tmu, uint32_t startAddress, gfxMipMapLevel
                 {
                     unsigned int texel = (unsigned int)((unsigned char*)info->data)[m];
 #if 1
-                    /* accurate conversion */
+                    // Accurate conversion
                     unsigned int texel_hi = (texel & 0x000000F0) << 20;
                     unsigned int texel_low = texel & 0x0000000F;
                     texel_low |= (texel_low << 4);
@@ -466,7 +467,7 @@ void gfxTexDownloadMipMap(gfxChipID_t tmu, uint32_t startAddress, gfxMipMapLevel
                     unsigned int G = texel & 0x000007E0;
                     unsigned int R = texel & 0x0000001F;
 #if 0
-                    /* accurate conversion */
+                    // Accurate conversion
                     ((unsigned int*)texture)[n] = 0xFF000000 | (R << 19) | ((R >> 2) << 16) | (G << 5) | ((G >> 9) << 8) | (B >> 8) | (B >> 13);
 #else
                     ((unsigned int*)texture)[n] = 0xFF000000 | (R << 19) | (G << 5) | (B >> 8);
@@ -489,7 +490,7 @@ void gfxTexDownloadMipMap(gfxChipID_t tmu, uint32_t startAddress, gfxMipMapLevel
                     unsigned int G = texel & 0x000003E0;
                     unsigned int R = texel & 0x0000001F;
 #if 0
-                    /* accurate conversion */
+                    // Accurate conversion
                     ((unsigned int*)texture)[n] = A | (R << 19) | ((R >> 2) << 16) | (G << 6) | ((G >> 8) << 8) | (B >> 7) | (B >> 12);
 #else
                     ((unsigned int*)texture)[n] = A | (R << 19) | (G << 6) | (B >> 7);
@@ -528,7 +529,7 @@ void gfxTexDownloadMipMap(gfxChipID_t tmu, uint32_t startAddress, gfxMipMapLevel
                     unsigned int G = texel & 0x000000F0;
                     unsigned int R = texel & 0x0000000F;
 #if 0
-                    /* accurate conversion */
+                    // Accurate conversion
                     ((unsigned int*)texture)[n] = (A << 16) | (A << 12) | (R << 20) | (R << 16) | (G << 8) | (G << 4) | (B >> 4) | (B >> 8);
 #else
                     ((unsigned int*)texture)[n] = (A << 16) | (R << 20) | (G << 8) | (B >> 4);
@@ -577,7 +578,7 @@ void gfxTexDownloadMipMap(gfxChipID_t tmu, uint32_t startAddress, gfxMipMapLevel
                   break;
             */
         default:
-            WriteTrace(TraceGlitch, TraceWarning, "gfxTexDownloadMipMap : unknown texture format: %x", info->format);
+            WriteTrace(TraceGlitch, TraceWarning, "gfxTexDownloadMipMap: Unknown texture format: %x", info->format);
             factor = 0;
         }
     }
@@ -693,7 +694,7 @@ void gfxTexDetailControl(gfxChipID_t tmu, int lod_bias, uint8_t detail_scale, fl
     {
         if (!lod_bias && !detail_scale && !detail_max) return;
         else
-            WriteTrace(TraceGlitch, TraceWarning, "gfxTexDetailControl : %d, %d, %f", lod_bias, detail_scale, detail_max);
+            WriteTrace(TraceGlitch, TraceWarning, "gfxTexDetailControl: %d, %d, %f", lod_bias, detail_scale, detail_max);
     }
     lambda = detail_max;
     if (lambda > 1.0f)
@@ -751,7 +752,7 @@ void gfxTexClampMode(gfxChipID_t tmu, gfxTextureClampMode_t s_clampmode, gfxText
             wrap_s0 = GL_MIRRORED_REPEAT;
             break;
         default:
-            WriteTrace(TraceGlitch, TraceWarning, "gfxTexClampMode : unknown s_clampmode : %x", s_clampmode);
+            WriteTrace(TraceGlitch, TraceWarning, "gfxTexClampMode: Unknown s_clampmode : %x", s_clampmode);
         }
         switch (t_clampmode)
         {
@@ -765,7 +766,7 @@ void gfxTexClampMode(gfxChipID_t tmu, gfxTextureClampMode_t s_clampmode, gfxText
             wrap_t0 = GL_MIRRORED_REPEAT;
             break;
         default:
-            WriteTrace(TraceGlitch, TraceWarning, "gfxTexClampMode : unknown t_clampmode : %x", t_clampmode);
+            WriteTrace(TraceGlitch, TraceWarning, "gfxTexClampMode: Unknown t_clampmode : %x", t_clampmode);
         }
         glActiveTexture(GL_TEXTURE0);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap_s0);
@@ -785,7 +786,7 @@ void gfxTexClampMode(gfxChipID_t tmu, gfxTextureClampMode_t s_clampmode, gfxText
             wrap_s1 = GL_MIRRORED_REPEAT;
             break;
         default:
-            WriteTrace(TraceGlitch, TraceWarning, "gfxTexClampMode : unknown s_clampmode : %x", s_clampmode);
+            WriteTrace(TraceGlitch, TraceWarning, "gfxTexClampMode: Unknown s_clampmode : %x", s_clampmode);
         }
         switch (t_clampmode)
         {
@@ -799,7 +800,7 @@ void gfxTexClampMode(gfxChipID_t tmu, gfxTextureClampMode_t s_clampmode, gfxText
             wrap_t1 = GL_MIRRORED_REPEAT;
             break;
         default:
-            WriteTrace(TraceGlitch, TraceWarning, "gfxTexClampMode : unknown t_clampmode : %x", t_clampmode);
+            WriteTrace(TraceGlitch, TraceWarning, "gfxTexClampMode: Unknown t_clampmode : %x", t_clampmode);
         }
         glActiveTexture(GL_TEXTURE1);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap_s1);

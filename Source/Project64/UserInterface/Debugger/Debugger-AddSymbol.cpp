@@ -16,7 +16,7 @@ LRESULT CAddSymbolDlg::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*l
     for (int i = 0;; i++)
     {
         const char* typeName = CSymbolTable::m_SymbolTypes[i].name;
-        if (typeName == NULL)
+        if (typeName == nullptr)
         {
             break;
         }
@@ -72,14 +72,8 @@ LRESULT CAddSymbolDlg::OnClicked(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*
             MessageBox(L"Name and/or description required", L"Error", MB_OK);
             return 0;
         }
-
-        wchar_t name[128];
-        wchar_t description[256];
-
-        m_NameEdit.GetWindowText(name, nameLen + 1);
-        m_DescriptionEdit.GetWindowText(description, descLen + 1);
         
-        m_Debugger->SymbolTable()->AddSymbol(type, address, stdstr().FromUTF16(name).c_str(), stdstr().FromUTF16(description).c_str());
+        m_Debugger->SymbolTable()->AddSymbol(type, address, GetCWindowText(m_NameEdit).c_str(), GetCWindowText(m_DescriptionEdit).c_str());
         m_Debugger->SymbolTable()->Save();
 
         m_Debugger->Debug_RefreshSymbolsWindow();

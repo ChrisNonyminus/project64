@@ -115,13 +115,13 @@ public:
 
     enum ArmCompareType
     {
-        ArmBranch_Equal = 0,               //Code = 0000
-        ArmBranch_Notequal = 1,            //Code = 0001
-        ArmBranch_GreaterThanOrEqual = 10, //Code = 1010
-        ArmBranch_LessThan = 11,           //Code = 1011
-        ArmBranch_GreaterThan = 12,        //Code = 1100
-        ArmBranch_LessThanOrEqual = 13,    //Code = 1101
-        ArmBranch_Always = 14,             //Code = 1110
+        ArmBranch_Equal = 0,               // Code = 0000
+        ArmBranch_Notequal = 1,            // Code = 0001
+        ArmBranch_GreaterThanOrEqual = 10, // Code = 1010
+        ArmBranch_LessThan = 11,           // Code = 1011
+        ArmBranch_GreaterThan = 12,        // Code = 1100
+        ArmBranch_LessThanOrEqual = 13,    // Code = 1101
+        ArmBranch_Always = 14,             // Code = 1110
     };
 
     enum ArmItMask
@@ -144,7 +144,7 @@ public:
     };
 
 protected:
-    //Logging Functions
+    // Logging functions
     static void WriteArmComment(const char * Comment);
     static void WriteArmLabel(const char * Label);
 
@@ -164,15 +164,15 @@ protected:
     static void IfBlock(ArmItMask mask, ArmCompareType CompareType);
     static void LoadArmRegPointerByteToArmReg(ArmReg DestReg, ArmReg RegPointer, uint16_t offset);
     static void LoadArmRegPointerByteToArmReg(ArmReg DestReg, ArmReg RegPointer, ArmReg RegPointer2, uint8_t shift);
-    static void LoadArmRegPointerToArmReg(ArmReg DestReg, ArmReg RegPointer, uint8_t Offset, const char * comment = NULL);
+    static void LoadArmRegPointerToArmReg(ArmReg DestReg, ArmReg RegPointer, uint8_t Offset, const char * comment = nullptr);
     static void LoadArmRegPointerToArmReg(ArmReg DestReg, ArmReg RegPointer, ArmReg RegPointer2, uint8_t shift);
     static void LoadArmRegPointerToFloatReg(ArmReg RegPointer, ArmFpuSingle Reg, uint8_t Offset);
     static void LoadFloatingPointControlReg(ArmReg DestReg);
     static void MoveArmRegArmReg(ArmReg DestReg, ArmReg SourceReg);
     static void MoveArmRegToVariable(ArmReg Reg, void * Variable, const char * VariableName);
-    static void MoveConstToArmReg(ArmReg DestReg, uint16_t Const, const char * comment = NULL);
-    static void MoveConstToArmRegTop(ArmReg DestReg, uint16_t Const, const char * comment = NULL);
-    static void MoveConstToArmReg(ArmReg DestReg, uint32_t Const, const char * comment = NULL);
+    static void MoveConstToArmReg(ArmReg DestReg, uint16_t Const, const char * comment = nullptr);
+    static void MoveConstToArmRegTop(ArmReg DestReg, uint16_t Const, const char * comment = nullptr);
+    static void MoveConstToArmReg(ArmReg DestReg, uint32_t Const, const char * comment = nullptr);
     static void MoveConstToVariable(uint32_t Const, void * Variable, const char * VariableName);
     static void MoveFloatRegToVariable(ArmFpuSingle reg, void * Variable, const char * VariableName);
     static void MoveVariableToArmReg(void * Variable, const char * VariableName, ArmReg reg);
@@ -187,7 +187,7 @@ protected:
     static void ShiftRightUnsignImmed(ArmReg DestReg, ArmReg SourceReg, uint32_t shift);
     static void ShiftLeftImmed(ArmReg DestReg, ArmReg SourceReg, uint32_t shift);
     static void SignExtendByte(ArmReg Reg);
-    static void StoreArmRegToArmRegPointer(ArmReg DestReg, ArmReg RegPointer, uint8_t Offset, const char * comment = NULL);
+    static void StoreArmRegToArmRegPointer(ArmReg DestReg, ArmReg RegPointer, uint8_t Offset, const char * comment = nullptr);
     static void StoreArmRegToArmRegPointer(ArmReg DestReg, ArmReg RegPointer, ArmReg RegPointer2, uint8_t shift);
     static void StoreFloatingPointControlReg(ArmReg SourceReg);
     static void StoreFloatRegToArmRegPointer(ArmFpuSingle Reg, ArmReg RegPointer, uint8_t Offset);

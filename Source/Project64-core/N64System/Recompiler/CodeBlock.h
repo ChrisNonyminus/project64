@@ -32,9 +32,9 @@ public:
     uint32_t NextTest();
 
 private:
-    CCodeBlock();                             // Disable default constructor
-    CCodeBlock(const CCodeBlock&);            // Disable copy constructor
-    CCodeBlock& operator=(const CCodeBlock&); // Disable assignment
+    CCodeBlock();
+    CCodeBlock(const CCodeBlock&);
+    CCodeBlock& operator=(const CCodeBlock&);
 
     bool AnalyseBlock();
 
@@ -46,10 +46,10 @@ private:
         bool & EndBlock, bool & PermLoop);
 
     uint32_t           m_VAddrEnter;
-    uint32_t           m_VAddrFirst;       // the address of the first opcode in the block
-    uint32_t           m_VAddrLast;        // the address of the first opcode in the block
-    uint8_t*           m_CompiledLocation; // What address is this compiled at
-    uint8_t*           m_CompiledLocationEnd; // What address is this compiled at
+    uint32_t           m_VAddrFirst;       // The address of the first opcode in the block
+    uint32_t           m_VAddrLast;        // The address of the first opcode in the block
+    uint8_t*           m_CompiledLocation; // What address is this compiled at?
+    uint8_t*           m_CompiledLocationEnd; // What address is this compiled at?
 
     typedef std::map<uint32_t, CCodeSection *> SectionMap;
     typedef std::list<CCodeSection *>      SectionList;

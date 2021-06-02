@@ -1,13 +1,13 @@
-﻿// ============ RDB for PJ64 v2.4. GoodN64 v327 =====================================
-// PJ64 v2.4 Official RDB
+﻿// ============ RDB for PJ64 v3.0. GoodN64 v327 =====================================
+// PJ64 v3.0 Official RDB
 // Not for use with previous versions of PJ64
 //---- START OF RDB FILE HEADER ---------------------------------------------------------
 
 [Meta]
 Author=Project64 Team
-Date=2020/06/21
+Date=2021/05/12
 Homepage=www.pj64-emu.com
-Version=2.4.0
+Version=3.0.0
 
 [Microcode Identifiers]
 //38221D7F=0 //SD Hiryuu no Ken Densetsu (J), near start (Smiff)
@@ -3702,7 +3702,6 @@ Status=Compatible
 32bit=Yes
 Counter Factor=1
 RDRAM Size=4
-RPC Key=mp1-u
 
 [82380387-DFC744D9-C:50]
 Good Name=Mario Party 2 (E) (M5)
@@ -3727,7 +3726,6 @@ Status=Compatible
 32bit=Yes
 Counter Factor=1
 RDRAM Size=4
-RPC Key=mp2-u
 
 [C5674160-0F5F453C-C:50]
 Good Name=Mario Party 3 (E) (M4)
@@ -3754,7 +3752,6 @@ Status=Compatible
 32bit=Yes
 Counter Factor=1
 RDRAM Size=4
-RPC Key=mp3-u
 Save Type=16kbit Eeprom
 
 [3BA7CDDC-464E52A0-C:4A]
@@ -4114,6 +4111,11 @@ Status=Compatible
 32bit=Yes
 Counter Factor=1
 Culling=1
+SMM-Cache=0
+SMM-FUNC=0
+SMM-PI DMA=0
+SMM-Protect=1
+SMM-TLB=0
 
 //================  N  ================
 [6D452016-713C09EE-C:50]
@@ -4764,7 +4766,13 @@ Internal Name=Pilot Wings64
 Status=Compatible
 32bit=Yes
 Counter Factor=3
+Linking=Off
 RDRAM Size=4
+SMM-Cache=0
+SMM-FUNC=0
+SMM-PI DMA=0
+SMM-TLB=0
+Use TLB=No
 
 [09CC4801-E42EE491-C:4A]
 Good Name=Pilotwings 64 (J)
@@ -4772,7 +4780,13 @@ Internal Name=Pilot Wings64
 Status=Compatible
 32bit=Yes
 Counter Factor=3
+Linking=Off
 RDRAM Size=4
+SMM-Cache=0
+SMM-FUNC=0
+SMM-PI DMA=0
+SMM-TLB=0
+Use TLB=No
 
 [C851961C-78FCAAFA-C:45]
 Good Name=Pilotwings 64 (U)
@@ -4781,7 +4795,13 @@ Status=Compatible
 32bit=Yes
 Counter Factor=3
 Culling=1
+Linking=Off
 RDRAM Size=4
+SMM-Cache=0
+SMM-FUNC=0
+SMM-PI DMA=0
+SMM-TLB=0
+Use TLB=No
 
 [4A1CD153-D830AEF8-C:50]
 Good Name=Pokemon Puzzle League (E)
@@ -5871,7 +5891,14 @@ Status=Compatible
 32bit=Yes
 
 [BFE23884-EF48EAAF-C:45]
-Good Name=Space Station Silicon Valley (U)
+Good Name=Space Station Silicon Valley (U) (V1.0)
+Internal Name=Silicon Valley
+Status=Compatible
+32bit=Yes
+Culling=1
+
+[FC70E272-08FFE7AA-C:45]
+Good Name=Space Station Silicon Valley (U) (V1.1)
 Internal Name=Silicon Valley
 Status=Compatible
 32bit=Yes
@@ -10113,6 +10140,10 @@ Good Name=Super Slide 64 (V1.0.1)
 Status=Compatible
 Counter Factor=1
 Linking=Off
+Fast SP=No
+SMM-FUNC=0
+SMM-PI DMA=0
+SMM-TLB=0
 Unaligned DMA=1
 
 [2C8F381A-181F60B7-C:45]
@@ -10958,3 +10989,130 @@ Status=Compatible
 Counter Factor=1
 Unaligned DMA=1
 
+[ED54E3F1-BD40CC5F-C:45]
+Good Name=Super Spooky 64 V1.1
+Status=Compatible
+Counter Factor=1
+Unaligned DMA=1
+
+[5EAEDC34-69ED342C-C:45]
+Good Name=SM64 Mega Microlevels (Final)
+Status=Compatible
+Counter Factor=1
+Unaligned DMA=1
+
+[219F8B4C-5E68ED5C-C:45]
+Good Name=SM64 Sapphire (N64 Compatible, 2020)
+Status=Compatible
+Counter Factor=1
+Unaligned DMA=1
+
+[17890560-F45C0B8E-C:45]
+Good Name=SM64 The Parallel Universes
+Status=Compatible
+Counter Factor=1
+Unaligned DMA=1
+
+[60CA1245-E42915DC-C:45]
+Good Name=Mario 64 The Scepter of Soul 1.1
+Status=Compatible
+Counter Factor=1
+Unaligned DMA=1
+
+[F0DA820E-4117682D-C:45]
+Good Name=SM64 Usamune ROM v1.91u
+Status=Compatible
+CPU Type=Interpreter
+Counter Factor=1
+Unaligned DMA=1
+
+[90B7FA7E-660441FA-C:4A]
+Good Name=SM64 Usamune ROM v1.91j
+Status=Compatible
+CPU Type=Interpreter
+Counter Factor=1
+Unaligned DMA=1
+
+[20C28D23-12FDC895-C:45]
+Good Name=Super Mario The Crystal Stars V2
+Status=Compatible
+Counter Factor=1
+Unaligned DMA=1
+
+[68ED612F-6FA31A8E-C:45]
+Good Name=New Soup 64
+Status=Compatible
+Counter Factor=1
+Unaligned DMA=1
+
+[9E12F8D0-E71881F2-C:45]
+Good Name=Mario Slam! 64
+Status=Compatible
+Counter Factor=1
+Unaligned DMA=1
+
+[FAD0FC87-AFC93349-C:45]
+Good Name=Super Oofio 64 Directors Cut
+Status=Compatible
+Counter Factor=1
+Unaligned DMA=1
+
+[FAD3F1C7-2E6C4A40-C:45]
+Good Name=Super Oofio 64 Directors Cut (No Hyperspeed)
+Status=Compatible
+Counter Factor=1
+Unaligned DMA=1
+
+[D63A3C82-CB3EBA86-C:45]
+Good Name=SM64 Chaos Edition V3.0
+Status=Compatible
+Counter Factor=1
+Unaligned DMA=1
+
+[091D192A-3BEA78AC-C:45]
+Good Name=Star Revenge 0 - Galaxy of Origins v1.0.3
+Status=Compatible
+Counter Factor=1
+Unaligned DMA=1
+
+[140E8581-C786EAA0-C:45]
+Good Name=Mario Can't Remember v1.1
+Status=Compatible
+Counter Factor=1
+Unaligned DMA=1
+
+[E58E2E59-724EDE64-C:45]
+Good Name=SM64 with Wavedash and Smash Bros. Melee Physics
+Status=Compatible
+Counter Factor=1
+Unaligned DMA=1
+
+[22647AEB-47678FB7-C:45]
+Good Name=Super Luigi 64 - Definitive Edition
+Status=Compatible
+Counter Factor=1
+Unaligned DMA=1
+
+[22647FEB-452216FA-C:45]
+Good Name=Super Luigi 64 - Definitive Edition
+Status=Compatible
+Counter Factor=1
+Unaligned DMA=1
+
+[2264006B-5A61C25E-C:45]
+Good Name=Super Luigi 64 - Definitive Edition
+Status=Compatible
+Counter Factor=1
+Unaligned DMA=1
+
+[9D2B9C7F-6D90A8EF-C:45]
+Good Name=Smash Remix 0.9.7
+Internal Name=SmashRemix
+Status=Compatible
+Counter Factor=1
+Culling=1
+SMM-Cache=0
+SMM-FUNC=0
+SMM-TLB=0
+RDRAM Size=8
+ViRefresh=2200

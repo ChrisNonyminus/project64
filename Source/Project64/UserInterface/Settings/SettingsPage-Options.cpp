@@ -10,10 +10,11 @@ m_SettingsConfig(SettingsConfig)
         return;
     }
 
-    //Set the text for all gui Items
+    // Set the text for all GUI items
     SetDlgItemText(IDC_AUTOSLEEP, wGS(OPTION_AUTO_SLEEP).c_str());
     SetDlgItemText(IDC_LOAD_FULLSCREEN, wGS(OPTION_AUTO_FULLSCREEN).c_str());
     SetDlgItemText(IDC_SCREEN_SAVER, wGS(OPTION_DISABLE_SS).c_str());
+    SetDlgItemText(IDC_DISCORD_RPC, wGS(OPTION_DISCORD_RPC).c_str());
     SetDlgItemText(IDC_BASIC_MODE, wGS(OPTION_BASIC_MODE).c_str());
     SetDlgItemText(IDC_MAXROMS_TXT, wGS(RB_MAX_ROMS).c_str());
     SetDlgItemText(IDC_ROMSEL_TEXT2, wGS(RB_ROMS).c_str());
@@ -21,16 +22,16 @@ m_SettingsConfig(SettingsConfig)
     SetDlgItemText(IDC_ROMSEL_TEXT4, wGS(RB_DIRS).c_str());
     SetDlgItemText(IDC_IPLDIR_TXT, wGS(OPTION_IPL_ROM_PATH).c_str());
 
-    AddModCheckBox(GetDlgItem(IDC_AUTOSLEEP), Setting_AutoSleep);
-    AddModCheckBox(GetDlgItem(IDC_LOAD_FULLSCREEN), Setting_AutoFullscreen);
-    AddModCheckBox(GetDlgItem(IDC_SCREEN_SAVER), Setting_DisableScrSaver);
-	AddModCheckBox(GetDlgItem(IDC_DISCORD_RPC), Setting_EnableDiscordRPC);
+    AddModCheckBox(GetDlgItem(IDC_AUTOSLEEP), (SettingID)Setting_AutoSleep);
+    AddModCheckBox(GetDlgItem(IDC_LOAD_FULLSCREEN), (SettingID)Setting_AutoFullscreen);
+    AddModCheckBox(GetDlgItem(IDC_SCREEN_SAVER), (SettingID)Setting_DisableScrSaver);
+	AddModCheckBox(GetDlgItem(IDC_DISCORD_RPC), (SettingID)Setting_EnableDiscordRPC);
     AddModCheckBox(GetDlgItem(IDC_BASIC_MODE), UserInterface_BasicMode);
 
-    CModifiedEditBox * TxtBox = AddModTextBox(GetDlgItem(IDC_REMEMBER), File_RecentGameFileCount, false);
+    CModifiedEditBox * TxtBox = AddModTextBox(GetDlgItem(IDC_REMEMBER), (SettingID)File_RecentGameFileCount, false);
     TxtBox->SetTextField(GetDlgItem(IDC_MAXROMS_TXT));
 
-    TxtBox = AddModTextBox(GetDlgItem(IDC_REMEMBERDIR), Directory_RecentGameDirCount, false);
+    TxtBox = AddModTextBox(GetDlgItem(IDC_REMEMBERDIR), (SettingID)Directory_RecentGameDirCount, false);
     TxtBox->SetTextField(GetDlgItem(IDC_MAXROMDIR_TXT));
 
     UpdatePageSettings();

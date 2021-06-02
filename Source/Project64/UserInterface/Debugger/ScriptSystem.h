@@ -38,7 +38,7 @@ private:
     vector<HOOKENTRY> m_Hooks;
     vector<INSTANCE_ENTRY> m_RunningInstances;
 
-    vector<char*> m_LogData;
+    vector<std::string> m_LogData;
 
     CScriptHook* m_HookCPUExec;
     CScriptHook* m_HookCPURead;
@@ -49,7 +49,7 @@ private:
 
     CriticalSection m_CS;
 
-    void RegisterHook(const char* hookId, CScriptHook* cbList); // associate string id with callback list
+    void RegisterHook(const char* hookId, CScriptHook* cbList); // Associate string ID with callback list
     void UnregisterHooks();
 
     HDC m_ScreenDC;
@@ -69,16 +69,9 @@ public:
         return m_ScreenDC;
     }
 
-    inline vector<char*>* LogData()
-    {
-        return &m_LogData;
-    }
-
     inline void LogText(const char* text)
     {
-        char* newStr = (char*)malloc(strlen(text));
-        strcpy(newStr, text);
-        m_LogData.push_back(newStr);
+        m_LogData.push_back(text);
         m_Debugger->Debug_RefreshScriptsWindow();
     }
 

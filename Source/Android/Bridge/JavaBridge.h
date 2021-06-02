@@ -11,18 +11,18 @@ class JavaBridge :
 public:
     JavaBridge(JavaVM* vm);
 
-    //Render window functions
+    // Render window functions
     void GfxThreadInit();
     void GfxThreadDone();
     void SwapWindow();
 
-    //Rom List
+    // ROM list
     void RomListReset(void);
     void RomListAddItem(const char * FullFileName, const char * FileName, const char * GoodName, uint32_t TextColor);
     void RomListLoaded(void);
     void RecentRomsUpdated(void);
 
-    //Notification
+    // Notification
     void DisplayError(const char * Message);
     void DisplayMessage(const char * Message, int DisplayTime);
     void DisplayMessage2(const char * Message);
@@ -30,9 +30,9 @@ public:
     void EmulationStopped(void);
 
 private:
-    JavaBridge(void);		                    // Disable default constructor
-    JavaBridge(const JavaBridge&);				// Disable copy constructor
-    JavaBridge& operator=(const JavaBridge&);	// Disable assignment
+    JavaBridge(void);
+    JavaBridge(const JavaBridge&);
+    JavaBridge& operator=(const JavaBridge&);
 
     JavaVM* m_vm;
     jclass m_GalleryActivityClass;

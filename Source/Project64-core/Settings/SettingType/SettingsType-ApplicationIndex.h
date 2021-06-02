@@ -12,17 +12,17 @@ public:
 
     virtual bool IndexBasedSetting(void) const { return true; }
 
-    //return the values
+    // Return the values
     virtual bool Load(uint32_t Index, bool & Value) const;
     virtual bool Load(uint32_t Index, uint32_t & Value) const;
     virtual bool Load(uint32_t Index, std::string & Value) const;
 
-    //return the default values
+    // Return the default values
     virtual void LoadDefault(uint32_t Index, bool & Value) const;
     virtual void LoadDefault(uint32_t Index, uint32_t & Value) const;
     virtual void LoadDefault(uint32_t Index, std::string & Value) const;
 
-    //Update the settings
+    // Update the settings
     virtual void Save(uint32_t Index, bool Value);
     virtual void Save(uint32_t Index, uint32_t Value);
     virtual void Save(uint32_t Index, const std::string & Value);
@@ -32,7 +32,7 @@ public:
     virtual void Delete(uint32_t Index);
 
 private:
-    CSettingTypeApplicationIndex(void);                                             // Disable default constructor
-    CSettingTypeApplicationIndex(const CSettingTypeApplicationIndex&);              // Disable copy constructor
-    CSettingTypeApplicationIndex& operator=(const CSettingTypeApplicationIndex&);   // Disable assignment
+    CSettingTypeApplicationIndex(void);
+    CSettingTypeApplicationIndex(const CSettingTypeApplicationIndex&);
+    CSettingTypeApplicationIndex& operator=(const CSettingTypeApplicationIndex&);
 };

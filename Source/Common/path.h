@@ -1,10 +1,10 @@
 #pragma once
 #include <string>
-#include "stdtypes.h"
+#include <stdint.h>
 
 class CPath
 {
-    //Enums
+    // Enums
 public:
 
     enum DIR_CURRENT_DIRECTORY { CURRENT_DIRECTORY = 1 };
@@ -15,12 +15,12 @@ public:
 
     enum 
     {
-        FIND_ATTRIBUTE_ALLFILES = 0xFFFF,  // Search Include all files
+        FIND_ATTRIBUTE_ALLFILES = 0xFFFF,  // Search include all files
         FIND_ATTRIBUTE_FILES    = 0x0000,  // File can be read or written to without restriction
         FIND_ATTRIBUTE_SUBDIR   = 0x0010,  // Subdirectories
     };    
 
-    //Attributes
+    // Attributes
 private:
     std::string	m_strPath;
 #ifdef _WIN32
@@ -33,9 +33,9 @@ private:
     uint32_t m_dwFindFileAttributes;
 
 public:
-    //Methods
+    // Methods
 
-    //Construction / destruction
+    // Construction / destruction
     CPath();
     CPath(const CPath& rPath);
     CPath(const char * lpszPath);
@@ -44,14 +44,14 @@ public:
     CPath(const std::string& strPath, const char * NameExten);
     CPath(const std::string& strPath, const std::string& NameExten);
 
-    CPath(DIR_CURRENT_DIRECTORY sdt, const char * NameExten = NULL);
+    CPath(DIR_CURRENT_DIRECTORY sdt, const char * NameExten = nullptr);
 #ifdef _WIN32
-    CPath(DIR_MODULE_DIRECTORY sdt, const char * NameExten = NULL);
+    CPath(DIR_MODULE_DIRECTORY sdt, const char * NameExten = nullptr);
     CPath(DIR_MODULE_FILE sdt);
 #endif
     virtual ~CPath();
 
-    //Operators
+    // Operators
     CPath& operator  = (const CPath& rPath);
     CPath& operator  = (const char * lpszPath);
     CPath& operator  = (const std::string & strPath);
@@ -60,7 +60,7 @@ public:
     operator const char *() const;
     operator const std::string &() { return m_strPath; }
 
-    //Get path components
+    // Get path components
 #ifdef _WIN32
     void   GetDriveDirectory(std::string & rDriveDirectory) const;
     std::string GetDriveDirectory(void) const;
@@ -77,15 +77,15 @@ public:
     std::string GetLastDirectory(void) const;
     void GetFullyQualified(std::string& rFullyQualified) const;
 #ifdef _WIN32
-	void GetComponents(std::string* pDrive = NULL, std::string* pDirectory = NULL, std::string* pName = NULL, std::string* pExtension = NULL) const;
+	void GetComponents(std::string* pDrive = nullptr, std::string* pDirectory = nullptr, std::string* pName = nullptr, std::string* pExtension = nullptr) const;
 #else
-    void GetComponents(std::string* pDirectory = NULL, std::string* pName = NULL, std::string* pExtension = NULL) const;
+    void GetComponents(std::string* pDirectory = nullptr, std::string* pName = nullptr, std::string* pExtension = nullptr) const;
 #endif
-    //Get other state
+    // Get other state
     bool IsEmpty() const { return m_strPath.empty(); }
     bool IsRelative() const;
 
-    //Set path components
+    // Set path components
 #ifdef _WIN32
     void SetDrive(char chDrive);
     void SetDriveDirectory(const char * lpszDriveDirectory);
@@ -97,13 +97,13 @@ public:
     void SetExtension(const char * lpszExtension);
     void SetExtension(int iExtension);
     void AppendDirectory(const char * lpszSubDirectory);
-    void UpDirectory(std::string* pLastDirectory = NULL);
+    void UpDirectory(std::string* pLastDirectory = nullptr);
 #ifdef _WIN32
 	void SetComponents(const char * lpszDrive, const char * lpszDirectory, const char * lpszName, const char * lpszExtension);
 #else
     void SetComponents(const char * lpszDirectory, const char * lpszName, const char * lpszExtension);
 #endif
-    //Set whole path
+    // Set whole path
     void Empty()		{ m_strPath.erase(); }
     void CurrentDirectory();
 #ifdef _WIN32
@@ -113,28 +113,28 @@ public:
     void ModuleDirectory(void * hInstance);
 #endif
 
-    //Directory information
+    // Directory information
     bool IsDirectory() const;
     bool DirectoryExists() const;
 
-    //File Information
+    // File information
     bool IsFile() const { return !IsDirectory(); }
     bool Exists() const;
 #ifdef _WIN32
     bool SelectFile(void * hwndOwner, const char * InitialDir, const char * FileFilter, bool FileMustExist);
 #endif
 
-    //Directory operations
+    // Directory operations
     bool DirectoryCreate(bool bCreateIntermediates = true);
     bool ChangeDirectory();
 	void NormalizePath(CPath BaseDir);
 
-    //File operations
+    // File operations
     bool Delete(bool bEvenIfReadOnly = true) const;
     bool CopyTo(const char * lpcszTargetFile, bool bOverwrite = true);
     bool MoveTo(const char * lpcszTargetFile, bool bOverwrite = true);
 
-    //Finders
+    // Finders
     bool FindFirst(uint32_t dwAttributes = 0);
     bool FindNext();
 
@@ -145,7 +145,7 @@ public:
 #endif
 
 private:
-    //Setup & Cleanup
+    // Setup and cleanup
     inline void Init();
     inline void Exit();
 

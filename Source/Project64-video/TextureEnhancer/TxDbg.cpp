@@ -1,9 +1,10 @@
 // Project64 - A Nintendo 64 emulator
-// http://www.pj64-emu.com/
+// https://www.pj64-emu.com/
 // Copyright(C) 2001-2021 Project64
 // Copyright(C) 2007 Hiroshi Morii
 // Copyright(C) 2003 Rice1964
 // GNU/GPLv2 licensed: https://gnu.org/licenses/gpl-2.0.html
+
 #define DBG_LEVEL 80
 
 #include "TxDbg.h"
@@ -17,7 +18,7 @@
 TxDbg::TxDbg()
 {
     const char * log_dir = g_settings->log_dir();
-    if (log_dir != NULL && log_dir[0] != '\0')
+    if (log_dir != nullptr && log_dir[0] != '\0')
     {
         _level = DBG_LEVEL;
 
